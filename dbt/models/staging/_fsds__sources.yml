@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: fsds
+    description: >
+      SEC Financial Statement Data Sets, typed and deduplicated by the Spark job
+      (src/filinglens/spark/fsds_to_iceberg.py) into Iceberg tables (local Hadoop catalog).
+      Read through Iceberg metadata, so only the current snapshot is visible.
+    meta:
+      external_location: "iceberg_scan('../data/warehouse/fsds/{name}')"
+    tables:
+      - name: sub
+        description: One row per filing (submission). Key adsh.
+      - name: num
+        description: One row per reported number. Key adsh, tag, version, ddate, qtrs, uom, segments, coreg.
+      - name: tag
+        description: One row per XBRL tag and taxonomy version.
+      - name: pre
+        description: How each number was presented in the filing's statements. Key adsh, report, line.

@@ -78,6 +78,22 @@ Notes:
 - Dedupe keeps the row from the newest quarter per natural key. `tag` repeats standard taxonomy tags every quarter, which is where most duplicates come from.
 - The first run failed with "No space left on device" while Spark spilled shuffle data to its default `/tmp`. Spill now goes to `data/spark-tmp` (`--local-dir`).
 
+## Data quality: dbt staging tests (DuckDB)
+
+- Commands (2026-11-16, from `dbt/`): `uv run dbt run`, then `uv run dbt test --select <model>` one model at a time.
+- DuckDB reads the Iceberg tables through `iceberg_scan` (current snapshot only) and returned the same row counts as Spark for all four tables.
+- 4 staging views; 17 tests: 0 errors, 14 passed, 3 warnings (warnings are known data issues, reported by count):
+
+| Check | Result |
+|---|---|
+| `sub`: blank fiscal_year | 10,773 filings (warn) |
+| `num`: duration_quarters outside 0–4 | 25,077 rows (warn) |
+| `num`: value is null | 4,891,874 rows (warn) |
+| Unique keys: `sub` accession_number, `tag` (tag, version): exact; `pre` and `num`: by 64-bit key hash | pass |
+| Every `num` and `pre` row belongs to a `sub` filing | pass |
+
+- Resource guards (after the first `dbt build` filled the disk with DuckDB spill): `max_temp_directory_size` 40GB, `memory_limit` 6GB, DuckDB threads 8, dbt threads 2.
+
 ## Databricks Free Edition rerun
 
 [T15]

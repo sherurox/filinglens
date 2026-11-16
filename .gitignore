@@ -28,3 +28,9 @@ Thumbs.db
 spark-warehouse/
 metastore_db/
 derby.log
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/.user.yml

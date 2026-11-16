@@ -1,0 +1,17 @@
+# Committed on purpose: no secrets. DuckDB is a local file.
+# Run dbt from inside dbt/ (cd dbt && uv run dbt ...): paths below are relative to dbt/.
+filinglens:
+  target: duckdb
+  outputs:
+    duckdb:
+      type: duckdb
+      path: ../data/filinglens.duckdb
+      threads: 2  # dbt: at most 2 models/tests at once (114M-row tests are heavy)
+      extensions:
+        - iceberg
+      settings:
+        memory_limit: "6GB"  # well under WSL's 19 GB
+        threads: 8  # DuckDB worker threads per query (default would be all 24)
+        preserve_insertion_order: false  # lets large scans and aggregations use less memory
+        temp_directory: "../data/duckdb-tmp"  # spill on disk, not RAM-backed /tmp
+        max_temp_directory_size: "40GB"  # hard cap: fail with an error instead of filling D:

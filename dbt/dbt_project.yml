@@ -1,0 +1,13 @@
+name: filinglens
+version: "1.0.0"
+profile: filinglens
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  filinglens:
+    staging:
+      +materialized: view  # no copy of 114M num rows; marts (T8) are tables

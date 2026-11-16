@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: stg_fsds__submissions
+    description: One row per filing (FSDS sub).
+    columns:
+      - name: accession_number
+        description: SEC accession number (adsh), unique per filing.
+        data_tests: [unique, not_null]
+      - name: cik
+        data_tests: [not_null]
+      - name: form
+        data_tests: [not_null]
+      - name: fiscal_year
+        description: Blank in FSDS for some filings; T8 decides how to treat them.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: fiscal_period
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["FY", "Q1", "Q2", "Q3", "Q4", "H1", "H2", "M9", "T1", "T2", "T3", "CY"]
+              config:
+                severity: warn
+
+  - name: stg_fsds__numbers
+    description: One row per reported number (FSDS num).
+    data_tests:
+      - unique_key_by_hash:
+          arguments:
+            combination_of_columns:
+              [accession_number, tag, tag_version, value_date, duration_quarters, unit, segments, coregistrant]
+    columns:
+      - name: accession_number
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_fsds__submissions')
+                field: accession_number
+      - name: duration_quarters
+        description: 0 = point in time (balance sheet); 1-4 = quarters covered.
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 4
+              config:
+                severity: warn
+      - name: value
+        description: Null when SEC's value was empty or did not parse as a number (Spark try_cast). T8 checks which.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: stg_fsds__tags
+    description: One row per tag and taxonomy version (FSDS tag).
+    data_tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [tag, tag_version]
+    columns:
+      - name: tag
+        data_tests: [not_null]
+
+  - name: stg_fsds__presentations
+    description: Where each number appeared in the filing (FSDS pre).
+    data_tests:
+      - unique_key_by_hash:
+          arguments:
+            combination_of_columns: [accession_number, report_number, line_number]
+    columns:
+      - name: accession_number
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_fsds__submissions')
+                field: accession_number

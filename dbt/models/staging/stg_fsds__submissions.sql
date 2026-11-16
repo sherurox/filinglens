@@ -1,0 +1,28 @@
+-- One row per filing. Renames only: Spark already typed and deduplicated.
+select
+    adsh as accession_number,
+    cik,
+    name as company_name,
+    sic,
+    countryba as business_country,
+    stprba as business_state,
+    countryinc as incorporation_country,
+    stprinc as incorporation_state,
+    ein,
+    former as former_name,
+    afs as filer_status,
+    wksi as is_well_known_seasoned_issuer,
+    fye as fiscal_year_end_mmdd,
+    form,
+    period as period_end_date,
+    fy as fiscal_year,
+    fp as fiscal_period,
+    filed as filed_date,
+    accepted as accepted_at,
+    prevrpt as is_amended_later,
+    detail as has_detail_tagging,
+    instance as xbrl_instance,
+    nciks as cik_count,
+    aciks as additional_ciks,
+    source_quarter
+from {{ source('fsds', 'sub') }}
