@@ -1,0 +1,420 @@
+{
+  "command": "uv run python -m filinglens.spark.fsds_to_iceberg",
+  "finished_utc": "2026-11-16T07:41:55+00:00",
+  "spark_version": "4.1.4",
+  "iceberg_runtime": "org.apache.iceberg:iceberg-spark-runtime-4.1_2.13:1.12.0",
+  "catalog": "Iceberg Hadoop catalog (local filesystem)",
+  "master": "local[*]",
+  "cpu_threads": 24,
+  "driver_memory": "10g",
+  "spark_local_dir": "data/spark-tmp",
+  "quarters": 35,
+  "first_quarter": "2018q1",
+  "last_quarter": "2026q3",
+  "extract_seconds": 0.1,
+  "extracted_bytes": 19941034487,
+  "warehouse_bytes": 2825014937,
+  "total_seconds": 186.4,
+  "tables": {
+    "sub": {
+      "raw_rows": 238543,
+      "rows": 238543,
+      "duplicates_removed": 0,
+      "rows_without_fy": 10773,
+      "seconds": 10.5,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 10773,
+          "file_count": 1
+        },
+        {
+          "fy": 2004,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2005,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2006,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2007,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2008,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2010,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2011,
+          "record_count": 5,
+          "file_count": 1
+        },
+        {
+          "fy": 2012,
+          "record_count": 11,
+          "file_count": 1
+        },
+        {
+          "fy": 2013,
+          "record_count": 18,
+          "file_count": 1
+        },
+        {
+          "fy": 2014,
+          "record_count": 24,
+          "file_count": 1
+        },
+        {
+          "fy": 2015,
+          "record_count": 68,
+          "file_count": 1
+        },
+        {
+          "fy": 2016,
+          "record_count": 279,
+          "file_count": 1
+        },
+        {
+          "fy": 2017,
+          "record_count": 7005,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 24410,
+          "file_count": 1
+        },
+        {
+          "fy": 2019,
+          "record_count": 24470,
+          "file_count": 1
+        },
+        {
+          "fy": 2020,
+          "record_count": 25049,
+          "file_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 28271,
+          "file_count": 1
+        },
+        {
+          "fy": 2022,
+          "record_count": 28494,
+          "file_count": 1
+        },
+        {
+          "fy": 2023,
+          "record_count": 26739,
+          "file_count": 1
+        },
+        {
+          "fy": 2024,
+          "record_count": 25056,
+          "file_count": 1
+        },
+        {
+          "fy": 2025,
+          "record_count": 24249,
+          "file_count": 1
+        },
+        {
+          "fy": 2026,
+          "record_count": 13246,
+          "file_count": 1
+        },
+        {
+          "fy": 2027,
+          "record_count": 370,
+          "file_count": 1
+        }
+      ]
+    },
+    "tag": {
+      "raw_rows": 2968300,
+      "rows": 2732499,
+      "duplicates_removed": 235801,
+      "rows_without_fy": 0,
+      "seconds": 8.5,
+      "partitions": [
+        {
+          "file_count": 25,
+          "record_count": 2732499
+        }
+      ]
+    },
+    "num": {
+      "raw_rows": 113997016,
+      "rows": 113996783,
+      "duplicates_removed": 233,
+      "rows_without_fy": 6169841,
+      "seconds": 129.7,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 6169841,
+          "file_count": 2
+        },
+        {
+          "fy": 2004,
+          "record_count": 100,
+          "file_count": 1
+        },
+        {
+          "fy": 2005,
+          "record_count": 97,
+          "file_count": 1
+        },
+        {
+          "fy": 2006,
+          "record_count": 97,
+          "file_count": 1
+        },
+        {
+          "fy": 2007,
+          "record_count": 100,
+          "file_count": 1
+        },
+        {
+          "fy": 2008,
+          "record_count": 98,
+          "file_count": 1
+        },
+        {
+          "fy": 2010,
+          "record_count": 318,
+          "file_count": 1
+        },
+        {
+          "fy": 2011,
+          "record_count": 1056,
+          "file_count": 1
+        },
+        {
+          "fy": 2012,
+          "record_count": 2025,
+          "file_count": 1
+        },
+        {
+          "fy": 2013,
+          "record_count": 2796,
+          "file_count": 1
+        },
+        {
+          "fy": 2014,
+          "record_count": 3629,
+          "file_count": 1
+        },
+        {
+          "fy": 2015,
+          "record_count": 12902,
+          "file_count": 1
+        },
+        {
+          "fy": 2016,
+          "record_count": 76320,
+          "file_count": 1
+        },
+        {
+          "fy": 2017,
+          "record_count": 3663226,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 10354884,
+          "file_count": 3
+        },
+        {
+          "fy": 2019,
+          "record_count": 11419511,
+          "file_count": 3
+        },
+        {
+          "fy": 2020,
+          "record_count": 11120372,
+          "file_count": 3
+        },
+        {
+          "fy": 2021,
+          "record_count": 11718306,
+          "file_count": 3
+        },
+        {
+          "fy": 2022,
+          "record_count": 12406712,
+          "file_count": 3
+        },
+        {
+          "fy": 2023,
+          "record_count": 13167975,
+          "file_count": 3
+        },
+        {
+          "fy": 2024,
+          "record_count": 13121253,
+          "file_count": 3
+        },
+        {
+          "fy": 2025,
+          "record_count": 13596417,
+          "file_count": 3
+        },
+        {
+          "fy": 2026,
+          "record_count": 7038850,
+          "file_count": 2
+        },
+        {
+          "fy": 2027,
+          "record_count": 119898,
+          "file_count": 1
+        }
+      ]
+    },
+    "pre": {
+      "raw_rows": 26160268,
+      "rows": 26160268,
+      "duplicates_removed": 0,
+      "rows_without_fy": 1372861,
+      "seconds": 31.6,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 1372861,
+          "file_count": 1
+        },
+        {
+          "fy": 2004,
+          "record_count": 46,
+          "file_count": 1
+        },
+        {
+          "fy": 2005,
+          "record_count": 46,
+          "file_count": 1
+        },
+        {
+          "fy": 2006,
+          "record_count": 46,
+          "file_count": 1
+        },
+        {
+          "fy": 2007,
+          "record_count": 46,
+          "file_count": 1
+        },
+        {
+          "fy": 2008,
+          "record_count": 45,
+          "file_count": 1
+        },
+        {
+          "fy": 2010,
+          "record_count": 113,
+          "file_count": 1
+        },
+        {
+          "fy": 2011,
+          "record_count": 410,
+          "file_count": 1
+        },
+        {
+          "fy": 2012,
+          "record_count": 832,
+          "file_count": 1
+        },
+        {
+          "fy": 2013,
+          "record_count": 1171,
+          "file_count": 1
+        },
+        {
+          "fy": 2014,
+          "record_count": 1479,
+          "file_count": 1
+        },
+        {
+          "fy": 2015,
+          "record_count": 4662,
+          "file_count": 1
+        },
+        {
+          "fy": 2016,
+          "record_count": 22303,
+          "file_count": 1
+        },
+        {
+          "fy": 2017,
+          "record_count": 794737,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 2511579,
+          "file_count": 1
+        },
+        {
+          "fy": 2019,
+          "record_count": 2646184,
+          "file_count": 1
+        },
+        {
+          "fy": 2020,
+          "record_count": 2723991,
+          "file_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 3032012,
+          "file_count": 1
+        },
+        {
+          "fy": 2022,
+          "record_count": 3107577,
+          "file_count": 1
+        },
+        {
+          "fy": 2023,
+          "record_count": 2951997,
+          "file_count": 1
+        },
+        {
+          "fy": 2024,
+          "record_count": 2799296,
+          "file_count": 1
+        },
+        {
+          "fy": 2025,
+          "record_count": 2722191,
+          "file_count": 1
+        },
+        {
+          "fy": 2026,
+          "record_count": 1430545,
+          "file_count": 1
+        },
+        {
+          "fy": 2027,
+          "record_count": 36099,
+          "file_count": 1
+        }
+      ]
+    }
+  }
+}

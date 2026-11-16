@@ -23,3 +23,8 @@ data/
 .DS_Store
 Thumbs.db
 *:Zone.Identifier
+
+# Spark (local runs can create these in the working directory)
+spark-warehouse/
+metastore_db/
+derby.log
