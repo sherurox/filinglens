@@ -25,3 +25,5 @@ Who wrote what. Updated with every commit.
 | `src/filinglens/ingest/rate_limit.py` | AI-assisted, except `TokenBucket.acquire()`: **hand-written** | FL-M1 T2 | `acquire()` reviewed 2026-11-16 |
 | `tests/fakes.py` | AI-assisted | FL-M1 T2 | deferred to final Q&A |
 | `tests/test_rate_limit.py` | AI-assisted | FL-M1 T2 | deferred to final Q&A |
+| `src/filinglens/ingest/edgar_client.py` | AI-assisted | FL-M1 T3 | deferred to final Q&A |
+| `tests/test_edgar_client.py` | AI-assisted | FL-M1 T3 | deferred to final Q&A |
