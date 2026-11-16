@@ -1,0 +1,301 @@
+rank,cik,ticker,name,sic,sic_description,sector
+1,320193,AAPL,Apple Inc.,3571,Electronic Computers,manufacturing
+2,1045810,NVDA,NVIDIA CORP,3674,Semiconductors & Related Devices,manufacturing
+3,789019,MSFT,MICROSOFT CORP,7372,Services-Prepackaged Software,services
+4,1652044,GOOGL,Alphabet Inc.,7370,"Services-Computer Programming, Data Processing, Etc.",services
+5,1018724,AMZN,AMAZON COM INC,5961,Retail-Catalog & Mail-Order Houses,retail
+6,1730168,AVGO,Broadcom Inc.,3674,Semiconductors & Related Devices,manufacturing
+7,1326801,META,"Meta Platforms, Inc.",7370,"Services-Computer Programming, Data Processing, Etc.",services
+8,1318605,TSLA,"Tesla, Inc.",3711,Motor Vehicles & Passenger Car Bodies,manufacturing
+9,59478,LLY,ELI LILLY & Co,2834,Pharmaceutical Preparations,manufacturing
+10,1067983,BRK-B,BERKSHIRE HATHAWAY INC,6331,"Fire, Marine & Casualty Insurance",finance
+11,104169,WMT,Walmart Inc.,5331,Retail-Variety Stores,retail
+13,2488,AMD,ADVANCED MICRO DEVICES INC,3674,Semiconductors & Related Devices,manufacturing
+14,19617,JPM,JPMORGAN CHASE & CO,6021,National Commercial Banks,finance
+15,723125,MU,MICRON TECHNOLOGY INC,3674,Semiconductors & Related Devices,manufacturing
+16,1403161,V,VISA INC.,7389,"Services-Business Services, NEC",services
+18,200406,JNJ,JOHNSON & JOHNSON,2834,Pharmaceutical Preparations,manufacturing
+20,1141391,MA,Mastercard Inc,7389,"Services-Business Services, NEC",services
+21,1551152,ABBV,AbbVie Inc.,2834,Pharmaceutical Preparations,manufacturing
+22,909832,COST,COSTCO WHOLESALE CORP /NEW,5331,Retail-Variety Stores,retail
+23,93410,CVX,CHEVRON CORP,2911,Petroleum Refining,manufacturing
+24,21344,KO,COCA COLA CO,2080,Beverages,manufacturing
+25,1321655,PLTR,Palantir Technologies Inc.,7372,Services-Prepackaged Software,services
+26,858877,CSCO,"CISCO SYSTEMS, INC.",3576,Computer Communications Equipment,manufacturing
+27,1341439,ORCL,ORACLE CORP,7372,Services-Prepackaged Software,services
+28,80424,PG,PROCTER & GAMBLE Co,2840,"Soap, Detergents, Cleang Preparations, Perfumes, Cosmetics",manufacturing
+29,310158,MRK,"Merck & Co., Inc.",2834,Pharmaceutical Preparations,manufacturing
+30,731766,UNH,UNITEDHEALTH GROUP INC,6324,Hospital & Medical Service Plans,finance
+31,70858,BAC,BANK OF AMERICA CORP /DE/,6021,National Commercial Banks,finance
+32,354950,HD,"HOME DEPOT, INC.",5211,Retail-Lumber & Other Building Materials Dealers,retail
+33,40545,GE,GENERAL ELECTRIC CO,3600,Electronic & Other Electrical Equipment (No Computer Equip),manufacturing
+34,50863,INTC,INTEL CORP,3674,Semiconductors & Related Devices,manufacturing
+35,1413329,PM,Philip Morris International Inc.,2111,Cigarettes,manufacturing
+37,6951,AMAT,APPLIED MATERIALS INC /DE,3674,Semiconductors & Related Devices,manufacturing
+39,895421,MS,MORGAN STANLEY,6211,"Security Brokers, Dealers & Flotation Companies",finance
+40,707549,LRCX,LAM RESEARCH CORP,3559,"Special Industry Machinery, NEC",manufacturing
+42,97476,TXN,TEXAS INSTRUMENTS INC,3674,Semiconductors & Related Devices,manufacturing
+45,18230,CAT,CATERPILLAR INC,3531,Construction Machinery & Equip,manufacturing
+47,101829,RTX,RTX Corp,3724,Aircraft Engines & Engine Parts,manufacturing
+48,886982,GS,GOLDMAN SACHS GROUP INC,6211,"Security Brokers, Dealers & Flotation Companies",finance
+49,1327567,PANW,Palo Alto Networks Inc,3577,"Computer Peripheral Equipment, NEC",manufacturing
+50,1596532,ANET,"Arista Networks, Inc.",3576,Computer Communications Equipment,manufacturing
+51,97745,TMO,THERMO FISHER SCIENTIFIC INC.,3829,"Measuring & Controlling Devices, NEC",manufacturing
+52,1065280,NFLX,NETFLIX INC,7841,Services-Video Tape Rental,services
+53,72971,WFC,WELLS FARGO & COMPANY/MN,6021,National Commercial Banks,finance
+54,318154,AMGN,AMGEN INC,2836,"Biological Products, (No Diagnostic Substances)",manufacturing
+57,1707925,LIN,LINDE PLC,2810,Industrial Inorganic Chemicals,manufacturing
+58,1571996,DELL,Dell Technologies Inc.,3571,Electronic Computers,manufacturing
+60,1535527,CRWD,"CrowdStrike Holdings, Inc.",7372,Services-Prepackaged Software,services
+61,51143,IBM,INTERNATIONAL BUSINESS MACHINES CORP,3570,Computer & office Equipment,manufacturing
+63,1996810,GEV,GE Vernova Inc.,3600,Electronic & Other Electrical Equipment (No Computer Equip),manufacturing
+65,4962,AXP,AMERICAN EXPRESS CO,6199,Finance Services,finance
+66,882095,GILD,"GILEAD SCIENCES, INC.",2836,"Biological Products, (No Diagnostic Substances)",manufacturing
+67,319201,KLAC,KLA CORP,3827,Optical Instruments & Lenses,manufacturing
+68,831001,C,CITIGROUP INC,6021,National Commercial Banks,finance
+70,1744489,DIS,Walt Disney Co,7990,Services-Miscellaneous Amusement & Recreation,services
+72,820313,APH,AMPHENOL CORP /DE/,3678,Electronic Connectors,manufacturing
+73,6281,ADI,ANALOG DEVICES INC,3674,Semiconductors & Related Devices,manufacturing
+75,77476,PEP,PEPSICO INC,2080,Beverages,manufacturing
+76,732712,VZ,VERIZON COMMUNICATIONS INC,4813,Telephone Communications (No Radiotelephone),transport_utilities
+77,63908,MCD,MCDONALDS CORP,5812,Retail-Eating  Places,retail
+78,804328,QCOM,QUALCOMM INC/DE,3663,Radio & Tv Broadcasting & Communications Equipment,manufacturing
+79,2012383,BLK,"BlackRock, Inc.",6211,"Security Brokers, Dealers & Flotation Companies",finance
+80,1594805,SHOP,SHOPIFY INC.,7372,Services-Prepackaged Software,services
+81,1800,ABT,ABBOTT LABORATORIES,2834,Pharmaceutical Preparations,manufacturing
+82,315189,DE,DEERE & CO,3523,Farm Machinery & Equipment,manufacturing
+83,1283699,TMUS,"T-Mobile US, Inc.",4812,Radiotelephone Communications,transport_utilities
+84,766704,WELL,WELLTOWER INC.,6798,Real Estate Investment Trusts,finance
+85,100885,UNP,UNION PACIFIC CORP,4011,"Railroads, Line-Haul Operating",transport_utilities
+86,753308,NEE,NEXTERA ENERGY INC,4911,Electric Services,transport_utilities
+87,1108524,CRM,"Salesforce, Inc.",7372,Services-Prepackaged Software,services
+91,1163165,COP,CONOCOPHILLIPS,2911,Petroleum Refining,manufacturing
+93,78003,PFE,PFIZER INC,2834,Pharmaceutical Preparations,manufacturing
+94,313616,DHR,DANAHER CORP /DE/,3823,"Industrial Instruments For Measurement, Display, and Control",manufacturing
+95,316709,SCHW,SCHWAB CHARLES CORP,6211,"Security Brokers, Dealers & Flotation Companies",finance
+98,1035267,ISRG,INTUITIVE SURGICAL INC,3842,"Orthopedic, Prosthetic & Surgical Appliances & Supplies",manufacturing
+99,109198,TJX,TJX COMPANIES INC /DE/,5651,Retail-Family Clothing Stores,retail
+100,732717,T,AT&T INC.,4813,Telephone Communications (No Radiotelephone),transport_utilities
+101,1835632,MRVL,"Marvell Technology, Inc.",3674,Semiconductors & Related Devices,manufacturing
+102,1467373,ACN,Accenture plc,7389,"Services-Business Services, NEC",services
+103,1393818,BX,Blackstone Inc.,6282,Investment Advice,finance
+105,1001838,SCCO,SOUTHERN COPPER CORP/,1000,Metal Mining,mining_energy
+106,896159,CB,Chubb Ltd,6331,"Fire, Marine & Casualty Insurance",finance
+110,1543151,UBER,"Uber Technologies, Inc",7389,"Services-Business Services, NEC",services
+111,936468,LMT,LOCKHEED MARTIN CORP,3760,Guided Missiles & Space Vehicles & Parts,manufacturing
+112,1381197,IBKR,"Interactive Brokers Group, Inc.",6211,"Security Brokers, Dealers & Flotation Companies",finance
+113,1551182,ETN,Eaton Corp plc,3590,Misc Industrial & Commercial Machinery & Equipment,manufacturing
+115,875320,VRTX,VERTEX PHARMACEUTICALS INC / MA,2834,Pharmaceutical Preparations,manufacturing
+117,80661,PGR,PROGRESSIVE CORP/OH/,6331,"Fire, Marine & Casualty Insurance",finance
+118,64040,SPGI,S&P Global Inc.,7320,"Services-Consumer Credit Reporting, Collection Agencies",services
+119,12927,BA,BOEING CO,3721,Aircraft,manufacturing
+122,2023554,SNDK,Sandisk Corp,3572,Computer Storage Devices,manufacturing
+123,1751008,APP,AppLovin Corp,7370,"Services-Computer Programming, Data Processing, Etc.",services
+125,764180,MO,"ALTRIA GROUP, INC.",2111,Cigarettes,manufacturing
+126,1613103,MDT,Medtronic plc,3845,Electromedical & Electrotherapeutic Apparatus,manufacturing
+128,60667,LOW,LOWES COMPANIES INC,5211,Retail-Lumber & Other Building Materials Dealers,retail
+129,1045609,PLD,"Prologis, Inc.",6798,Real Estate Investment Trusts,finance
+135,829224,SBUX,STARBUCKS CORP,5810,Retail-Eating & Drinking Places,retail
+137,8670,ADP,AUTOMATIC DATA PROCESSING INC,7374,Services-Computer Processing & Data Preparation,services
+140,1075531,BKNG,Booking Holdings Inc.,4700,Transportation Services,transport_utilities
+143,1164727,NEM,NEWMONT Corp /DE/,1040,Gold and Silver Ores,mining_energy
+145,927628,COF,CAPITAL ONE FINANCIAL CORP,6021,National Commercial Banks,finance
+148,64803,CVS,CVS HEALTH Corp,5912,Retail-Drug Stores and Proprietary Stores,retail
+149,1477333,NET,"Cloudflare, Inc.",7372,Services-Prepackaged Software,services
+151,1156375,CME,CME GROUP INC.,6200,"Security & Commodity Brokers, Dealers, Exchanges & Services",finance
+152,9631,BNS,BANK OF NOVA SCOTIA,6022,State Commercial Banks,finance
+154,1048286,MAR,MARRIOTT INTERNATIONAL INC /MD/,7011,Hotels & Motels,services
+155,92122,SO,SOUTHERN CO,4911,Electric Services,transport_utilities
+156,1559720,ABNB,"Airbnb, Inc.",7340,Services-To Dwellings & Other Buildings,services
+157,895728,ENB,ENBRIDGE INC,4610,Pipe Lines (No Natural Gas),transport_utilities
+158,1101239,EQIX,EQUINIX INC,6798,Real Estate Investment Trusts,finance
+159,1690820,CVNA,CARVANA CO.,5500,Retail-Auto Dealers & Gasoline Stations,retail
+163,860730,HCA,"HCA Healthcare, Inc.",8062,"Services-General Medical & Surgical Hospitals, NEC",services
+164,1640147,SNOW,Snowflake Inc.,7372,Services-Prepackaged Software,services
+165,1373715,NOW,"ServiceNow, Inc.",7372,Services-Prepackaged Software,services
+167,1390777,BNY,Bank of New York Mellon Corp,6022,State Commercial Banks,finance
+171,1326160,DUK,Duke Energy CORP,4931,Electric & Other Services Combined,transport_utilities
+173,1571949,ICE,"Intercontinental Exchange, Inc.",6200,"Security & Commodity Brokers, Dealers, Exchanges & Services",finance
+174,1868275,CEG,Constellation Energy Corp,4911,Electric Services,transport_utilities
+177,62709,MRSH,"MARSH & MCLENNAN COMPANIES, INC.",6411,"Insurance Agents, Brokers & Service",finance
+179,277948,CSX,CSX CORP,4011,"Railroads, Line-Haul Operating",transport_utilities
+180,823768,WM,WASTE MANAGEMENT INC,4953,Refuse Systems,transport_utilities
+183,1090727,UPS,UNITED PARCEL SERVICE INC,4210,Trucking & Courier Services (No Air),transport_utilities
+185,36104,USB,US BANCORP \DE\,6021,National Commercial Banks,finance
+187,796343,ADBE,ADOBE INC.,7372,Services-Prepackaged Software,services
+190,1156039,ELV,"Elevance Health, Inc.",6324,Hospital & Medical Service Plans,finance
+192,713676,PNC,"PNC FINANCIAL SERVICES GROUP, INC.",6021,National Commercial Banks,finance
+194,813672,CDNS,CADENCE DESIGN SYSTEMS INC,7372,Services-Prepackaged Software,services
+196,896878,INTU,INTUIT INC.,7372,Services-Prepackaged Software,services
+199,1404912,KKR,KKR & Co. Inc.,6282,Investment Advice,finance
+202,1063761,SPG,SIMON PROPERTY GROUP INC.,6798,Real Estate Investment Trusts,finance
+203,883241,SNPS,SYNOPSYS INC,7372,Services-Prepackaged Software,services
+204,1053507,AMT,AMERICAN TOWER CORP /MA/,6798,Real Estate Investment Trusts,finance
+206,1166691,CMCSA,COMCAST CORP,4841,Cable & Other Pay Television Services,transport_utilities
+207,1059556,MCO,MOODYS CORP /DE/,7320,"Services-Consumer Credit Reporting, Collection Agencies",services
+208,107263,WMB,"WILLIAMS COMPANIES, INC.",4922,Natural Gas Transmission,transport_utilities
+209,831259,FCX,FREEPORT-MCMORAN INC,1000,Metal Mining,mining_energy
+212,884887,RCL,ROYAL CARIBBEAN CRUISES LTD,4400,Water Transportation,transport_utilities
+214,89800,SHW,SHERWIN WILLIAMS CO,5200,"Retail-Building Materials, Hardware, Garden Supply",retail
+217,86312,TRV,"TRAVELERS COMPANIES, INC.",6331,"Fire, Marine & Casualty Insurance",finance
+218,1585689,HLT,Hilton Worldwide Holdings Inc.,7011,Hotels & Motels,services
+219,1937926,BAM,Brookfield Asset Management Ltd.,6282,Investment Advice,finance
+220,16875,CP,CANADIAN PACIFIC KANSAS CITY LTD/CN,4011,"Railroads, Line-Haul Operating",transport_utilities
+222,1061219,EPD,ENTERPRISE PRODUCTS PARTNERS L.P.,4922,Natural Gas Transmission,transport_utilities
+223,821189,EOG,EOG RESOURCES INC,1311,Crude Petroleum & Natural Gas,mining_energy
+231,1739940,CI,Cigna Group,6324,Hospital & Medical Service Plans,finance
+233,1060391,RSG,"REPUBLIC SERVICES, INC.",4953,Refuse Systems,transport_utilities
+236,745732,ROST,"ROSS STORES, INC.",5651,Retail-Family Clothing Stores,retail
+238,87347,SLB,SLB LIMITED/NV,1389,"Oil & Gas Field Services, NEC",mining_energy
+239,1792789,DASH,"DoorDash, Inc.",7389,"Services-Business Services, NEC",services
+240,1048911,FDX,FEDEX CORP,4513,Air Courier Services,transport_utilities
+241,702165,NSC,NORFOLK SOUTHERN CORP,4011,"Railroads, Line-Haul Operating",transport_utilities
+242,1099590,MELI,MERCADOLIBRE INC,7389,"Services-Business Services, NEC",services
+244,1783879,HOOD,"Robinhood Markets, Inc.",6211,"Security Brokers, Dealers & Flotation Companies",finance
+246,898173,ORLY,O REILLY AUTOMOTIVE INC,5531,Retail-Auto & Home Supply Stores,retail
+248,27419,TGT,TARGET CORP,5331,Retail-Variety Stores,retail
+251,1858681,APO,"Apollo Global Management, Inc.",6282,Investment Advice,finance
+252,1506307,KMI,"KINDER MORGAN, INC.",4922,Natural Gas Transmission,transport_utilities
+253,354190,AJG,Arthur J. Gallagher & Co.,6411,"Insurance Agents, Brokers & Service",finance
+255,1297996,DLR,"DIGITAL REALTY TRUST, INC.",6798,Real Estate Investment Trusts,finance
+257,315293,AON,Aon plc,6411,"Insurance Agents, Brokers & Service",finance
+258,1067701,URI,"UNITED RENTALS, INC.",7359,"Services-Equipment Rental & Leasing, NEC",services
+259,4904,AEP,AMERICAN ELECTRIC POWER CO INC,4911,Electric Services,transport_utilities
+266,1276187,ET,Energy Transfer LP,4922,Natural Gas Transmission,transport_utilities
+271,1561550,DDOG,"Datadog, Inc.",7372,Services-Prepackaged Software,services
+273,899051,ALL,ALLSTATE CORP,6331,"Fire, Marine & Casualty Insurance",finance
+276,1099219,MET,METLIFE INC,6311,Life Insurance,finance
+277,1389170,TRGP,Targa Resources Corp.,4922,Natural Gas Transmission,transport_utilities
+279,815556,FAST,FASTENAL CO,5200,"Retail-Building Materials, Hardware, Garden Supply",retail
+280,3570,LNG,"Cheniere Energy, Inc.",4924,Natural Gas Distribution,transport_utilities
+281,4977,AFL,AFLAC INC,6321,Accident & Health Insurance,finance
+285,1393311,PSA,Public Storage,6798,Real Estate Investment Trusts,finance
+291,1120193,NDAQ,"NASDAQ, INC.",6200,"Security & Commodity Brokers, Dealers, Exchanges & Services",finance
+295,92230,TFC,TRUIST FINANCIAL CORP,6021,National Commercial Banks,finance
+296,715957,D,"DOMINION ENERGY, INC",4911,Electric Services,transport_utilities
+299,797468,OXY,OCCIDENTAL PETROLEUM CORP /DE/,1311,Crude Petroleum & Natural Gas,mining_energy
+301,1552000,MPLX,MPLX LP,4610,Pipe Lines (No Natural Gas),transport_utilities
+303,27904,DAL,"DELTA AIR LINES, INC.",4512,"Air Transportation, Scheduled",transport_utilities
+305,726728,O,REALTY INCOME CORP,6798,Real Estate Investment Trusts,finance
+306,1039684,OKE,ONEOK INC /NEW/,4923,Natural Gas Transmisison & Distribution,transport_utilities
+314,769397,ADSK,"Autodesk, Inc.",7372,Services-Prepackaged Software,services
+317,65984,ETR,ENTERGY CORP /DE/,4911,Electric Services,transport_utilities
+319,49071,HUM,HUMANA INC,6324,Hospital & Medical Service Plans,finance
+321,1090012,DVN,DEVON ENERGY CORP/DE,1311,Crude Petroleum & Natural Gas,mining_energy
+322,866787,AZO,AUTOZONE INC,5531,Retail-Auto & Home Supply Stores,retail
+323,1065088,EBAY,EBAY INC,7389,"Services-Business Services, NEC",services
+324,72903,XEL,XCEL ENERGY INC,4931,Electric & Other Services Combined,transport_utilities
+327,1032208,SRE,SEMPRA,4932,Gas & Other Services Combined,transport_utilities
+331,1539838,FANG,"Diamondback Energy, Inc.",1311,Crude Petroleum & Natural Gas,mining_energy
+334,1512673,XYZ,"Block, Inc.",7372,Services-Prepackaged Software,services
+337,906107,VMRK,VIVMARK RESIDENTIAL,6798,Real Estate Investment Trusts,finance
+340,1393052,VEEV,VEEVA SYSTEMS INC,7372,Services-Prepackaged Software,services
+341,35527,FITB,FIFTH THIRD BANCORP,6022,State Commercial Banks,finance
+342,1050446,MSTR,Strategy Inc,6199,Finance Services,finance
+343,1633917,PYPL,"PayPal Holdings, Inc.",7389,"Services-Business Services, NEC",services
+345,1318220,WCN,"Waste Connections, Inc.",4953,Refuse Systems,transport_utilities
+353,740260,VTR,"Ventas, Inc.",6798,Real Estate Investment Trusts,finance
+355,1109357,EXC,EXELON CORP,4931,Electric & Other Services Combined,transport_utilities
+360,1408198,MSCI,MSCI Inc.,7389,"Services-Business Services, NEC",services
+361,1604821,NTRA,"Natera, Inc.",8071,Services-Medical Laboratories,services
+363,1327811,WDAY,"Workday, Inc.",7374,Services-Computer Processing & Data Preparation,services
+365,1692819,VST,Vistra Corp.,4911,Electric Services,transport_utilities
+367,1058090,CMG,CHIPOTLE MEXICAN GRILL INC,5812,Retail-Eating  Places,retail
+370,1478242,IQV,IQVIA HOLDINGS INC.,8731,Services-Commercial Physical & Biological Research,services
+375,1047862,ED,CONSOLIDATED EDISON INC,4931,Electric & Other Services Combined,transport_utilities
+380,1041061,YUM,YUM BRANDS INC,5812,Retail-Eating  Places,retail
+381,946581,TTWO,TAKE TWO INTERACTIVE SOFTWARE INC,7372,Services-Prepackaged Software,services
+382,1335258,LYV,"Live Nation Entertainment, Inc.",7900,Services-Amusement & Recreation Services,services
+388,56873,KR,KROGER CO,5411,Retail-Grocery Stores,retail
+390,723531,PAYX,PAYCHEX INC,8700,"Services-Engineering, Accounting, Research, Management",services
+401,815097,CCL,Carnival Corp Ltd.,4400,Water Transportation,transport_utilities
+408,783325,WEC,"WEC ENERGY GROUP, INC.",4931,Electric & Other Services Combined,transport_utilities
+409,2041610,SKYD,Skydance Corp,4833,Television Broadcasting Stations,transport_utilities
+413,1650372,TEAM,Atlassian Corp,7372,Services-Prepackaged Software,services
+416,1754301,FOXA,Fox Corp,4833,Television Broadcasting Stations,transport_utilities
+418,788784,PEG,PUBLIC SERVICE ENTERPRISE GROUP INC,4931,Electric & Other Services Combined,transport_utilities
+421,916076,MLM,MARTIN MARIETTA MATERIALS INC,1400,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),mining_energy
+423,1315098,RBLX,Roblox Corp,7372,Services-Prepackaged Software,services
+426,1973266,TKO,"TKO Group Holdings, Inc.",7900,Services-Amusement & Recreation Services,services
+429,100517,UAL,"United Airlines Holdings, Inc.",4512,"Air Transportation, Scheduled",transport_utilities
+430,1396009,VMC,Vulcan Materials CO,1400,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),mining_energy
+433,878927,ODFL,"OLD DOMINION FREIGHT LINE, INC.",4213,Trucking (No Local),transport_utilities
+441,1618756,QSR,Restaurant Brands International Inc.,5812,Retail-Eating  Places,retail
+453,2007855,VG,"Venture Global, Inc.",4924,Natural Gas Distribution,transport_utilities
+455,33213,EQT,EQT Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+456,798354,FISV,FISERV INC,7389,"Services-Business Services, NEC",services
+457,1447669,TWLO,TWILIO INC,7372,Services-Prepackaged Software,services
+471,1002910,AEE,AMEREN CORP,4931,Electric & Other Services Combined,transport_utilities
+478,1324424,EXPE,"Expedia Group, Inc.",4700,Transportation Services,transport_utilities
+489,1383650,CQP,"Cheniere Energy Partners, L.P.",4924,Natural Gas Distribution,transport_utilities
+490,731802,ATO,ATMOS ENERGY CORP,4924,Natural Gas Distribution,transport_utilities
+491,29534,DG,DOLLAR GENERAL CORP,5331,Retail-Variety Stores,retail
+492,719955,WSM,WILLIAMS SONOMA INC,5700,"Retail-Home Furniture, Furnishings & Equipment Stores",retail
+493,1410636,AWK,"American Water Works Company, Inc.",4941,Water Supply,transport_utilities
+494,900075,CPRT,COPART INC,5500,Retail-Auto Dealers & Gasoline Stations,retail
+523,1403568,ULTA,"Ulta Beauty, Inc.",5990,"Retail-Retail Stores, NEC",retail
+524,1834584,CPNG,"Coupang, Inc.",5961,Retail-Catalog & Mail-Order Houses,retail
+526,45012,HAL,HALLIBURTON CO,1389,"Oil & Gas Field Services, NEC",mining_energy
+540,935703,DLTR,"DOLLAR TREE, INC.",5331,Retail-Variety Stores,retail
+544,726958,CASY,CASEYS GENERAL STORES INC,5500,Retail-Auto Dealers & Gasoline Stations,retail
+550,940944,DRI,DARDEN RESTAURANTS INC,5812,Retail-Eating  Places,retail
+607,764478,BBY,BEST BUY CO INC,5731,"Retail-Radio, Tv & Consumer Electronics Stores",retail
+610,1402057,CDW,CDW Corp,5961,Retail-Catalog & Mail-Order Houses,retail
+611,2074176,VNOM,"Viper Energy, Inc.",1311,Crude Petroleum & Natural Gas,mining_energy
+626,895126,EXE,EXPAND ENERGY Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+646,1658566,PR,Permian Resources Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+651,916365,TSCO,TRACTOR SUPPLY CO /DE/,5200,"Retail-Building Materials, Hardware, Garden Supply",retail
+684,1792580,OVV,Ovintiv Inc.,1311,Crude Petroleum & Natural Gas,mining_energy
+710,1673358,YUMC,"Yum China Holdings, Inc.",5812,Retail-Eating  Places,retail
+717,1841666,APA,APA Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+726,1579298,BURL,"Burlington Stores, Inc.",5311,Retail-Department Stores,retail
+746,1616707,W,Wayfair Inc.,5961,Retail-Catalog & Mail-Order Houses,retail
+766,215466,CDE,"Coeur Mining, Inc.",1040,Gold and Silver Ores,mining_energy
+792,1584509,ARMK,Aramark,5812,Retail-Eating  Places,retail
+795,1019849,PAG,"PENSKE AUTOMOTIVE GROUP, INC.",5500,Retail-Auto Dealers & Gasoline Stations,retail
+797,1531152,BJ,"BJ's Wholesale Club Holdings, Inc.",5331,Retail-Variety Stores,retail
+815,1177609,FIVE,"FIVE BELOW, INC",5331,Retail-Variety Stores,retail
+834,1089063,DKS,"DICK'S SPORTING GOODS, INC.",5940,Retail-Miscellaneous Shopping Goods Stores,retail
+842,1326380,GME,GameStop Corp.,5734,Retail-Computer & Computer Software Stores,retail
+859,1289460,TXRH,"Texas Roadhouse, Inc.",5812,Retail-Eating  Places,retail
+861,315852,RRC,RANGE RESOURCES CORP,1311,Crude Petroleum & Natural Gas,mining_energy
+870,1433270,AR,ANTERO RESOURCES Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+995,1573516,MUSA,Murphy USA Inc.,5500,Retail-Auto Dealers & Gasoline Stations,retail
+1005,28917,DDS,"DILLARD'S, INC.",5311,Retail-Department Stores,retail
+1030,1766502,CHWY,"Chewy, Inc.",5961,Retail-Catalog & Mail-Order Houses,retail
+1034,719413,HL,HECLA MINING CO/DE/,1400,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),mining_energy
+1079,1856437,VSXY,Victoria's Secret & Co.,5621,Retail-Women's Clothing Stores,retail
+1083,703351,EAT,"BRINKER INTERNATIONAL, INC",5812,Retail-Eating  Places,retail
+1109,1486159,CHRD,Chord Energy Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+1115,840489,FCFS,"FirstCash Holdings, Inc.",5900,Retail-Miscellaneous Retail,retail
+1124,893538,SM,SM Energy Co,1311,Crude Petroleum & Natural Gas,mining_energy
+1137,764065,CLF,CLEVELAND-CLIFFS INC.,1000,Metal Mining,mining_energy
+1144,1170010,KMX,CARMAX INC,5500,Retail-Auto Dealers & Gasoline Stations,retail
+1151,39911,GAP,GAP INC,5651,Retail-Family Clothing Stores,retail
+1165,912615,URBN,URBAN OUTFITTERS INC,5651,Retail-Family Clothing Stores,retail
+1194,1895262,NE,Noble Corp plc,1381,Drilling Oil & Gas Wells,mining_energy
+1198,1801368,MP,MP Materials Corp. / DE,1000,Metal Mining,mining_energy
+1212,1698990,MGY,Magnolia Oil & Gas Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+1219,1520006,MTDR,Matador Resources Co,1311,Crude Petroleum & Natural Gas,mining_energy
+1251,1789832,HESM,Hess Midstream LP,1311,Crude Petroleum & Natural Gas,mining_energy
+1299,1451505,RIG,Transocean Ltd.,1381,Drilling Oil & Gas Wells,mining_energy
+1309,1866175,CRGY,Crescent Energy Co,1311,Crude Petroleum & Natural Gas,mining_energy
+1334,314808,VAL,Valaris Ltd,1381,Drilling Oil & Gas Wells,mining_energy
+1397,717423,MUR,MURPHY OIL CORP,1311,Crude Petroleum & Natural Gas,mining_energy
+1398,1070412,CNX,CNX Resources Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+1518,23194,CRK,COMSTOCK RESOURCES INC,1311,Crude Petroleum & Natural Gas,mining_energy
+1534,1691303,HCC,"WARRIOR MET COAL, INC.",1220,Silver Ores,mining_energy
+1569,1609253,CRC,California Resources Corp,1311,Crude Petroleum & Natural Gas,mining_energy
+1587,1710366,CNR,"Core Natural Resources, Inc.",1220,Silver Ores,mining_energy
+1601,889900,PTEN,PATTERSON UTI ENERGY INC,1381,Drilling Oil & Gas Wells,mining_energy
+1658,46765,HP,"Helmerich & Payne, Inc.",1381,Drilling Oil & Gas Wells,mining_energy
+1678,821483,PARR,"PAR PACIFIC HOLDINGS, INC.",1311,Crude Petroleum & Natural Gas,mining_energy
+1717,73756,OII,OCEANEERING INTERNATIONAL INC,1389,"Oil & Gas Field Services, NEC",mining_energy
+1727,2064947,WBI,WaterBridge Infrastructure LLC,1389,"Oil & Gas Field Services, NEC",mining_energy
+1729,1334933,UEC,URANIUM ENERGY CORP,1090,Miscellaneous Metal Ores,mining_energy
+1761,1086600,ARLP,ALLIANCE RESOURCE PARTNERS LP,1221,Bituminous Coal & Lignite Surface Mining,mining_energy
+1763,82020,USLM,UNITED STATES LIME & MINERALS INC,1400,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),mining_energy
+1769,1955520,KNF,Knife River Corp,1400,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),mining_energy
+1817,1970622,USAR,"USA Rare Earth, Inc.",1000,Metal Mining,mining_energy
+1833,1621434,BSM,"Black Stone Minerals, L.P.",1311,Crude Petroleum & Natural Gas,mining_energy
+1874,874499,GPOR,GULFPORT ENERGY CORP,1311,Crude Petroleum & Natural Gas,mining_energy
