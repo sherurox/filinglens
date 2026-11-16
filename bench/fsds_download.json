@@ -1,0 +1,16 @@
+{
+  "command": "uv run python -m filinglens.ingest.fsds",
+  "finished_utc": "2026-11-16T07:28:12+00:00",
+  "quarters_requested": 35,
+  "first_quarter": "2018q1",
+  "last_quarter": "2026q3",
+  "downloaded": 35,
+  "skipped_existing": 0,
+  "not_published": 0,
+  "failed": 0,
+  "bytes_on_disk": 3428814515,
+  "requests": 35,
+  "elapsed_s": 88.0,
+  "max_requests_in_any_1s_window": 4,
+  "problems": {}
+}

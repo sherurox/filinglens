@@ -25,7 +25,11 @@ Every number here comes from a command's output; the command is listed next to i
 
 ## Financial Statement Data Sets and Iceberg tables
 
-[T5–T6: download, row counts, partition layout, runtime]
+- Download command: `uv run python -m filinglens.ingest.fsds` (2026-11-16). Stats: `bench/fsds_download.json`; SHA-256 per zip in `data/raw/fsds/manifest.csv`.
+- 35 quarterly zips, 2018q1–2026q3; 0 failed; 3,428,814,515 bytes; 35 requests in 88.0 s (max 4 in any 1-second window). Rerun: 0 requests.
+- Each zip is verified (sub/num/tag/pre present, CRC check of every member) before it is kept.
+
+[T6: Iceberg tables: row counts, partition layout, runtime]
 
 ## Databricks Free Edition rerun
 
