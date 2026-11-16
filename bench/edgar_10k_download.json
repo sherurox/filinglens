@@ -1,0 +1,21 @@
+{
+  "command": "uv run python -m filinglens.ingest.tenk ",
+  "finished_utc": "2026-11-16T07:20:32+00:00",
+  "companies_with_10k": 300,
+  "filings_planned": 2258,
+  "downloaded": 2258,
+  "skipped_existing": 0,
+  "failed": 0,
+  "plan_errors": 0,
+  "bytes_downloaded": 11703535657,
+  "requests": 2865,
+  "elapsed_s": 362.4,
+  "mean_requests_per_s": 7.91,
+  "max_requests_in_any_1s_window": 8,
+  "limiter": {
+    "rate_per_s": 8.0,
+    "capacity": 1.0
+  },
+  "sec_limit_per_s": 10,
+  "plan_error_messages": []
+}

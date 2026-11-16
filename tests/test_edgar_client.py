@@ -121,3 +121,9 @@ def test_load_user_agent_rejects_missing_or_template(monkeypatch):
         load_user_agent()
     monkeypatch.setenv("SEC_USER_AGENT", UA)
     assert load_user_agent() == UA
+
+
+def test_request_log_records_every_attempt():
+    client, calls, _, _ = make_client(503, 503, 200)
+    assert fetch(client).status_code == 200
+    assert len(client.request_log) == len(calls) == 3

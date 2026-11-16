@@ -46,6 +46,7 @@ class EdgarClient:
         self.backoff_base = backoff_base
         self.backoff_cap = backoff_cap
         self.rng = rng or random.Random()
+        self.request_log: list[float] = []  # start time of every attempt: rate-limit evidence
         self._http = httpx.AsyncClient(
             headers={"User-Agent": user_agent, "Accept-Encoding": "gzip, deflate"},
             timeout=httpx.Timeout(30.0),
@@ -79,6 +80,7 @@ class EdgarClient:
         """GET with retries. Every attempt, retries included, takes a rate-limit token."""
         for attempt in range(1, self.max_attempts + 1):
             await self.bucket.acquire()
+            self.request_log.append(self.clock.now())
             response: httpx.Response | None = None
             try:
                 response = await self._http.get(url)

@@ -2,6 +2,7 @@
 
 import asyncio
 import time
+from bisect import bisect_left
 from typing import Protocol
 
 
@@ -57,3 +58,9 @@ class TokenBucket:
                 await self.clock.sleep(wait_time)
                 self._refill()
             self._tokens -= 1.0
+
+
+def max_in_window(times: list[float], window: float = 1.0) -> int:
+    """Most events inside any half-open window [t, t + window). `times` need not be sorted."""
+    ordered = sorted(times)
+    return max((bisect_left(ordered, t + window) - i for i, t in enumerate(ordered)), default=0)
