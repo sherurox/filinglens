@@ -1,0 +1,25 @@
+# Secrets: only the template is committed
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Data: re-downloadable from SEC EDGAR, never committed
+data/
+
+# Editors / OS (Zone.Identifier files appear when copying from Windows into WSL)
+.idea/
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
