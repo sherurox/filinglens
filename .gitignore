@@ -34,3 +34,13 @@ dbt/target/
 dbt/logs/
 dbt/dbt_packages/
 dbt/.user.yml
+
+# Terraform (state lives in HCP Terraform; the lock file is committed)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+tfplan
+crash.log
+override.tf
+override.tf.json

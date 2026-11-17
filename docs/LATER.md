@@ -11,3 +11,5 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-16 | Try dbt v2 (Fusion engine) | dbt Core v1.12 works with dbt-duckdb, dbt-bigquery and Dagster today; v2 reads v1 manifests, so moving later is cheap | FL-M1 T7 |
 | 2026-11-17 | Segment-level facts (segments / coregistrant not null) | Spec asks for company financials; 57.5M segment rows would multiply the marts | FL-M1 T8 |
 | 2026-11-17 | Fiscal-year mapping in dim_period (per company fiscal year end) | Calendar periods are comparable across companies; fiscal mapping needs per-company rules | FL-M1 T8 |
+| 2026-11-17 | Include 40-F / 20-F filers (IFRS taxonomy) in the marts | Universe company BNS files 40-F/6-K only; IFRS tags don't map 1:1 to US GAAP tags | FL-M1 T8 |
+| 2026-11-17 | terraform fmt/validate (and tflint) in CI | Planned for SS-M6 (platform milestone); M1 has 2 resources | FL-M1 T9 |

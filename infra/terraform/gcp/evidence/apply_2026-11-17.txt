@@ -1,0 +1,13 @@
+google_bigquery_dataset.dbt: Creating...
+google_bigquery_dataset.raw: Creating...
+google_bigquery_dataset.dbt: Creation complete after 1s [id=projects/filinglens-515005/datasets/filinglens]
+google_bigquery_dataset.raw: Creation complete after 1s [id=projects/filinglens-515005/datasets/filinglens_raw]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+datasets = {
+  "dbt" = "filinglens-515005.filinglens"
+  "raw" = "filinglens-515005.filinglens_raw"
+}
