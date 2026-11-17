@@ -17,3 +17,6 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-17 | Check why 84 companies first report OperatingLeaseRightOfUseAsset in 2018 (and 3 in 2017) | Earlier than most ASC 842 effective dates: adoption-date balances or early adopters? Not verified | FL-M1 T12 |
 | 2026-11-17 | Revenue concept mapping beyond a tag priority list | Banks/insurers use other tags; a tag switch between years can look like a decline (sql/ 02, 05–08) | FL-M1 T12 |
 | 2026-11-17 | Ratio benchmark: time the Numba kernel alone vs the end-to-end call | At 1M rows NumPy (0.032678 s) beat Numba (0.043817 s) end to end; check whether building the output DataFrame dominates | FL-M1 T13 |
+| 2026-11-17 | Incremental Spark: per-quarter staging table with dynamic partition overwrite, dedupe moved downstream | Today a backfill of any quarter range rebuilds all Iceberg tables (183.4 s) | FL-M1 T14 |
+| 2026-11-17 | Dagster: DynamicPartitionsDefinition + a sensor for newly published FSDS quarters | The partition list is fixed at 2018q1–2026q3 | FL-M1 T14 |
+| 2026-11-17 | Dagster `backfill_policy` is beta (1.13); fallback is per-partition runs with a concurrency limit of 1 for the SEC pool | Keeps SEC's 10 req/s safe if the beta API changes | FL-M1 T14 |

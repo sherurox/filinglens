@@ -1,0 +1,84 @@
+{
+  "command": "uv run python dagster_project/backfill_report.py",
+  "backfill_id": "lpxnvhwm",
+  "status": "COMPLETED_SUCCESS",
+  "created_utc": "2026-11-17T09:28:35+00:00",
+  "runs": [
+    {
+      "run_id": "6844bcdb-c38f-4541-b383-351cd162758f",
+      "status": "SUCCESS",
+      "partition_range": null,
+      "assets": [
+        "universe"
+      ],
+      "started_utc": "2026-11-17T09:28:47+00:00",
+      "seconds": 12.9
+    },
+    {
+      "run_id": "20d3cfaf-da57-4bdf-aedc-6ca7a6fe2d76",
+      "status": "SUCCESS",
+      "partition_range": "2025q1...2025q4",
+      "assets": [
+        "fsds_quarter_zip"
+      ],
+      "started_utc": "2026-11-17T09:28:48+00:00",
+      "seconds": 24.7
+    },
+    {
+      "run_id": "08e0353d-b0c4-4721-aee9-4f430eda21bb",
+      "status": "SUCCESS",
+      "partition_range": null,
+      "assets": [
+        "dim_company",
+        "dim_period",
+        "dim_tag",
+        "fct_financials",
+        "fsds/num",
+        "fsds/pre",
+        "fsds/sub",
+        "fsds/tag",
+        "int_fsds__company_facts",
+        "int_fsds__periodic_filings",
+        "stg_fsds__numbers",
+        "stg_fsds__presentations",
+        "stg_fsds__submissions",
+        "stg_fsds__tags"
+      ],
+      "started_utc": "2026-11-17T09:29:51+00:00",
+      "seconds": 221.7
+    }
+  ],
+  "quarters_backfilled": [
+    "2025q1",
+    "2025q2",
+    "2025q3",
+    "2025q4"
+  ],
+  "zip_sha256_vs_t5_manifest": [
+    {
+      "quarter": "2025q1",
+      "sha256_t5": "4386e7057cc216b6fc729d8f957998acb831d29be7b16f6d8ed0f6b1ab74eba5",
+      "sha256_now": "4386e7057cc216b6fc729d8f957998acb831d29be7b16f6d8ed0f6b1ab74eba5",
+      "same": true
+    },
+    {
+      "quarter": "2025q2",
+      "sha256_t5": "81bf19bdb5606d5ee0164a8de8b7e96d5546170e42e59bcbf95b652ca83ac5d7",
+      "sha256_now": "81bf19bdb5606d5ee0164a8de8b7e96d5546170e42e59bcbf95b652ca83ac5d7",
+      "same": true
+    },
+    {
+      "quarter": "2025q3",
+      "sha256_t5": "ebe25fa74c3655f4738ed9eb144af3953c3981c80f57d74829fb9ad68b114710",
+      "sha256_now": "ebe25fa74c3655f4738ed9eb144af3953c3981c80f57d74829fb9ad68b114710",
+      "same": true
+    },
+    {
+      "quarter": "2025q4",
+      "sha256_t5": "2b36ac3850c022cf19edd882e31c3c453c7666677b9fdd2e1f7748fdb5768c6e",
+      "sha256_now": "2b36ac3850c022cf19edd882e31c3c453c7666677b9fdd2e1f7748fdb5768c6e",
+      "same": true
+    }
+  ],
+  "all_zips_identical_to_t5": true
+}

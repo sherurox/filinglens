@@ -6,6 +6,7 @@ on:
     paths: &code_paths
       - "src/**"
       - "tests/**"
+      - "dagster_project/**"
       - "pyproject.toml"
       - "uv.lock"
       - ".python-version"

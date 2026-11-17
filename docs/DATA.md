@@ -205,6 +205,27 @@ Notes:
   - inputs: revenue 2,852, net income 2,559, operating income 2,284, assets 2,671, liabilities 1,809, equity 2,486;
   - features: net margin 2,556, operating margin 2,281, liabilities/equity 1,560, assets/equity 2,214, revenue growth 2,561, assets growth 2,382.
 
+## Orchestration (Dagster)
+
+- Code: `dagster_project/definitions.py` (Dagster 1.13.30, dagster-dbt 0.29.30). UI: `export DAGSTER_HOME="$PWD/data/dagster"`, then `uv run dagster dev -f dagster_project/definitions.py`.
+- Assets:
+  - `fsds_quarter_zip`: 35 quarterly partitions (2018q1–2026q3). Downloads and verifies one quarter's zip, then extracts it. `BackfillPolicy.single_run()` makes a backfill one run over the whole range, so all quarters share one EDGAR client and its 8 req/s token bucket. Separate runs per partition could exceed SEC's limit together.
+  - `fsds/sub`, `fsds/num`, `fsds/tag`, `fsds/pre`: the Spark → Iceberg job as a subprocess, unpartitioned. It dedupes across quarters ("newest quarter wins"), so it rebuilds from all quarters. Its stats go to `data/dagster/` (the T6 evidence file stays untouched).
+  - dbt: every model and test via dagster-dbt (`dbt build` on DuckDB). `source('fsds', …)` maps to the `fsds/*` assets, so the lineage needs no manual wiring.
+- Asset graph: `docs/img/dagster_asset_graph.png`. Backfill: `docs/img/dagster_backfill.png`.
+- Backfill (17 Nov 2026), evidence in `bench/dagster_backfill.json` (`uv run python dagster_project/backfill_report.py`):
+  - The zips and extracted files of 2025q1–2025q4 were deleted first, so the backfill had real work to do.
+  - Backfill `lpxnvhwm`: COMPLETED_SUCCESS, 3 runs:
+    - download of 2025q1...2025q4 in one run: 24.7 s;
+    - the `universe` seed: 12.9 s;
+    - Spark + all dbt models and tests: 221.7 s (Spark: 183.4 s).
+  - The re-downloaded zips have the same SHA-256 as the T5 manifest (4 of 4).
+  - Spark rebuilt the same rows as T6: sub 238,543 · num 113,996,783 · tag 2,732,499 · pre 26,160,268.
+- Limits:
+  - Only the download is partitioned. A backfill of any range still rebuilds every Iceberg table and dbt model.
+  - `backfill_policy` is marked beta in Dagster 1.13.
+  - New quarters need a code change (fixed partition list). See `docs/LATER.md`.
+
 ## Databricks Free Edition rerun
 
 [T15]

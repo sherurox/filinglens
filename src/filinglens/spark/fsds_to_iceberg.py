@@ -49,25 +49,31 @@ KEYS: dict[str, list[str]] = {
 PARTITIONED = {"sub", "num", "pre"}  # by fiscal year; tag is a small dimension
 
 
-def extract_quarters(zip_dir: Path, out_dir: Path) -> list[str]:
-    """Unzip sub/num/tag/pre of each <quarter>.zip into <out_dir>/<quarter>/.
+def extract_quarter(zip_path: Path, out_dir: Path) -> Path:
+    """Unzip sub/num/tag/pre of one <quarter>.zip into <out_dir>/<quarter>/; return that folder.
 
     Spark can't read inside zip files. Files already extracted in full are skipped, and
     each file is written to .part first, so an interrupted run never leaves half a file.
     """
+    with zipfile.ZipFile(zip_path) as zf:
+        for member in MEMBERS:
+            info = zf.getinfo(f"{member}.txt")
+            target = out_dir / zip_path.stem / info.filename
+            if target.exists() and target.stat().st_size == info.file_size:
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            tmp = target.with_name(target.name + ".part")
+            with zf.open(info) as src, tmp.open("wb") as dst:
+                shutil.copyfileobj(src, dst, 1 << 20)
+            os.replace(tmp, target)
+    return out_dir / zip_path.stem
+
+
+def extract_quarters(zip_dir: Path, out_dir: Path) -> list[str]:
+    """extract_quarter for every <quarter>.zip in zip_dir; returns the quarters, in order."""
     quarters = []
     for zip_path in sorted(zip_dir.glob("*.zip")):
-        with zipfile.ZipFile(zip_path) as zf:
-            for member in MEMBERS:
-                info = zf.getinfo(f"{member}.txt")
-                target = out_dir / zip_path.stem / info.filename
-                if target.exists() and target.stat().st_size == info.file_size:
-                    continue
-                target.parent.mkdir(parents=True, exist_ok=True)
-                tmp = target.with_name(target.name + ".part")
-                with zf.open(info) as src, tmp.open("wb") as dst:
-                    shutil.copyfileobj(src, dst, 1 << 20)
-                os.replace(tmp, target)
+        extract_quarter(zip_path, out_dir)
         quarters.append(zip_path.stem)
     return quarters
 

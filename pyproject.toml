@@ -7,6 +7,9 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "dagster>=1.13.30",
+    "dagster-dbt>=0.29.30",
+    "dagster-webserver>=1.13.30",
     "dbt-bigquery>=1.11",
     "dbt-core>=1.12.7",
     "dbt-duckdb>=1.11.1",
