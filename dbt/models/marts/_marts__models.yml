@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: fct_financials
+    description: >
+      One row per company x tag x period x unit (whole-company values from 10-K/10-Q and
+      amendments). value is as last reported; first_reported_value and was_restated show changes.
+    data_tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [cik, tag, value_date, duration_quarters, unit]
+    columns:
+      - name: cik
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_company')
+                field: cik
+      - name: period_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_period')
+                field: period_key
+      - name: tag_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tag')
+                field: tag_key
+      - name: value
+        data_tests: [not_null]
+      - name: duration_quarters
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 4
+      - name: times_reported
+        data_tests:
+          - accepted_range:
+              arguments:
+                min_value: 1
+      - name: was_restated
+        data_tests: [not_null]
+
+  - name: dim_company
+    description: One row per universe company.
+    columns:
+      - name: cik
+        data_tests: [unique, not_null]
+      - name: ticker
+        data_tests: [not_null]
+      - name: sector
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [finance, manufacturing, mining_energy, retail, services, transport_utilities]
+
+  - name: dim_period
+    description: One row per period used by the facts (calendar-based).
+    columns:
+      - name: period_key
+        description: yyyymmdd * 10 + duration_quarters.
+        data_tests: [unique, not_null]
+      - name: period_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [instant, quarter, half_year, nine_months, annual]
+
+  - name: dim_tag
+    description: One row per XBRL tag version used by the facts.
+    columns:
+      - name: tag_key
+        data_tests: [unique, not_null]
+      - name: tag_label
+        description: From SEC's tag table; null would mean a tag missing from it.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn

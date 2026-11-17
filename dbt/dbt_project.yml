@@ -5,9 +5,14 @@ profile: filinglens
 model-paths: ["models"]
 macro-paths: ["macros"]
 test-paths: ["tests"]
+seed-paths: ["seeds"]
 clean-targets: ["target", "dbt_packages"]
 
 models:
   filinglens:
     staging:
-      +materialized: view  # no copy of 114M num rows; marts (T8) are tables
+      +materialized: view  # no copy of 114M num rows
+    intermediate:
+      +materialized: view  # business rules, read once by the marts
+    marts:
+      +materialized: table  # BigQuery sandbox: table/view only, no incremental (no DML)

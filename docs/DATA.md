@@ -8,7 +8,7 @@ Every number here comes from a command's output; the command is listed next to i
 |---|---|---|
 | SEC EDGAR: 10-K documents, submissions JSON, `company_tickers.json` | sec.gov, data.sec.gov | SEC's webmaster FAQ states that government-created content and EDGAR public filings are free to access and reuse (https://www.sec.gov/files/about/webmaster-faq.htm). Access follows SEC fair access: at most 10 requests/s, with a declared User-Agent. |
 
-## Company universe: `docs/universe.csv`
+## Company universe: `dbt/seeds/universe.csv`
 
 - Command: `uv run python -m filinglens.ingest.universe` (2026-11-16, 4m6.7s).
 - 300 companies, 50 per sector: finance, manufacturing, mining_energy, retail, services, transport_utilities (SIC divisions).
@@ -93,6 +93,32 @@ Notes:
 | Every `num` and `pre` row belongs to a `sub` filing | pass |
 
 - Resource guards (after the first `dbt build` filled the disk with DuckDB spill): `max_temp_directory_size` 40GB, `memory_limit` 6GB, DuckDB threads 8, dbt threads 2.
+
+## Marts: star schema (dbt on DuckDB, universe only)
+
+- Profile that decided the rules: `uv run python notebooks/profile_fsds_t8.py` → `bench/fsds_profile_t8.txt` (2026-11-17).
+- Build (from `dbt/`): `uv run dbt seed`, `uv run dbt run --select path:models/intermediate path:models/marts` (2 views + 4 tables, 6.48 s), then tests one model group at a time.
+- Rules:
+  - Universe only: all 300 companies are in FSDS (10,214 of 238,543 filings).
+  - Forms 10-K, 10-K/A, 10-Q, 10-Q/A. Blank fiscal years are almost all other forms (10-K: 1, 10-Q: 1 of 10,773).
+  - Whole-company values: segments and coregistrant null (54,848,871 of 113,996,783 num rows).
+  - Non-null values: nulls are empty in SEC's file (2024q1 raw: 122,967 empty, 0 unparseable).
+  - duration_quarters 0–4 (instant to annual); 25,077 rows with longer spans are dropped.
+  - "As last reported": latest filing wins; first_reported_value and was_restated kept. Before collapsing (10-K/10-Q only), 827,658 of 1,410,743 facts were reported more than once and 52,448 changed value.
+  - Periods are calendar-based: fiscal_year ≠ year(period end) for 17,058 + 3,990 filings.
+- Results:
+
+| Table | Rows |
+|---|---|
+| `fct_financials` | 1,410,590 (51,866 restated; value dates 2012-02-29 to 2026-08-31) |
+| `dim_company` | 300 (299 have facts) |
+| `dim_period` | 662 |
+| `dim_tag` | 101,822 tag versions |
+
+- Value dates before 2018 come from prior-period comparatives inside 2018+ filings (FSDS starts at 2018q1).
+- Universe companies with no facts:
+- BNS (BANK OF NOVA SCOTIA, finance, CIK 9631): 0 10-K/10-Q filings in FSDS; forms present: 6-K, 40-F.
+- Tests: 40 dbt tests in the project; marts and seed: 28 pass, 0 warnings.
 
 ## Databricks Free Edition rerun
 

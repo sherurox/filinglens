@@ -1,0 +1,15 @@
+version: 2
+
+seeds:
+  - name: universe
+    description: >
+      The 300 companies FilingLens covers (50 per SIC sector), chosen by
+      src/filinglens/ingest/universe.py on 2026-11-16. Frozen here so every engine uses the same list.
+    columns:
+      - name: cik
+        data_tests: [unique, not_null]
+      - name: sector
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [finance, manufacturing, mining_energy, retail, services, transport_utilities]

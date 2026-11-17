@@ -50,7 +50,7 @@ models:
               config:
                 severity: warn
       - name: value
-        description: Null when SEC's value was empty or did not parse as a number (Spark try_cast). T8 checks which.
+        description: "Null when SEC's file has no value (2024q1 raw file: 122,967 empty, 0 unparseable; bench/fsds_profile_t8.txt)."
         data_tests:
           - not_null:
               config:

@@ -103,7 +103,7 @@ def write_csv(companies: list[dict[str, Any]], path: Path) -> None:
         writer.writerows(companies)
 
 
-async def main(out: Path = Path("docs/universe.csv")) -> None:
+async def main(out: Path = Path("dbt/seeds/universe.csv")) -> None:
     from filinglens.ingest.edgar_client import EdgarClient, load_user_agent
 
     async with EdgarClient(load_user_agent()) as client:

@@ -1,0 +1,37 @@
+name: dbt-ci
+
+on:
+  push:
+    branches: [main]
+    paths: &dbt_paths
+      - "dbt/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/dbt-ci.yml"
+  pull_request:
+    paths: *dbt_paths
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dbt-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: dbt
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      # Parse needs no data or warehouse; --warn-error keeps the project deprecation-free.
+      - run: uv run dbt --warn-error parse --no-partial-parse
+      - run: uv run dbt ls --resource-type model --resource-type seed --resource-type test
