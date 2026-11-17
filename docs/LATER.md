@@ -16,3 +16,4 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-17 | dbt model contracts (enforced column data types) on staging and marts | Would have failed the BigQuery `stg_fsds__tags` view at build time when `tag` resolved to the whole row (a STRUCT); tests check values, not types | FL-M1 T10 |
 | 2026-11-17 | Check why 84 companies first report OperatingLeaseRightOfUseAsset in 2018 (and 3 in 2017) | Earlier than most ASC 842 effective dates: adoption-date balances or early adopters? Not verified | FL-M1 T12 |
 | 2026-11-17 | Revenue concept mapping beyond a tag priority list | Banks/insurers use other tags; a tag switch between years can look like a decline (sql/ 02, 05–08) | FL-M1 T12 |
+| 2026-11-17 | Ratio benchmark: time the Numba kernel alone vs the end-to-end call | At 1M rows NumPy (0.032678 s) beat Numba (0.043817 s) end to end; check whether building the output DataFrame dominates | FL-M1 T13 |

@@ -1,0 +1,159 @@
+{
+  "command": "uv run python -m filinglens.features.bench_ratios --note Best performance, plugged in",
+  "finished_utc": "2026-11-17T09:15:34+00:00",
+  "environment": {
+    "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics",
+    "logical_cpus": 24,
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.12.16",
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "numba": "0.68.1",
+    "windows_power_scheme": "Balanced",
+    "on_ac_power": "True",
+    "note": "Best performance, plugged in"
+  },
+  "numba_compile_seconds": 0.318,
+  "real_annual": {
+    "rows": 2852,
+    "companies": 283,
+    "first_value_date": "2015-11-30",
+    "last_value_date": "2026-07-31",
+    "non_null": {
+      "revenue": 2852,
+      "net_income": 2559,
+      "operating_income": 2284,
+      "assets": 2671,
+      "liabilities": 1809,
+      "equity": 2486,
+      "net_margin": 2556,
+      "operating_margin": 2281,
+      "liabilities_to_equity": 1560,
+      "equity_multiplier": 2214,
+      "revenue_growth": 2561,
+      "assets_growth": 2382
+    }
+  },
+  "results": [
+    {
+      "dataset": "real_annual",
+      "rows": 2852,
+      "implementation": "pandas_apply",
+      "repeats": 5,
+      "median_s": 0.046293,
+      "min_s": 0.045904,
+      "rows_per_s": 61607,
+      "speedup_vs_pandas_apply": 1.0
+    },
+    {
+      "dataset": "real_annual",
+      "rows": 2852,
+      "implementation": "numpy",
+      "repeats": 5,
+      "median_s": 0.00028,
+      "min_s": 0.000257,
+      "rows_per_s": 10177572,
+      "speedup_vs_pandas_apply": 165.2
+    },
+    {
+      "dataset": "real_annual",
+      "rows": 2852,
+      "implementation": "numba",
+      "repeats": 5,
+      "median_s": 0.000163,
+      "min_s": 0.000149,
+      "rows_per_s": 17476882,
+      "speedup_vs_pandas_apply": 283.68
+    },
+    {
+      "dataset": "synthetic_10000",
+      "rows": 10000,
+      "implementation": "pandas_apply",
+      "repeats": 5,
+      "median_s": 0.161278,
+      "min_s": 0.152986,
+      "rows_per_s": 62005,
+      "speedup_vs_pandas_apply": 1.0
+    },
+    {
+      "dataset": "synthetic_10000",
+      "rows": 10000,
+      "implementation": "numpy",
+      "repeats": 5,
+      "median_s": 0.000414,
+      "min_s": 0.000394,
+      "rows_per_s": 24153714,
+      "speedup_vs_pandas_apply": 389.55
+    },
+    {
+      "dataset": "synthetic_10000",
+      "rows": 10000,
+      "implementation": "numba",
+      "repeats": 5,
+      "median_s": 0.000249,
+      "min_s": 0.000238,
+      "rows_per_s": 40181137,
+      "speedup_vs_pandas_apply": 648.03
+    },
+    {
+      "dataset": "synthetic_100000",
+      "rows": 100000,
+      "implementation": "pandas_apply",
+      "repeats": 5,
+      "median_s": 1.589656,
+      "min_s": 1.558586,
+      "rows_per_s": 62907,
+      "speedup_vs_pandas_apply": 1.0
+    },
+    {
+      "dataset": "synthetic_100000",
+      "rows": 100000,
+      "implementation": "numpy",
+      "repeats": 5,
+      "median_s": 0.002289,
+      "min_s": 0.002198,
+      "rows_per_s": 43695160,
+      "speedup_vs_pandas_apply": 694.6
+    },
+    {
+      "dataset": "synthetic_100000",
+      "rows": 100000,
+      "implementation": "numba",
+      "repeats": 5,
+      "median_s": 0.001334,
+      "min_s": 0.001296,
+      "rows_per_s": 74973759,
+      "speedup_vs_pandas_apply": 1191.83
+    },
+    {
+      "dataset": "synthetic_1000000",
+      "rows": 1000000,
+      "implementation": "pandas_apply",
+      "repeats": 3,
+      "median_s": 16.650744,
+      "min_s": 16.237733,
+      "rows_per_s": 60057,
+      "speedup_vs_pandas_apply": 1.0
+    },
+    {
+      "dataset": "synthetic_1000000",
+      "rows": 1000000,
+      "implementation": "numpy",
+      "repeats": 5,
+      "median_s": 0.032678,
+      "min_s": 0.031117,
+      "rows_per_s": 30601550,
+      "speedup_vs_pandas_apply": 509.54
+    },
+    {
+      "dataset": "synthetic_1000000",
+      "rows": 1000000,
+      "implementation": "numba",
+      "repeats": 5,
+      "median_s": 0.043817,
+      "min_s": 0.04247,
+      "rows_per_s": 22821969,
+      "speedup_vs_pandas_apply": 380.0
+    }
+  ]
+}

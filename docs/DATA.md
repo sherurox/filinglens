@@ -174,6 +174,37 @@ Notes:
 - Docs site: `uv run dbt docs generate --target bigquery --static` writes one self-contained file, copied to `docs/dbt/index.html` (2.7 MB; open it in a browser). It includes the BigQuery catalog: column types and row counts.
 - Teardown: `bq rm -r -f -d filinglens-515005:filinglens` (models and seed), or `terraform destroy` (README).
 
+## Ratio features (FL-M1 step 8, D5)
+
+- Code: `src/filinglens/features/ratios.py` computes 6 ratios per company and fiscal year end, three ways: pandas `apply` (a Python function per row), vectorized NumPy, and Numba (one `@njit` loop).
+  - Margins: net margin, operating margin.
+  - Leverage: liabilities / equity, assets / equity.
+  - Growth: revenue growth, assets growth.
+- Rules, identical in all three implementations; the tests require bit-for-bit equal results:
+  - A ratio is NaN unless its denominator is > 0.
+  - Growth is computed only against the same company 330–400 days earlier.
+- Input: annual facts pivoted from `fct_financials`. Revenue uses the tag priority list from `sql/`; balances are taken at the fiscal year end.
+- Benchmark command: `uv run python -m filinglens.features.bench_ratios --note "Best performance, plugged in"` → `bench/ratios.csv` (table), `bench/ratios.json` (environment, coverage), `data/features/annual_ratios.parquet` (git-ignored).
+  - Each dataset: equality check, one warm-up, then the median of 5 end-to-end runs (DataFrame in, DataFrame out). pandas apply at 1M rows uses 3 runs.
+  - The recorded `command` in this run lost the quotes around `--note` (fixed since); the note is under `environment.note`.
+- Environment (17 Nov 2026): AMD Ryzen 9 8940HX (24 logical CPUs), WSL2, Python 3.12.16, numpy 2.5.5, pandas 3.1.1, numba 0.68.1. On AC power; Windows power mode Best performance (an overlay on the Balanced scheme, which `powercfg` reports).
+
+| Dataset | Rows | pandas apply (s) | NumPy (s) | Numba (s) | NumPy vs apply | Numba vs apply |
+|---|---|---|---|---|---|---|
+| real annual | 2,852 | 0.046293 | 0.00028 | 0.000163 | ×165.2 | ×283.68 |
+| synthetic | 10,000 | 0.161278 | 0.000414 | 0.000249 | ×389.55 | ×648.03 |
+| synthetic | 100,000 | 1.589656 | 0.002289 | 0.001334 | ×694.6 | ×1191.83 |
+| synthetic | 1,000,000 | 16.650744 | 0.032678 | 0.043817 | ×509.54 | ×380.0 |
+
+- Numba compile time (fresh, uncached kernel): 0.318 s.
+  - At real-data size, Numba saves 0.000117 s per call over NumPy, so the compile pays off after about 2,700 calls (arithmetic on the numbers above).
+- Numba is fastest up to 100k rows; NumPy is fastest at 1M.
+  - Not yet measured: whether building the output DataFrame from Numba's (n × 6) array dominates at that size (see `docs/LATER.md`).
+- Real data: 2,852 company-years from 283 of the 300 companies (value dates 2015-11-30 to 2026-07-31). The other 17 use none of the priority revenue tags (mostly banks).
+- Non-null counts:
+  - inputs: revenue 2,852, net income 2,559, operating income 2,284, assets 2,671, liabilities 1,809, equity 2,486;
+  - features: net margin 2,556, operating margin 2,281, liabilities/equity 1,560, assets/equity 2,214, revenue growth 2,561, assets growth 2,382.
+
 ## Databricks Free Edition rerun
 
 [T15]
