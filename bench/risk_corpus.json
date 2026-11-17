@@ -1,0 +1,43 @@
+{
+  "command": "uv run python -m filinglens.extract.risk_corpus",
+  "finished_utc": "2026-11-17T11:01:41+00:00",
+  "filings": 2258,
+  "status": {
+    "no_heading": 8,
+    "ok": 2183,
+    "too_short": 67
+  },
+  "method_when_ok": {
+    "heading": 30,
+    "item": 2153
+  },
+  "companies": 300,
+  "companies_with_ok_filing": 292,
+  "ok_filings_by_sector": {
+    "finance": "334/376",
+    "manufacturing": "377/383",
+    "mining_energy": "346/362",
+    "retail": "390/390",
+    "services": "364/364",
+    "transport_utilities": "372/383"
+  },
+  "paragraphs": 199367,
+  "paragraphs_by_period_year": {
+    "2018": 21259,
+    "2019": 20944,
+    "2020": 23916,
+    "2021": 25475,
+    "2022": 26141,
+    "2023": 26571,
+    "2024": 27542,
+    "2025": 27519
+  },
+  "words_per_paragraph": {
+    "median": 106,
+    "p95": 271.0,
+    "max": 835
+  },
+  "elapsed_s": 51.0,
+  "workers": 8,
+  "lxml": "6.1.3"
+}
