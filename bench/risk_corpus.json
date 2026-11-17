@@ -1,43 +1,43 @@
 {
   "command": "uv run python -m filinglens.extract.risk_corpus",
-  "finished_utc": "2026-11-17T11:01:41+00:00",
+  "finished_utc": "2026-11-17T11:07:35+00:00",
   "filings": 2258,
   "status": {
     "no_heading": 8,
-    "ok": 2183,
-    "too_short": 67
+    "ok": 2207,
+    "too_short": 43
   },
   "method_when_ok": {
     "heading": 30,
-    "item": 2153
+    "item": 2177
   },
   "companies": 300,
-  "companies_with_ok_filing": 292,
+  "companies_with_ok_filing": 295,
   "ok_filings_by_sector": {
-    "finance": "334/376",
+    "finance": "342/376",
     "manufacturing": "377/383",
-    "mining_energy": "346/362",
+    "mining_energy": "354/362",
     "retail": "390/390",
     "services": "364/364",
-    "transport_utilities": "372/383"
+    "transport_utilities": "380/383"
   },
-  "paragraphs": 199367,
+  "paragraphs": 201516,
   "paragraphs_by_period_year": {
-    "2018": 21259,
-    "2019": 20944,
-    "2020": 23916,
-    "2021": 25475,
-    "2022": 26141,
-    "2023": 26571,
-    "2024": 27542,
-    "2025": 27519
+    "2018": 21504,
+    "2019": 21200,
+    "2020": 24202,
+    "2021": 25739,
+    "2022": 26424,
+    "2023": 26853,
+    "2024": 27833,
+    "2025": 27761
   },
   "words_per_paragraph": {
-    "median": 106,
+    "median": 106.0,
     "p95": 271.0,
     "max": 835
   },
-  "elapsed_s": 51.0,
+  "elapsed_s": 49.6,
   "workers": 8,
   "lxml": "6.1.3"
 }

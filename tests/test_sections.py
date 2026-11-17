@@ -1,6 +1,8 @@
 """Item 1A splitter: TOC entries lose to the real section, split and fallback headings, hidden
 inline-XBRL text, emphasis detection, and paragraphs with their headings."""
 
+import pytest
+
 from filinglens.extract.sections import (
     find_risk_section,
     html_to_blocks,
@@ -58,6 +60,25 @@ def test_heading_split_over_two_blocks():
     html = f"<p>ITEM 1A.</p><p>RISK FACTORS</p><p>{BODY}</p><p>ITEM 2. PROPERTIES</p>"
     start, end, method = find_risk_section(html_to_blocks(doc(html)))
     assert (start, end, method) == (2, 3, "item")
+
+
+@pytest.mark.parametrize(
+    ("heading", "end"),
+    [
+        ("Item 1(a). Risk Factors.", "Item 1(b). Unresolved Staff Comments."),  # HAL
+        ("ITEM 1(A). RISK FACTORS", "ITEM 1(B). UNRESOLVED STAFF COMMENTS"),  # ICE
+        ("Item 1(a) | Risk Factors", "Item 1(b) | Unresolved Staff Comments"),
+        ("Part I. Item 1A. Risk Factors", "Part I. Item 1B. Unresolved Staff Comments"),  # EXPE
+    ],
+)
+def test_item_1a_spelling_variants(heading, end):
+    html = f"<p>{heading}</p><p>{BODY}</p><p>{end}</p>"
+    assert find_risk_section(html_to_blocks(doc(html))) == (1, 2, "item")
+
+
+def test_item_1_and_item_10_are_not_item_1a():
+    html = f"<p>Item 1. Business</p><p>{BODY}</p><p>Item 10. Directors</p>"
+    assert find_risk_section(html_to_blocks(doc(html))) is None
 
 
 def test_table_cells_are_separated_by_spaces():

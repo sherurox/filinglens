@@ -32,9 +32,11 @@ EMPHASIS_STYLE = re.compile(
 )
 HEADING_MAX_WORDS = 12  # item headings are short; longer blocks are body text that mentions them
 
-ITEM_1A = re.compile(r"item\s*1a\b[\s.:\-–—]*")
+# "Item 1A", "Item 1(a)", "ITEM 1(A)", optionally after "Part I."; separators include "|".
+PART = r"(part\s+[iv]+\b\W*)?"
+ITEM_1A = re.compile(PART + r"item\s*1\s*\(?a\)?(?![a-z0-9])[\s.:|\-–—]*")
 END_HEADING = re.compile(
-    r"(item\s*(1b|1c|[2-9]|1[0-6])\b"
+    r"(" + PART + r"item\s*(1\s*\(?[bc]\)?(?![a-z0-9])|[2-9]\b|1[0-6]\b)"
     r"|unresolved (sec )?staff comments\b"
     r"|cybersecurity\.?$|properties\.?$|legal proceedings\.?$)"
 )
