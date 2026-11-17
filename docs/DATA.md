@@ -120,6 +120,28 @@ Notes:
 - BNS (BANK OF NOVA SCOTIA, finance, CIK 9631): 0 10-K/10-Q filings in FSDS; forms present: 6-K, 40-F.
 - Tests: 40 dbt tests in the project; marts and seed: 28 pass, 0 warnings.
 
+## BigQuery sandbox: raw tables (universe subset)
+
+- Command (repo root): `set -a; source .env; set +a`, then `uv run python -m filinglens.ingest.load_bigquery` → `bench/bigquery_load.json` (2026-11-17).
+- What it loads: DuckDB reads the Iceberg tables and writes the universe's filings (all forms) to Parquet (zstd): `sub`, `num` and `pre` rows of those filings, and the `tag` rows for the (tag, version) pairs those numbers use. Then one `bq load --replace` per table into `filinglens_raw`.
+- Why this way:
+  - Load jobs are not DML, so the sandbox allows them. `--replace` makes a rerun overwrite instead of duplicate.
+  - Local upload, no Cloud Storage bucket (a bucket would need billing).
+  - Universe only: the sandbox caps storage at 10 GB, and BigQuery counts logical (uncompressed) bytes.
+
+| Table | Rows exported = rows in BigQuery | Parquet bytes | BigQuery bytes | Load (s) |
+|---|---|---|---|---|
+| `sub` | 10,214 | 423,789 | 3,190,211 | 14.4 |
+| `num` | 6,681,857 | 76,077,106 | 1,139,576,502 | 654.1 |
+| `pre` | 1,300,570 | 13,615,688 | 201,737,122 | 123.3 |
+| `tag` | 118,766 | 1,706,298 | 33,196,727 | 20.3 |
+| **Total** | | 91,822,881 | 1,377,700,562 (13.8% of 10 GB) | 812.1 |
+
+- BigQuery stores 15.0× the Parquet size for this data (logical bytes, read from `__TABLES__`, which costs no query bytes).
+- Export: 3.4 s. Load: 812.1 s, limited by the home upload link (one 10-second sample during the `num` upload: 127 KiB/s).
+- Parquet byte sizes differ slightly between runs (parallel writes with `preserve_insertion_order = false`); row counts were identical in all three runs.
+- Teardown: `bq rm -r -f -d filinglens-515005:filinglens_raw`, or `terraform destroy` (README). Tables also expire after 60 days.
+
 ## Databricks Free Edition rerun
 
 [T15]

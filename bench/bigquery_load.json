@@ -1,0 +1,61 @@
+{
+  "command": "uv run python -m filinglens.ingest.load_bigquery",
+  "finished_utc": "2026-11-17T06:09:18+00:00",
+  "dataset": "filinglens_raw",
+  "exported": {
+    "sub": {
+      "rows": 10214,
+      "parquet_bytes": 423789,
+      "seconds": 0.0
+    },
+    "num": {
+      "rows": 6681857,
+      "parquet_bytes": 76077106,
+      "seconds": 2.5
+    },
+    "pre": {
+      "rows": 1300570,
+      "parquet_bytes": 13615688,
+      "seconds": 0.7
+    },
+    "tag": {
+      "rows": 118766,
+      "parquet_bytes": 1706298,
+      "seconds": 0.2
+    }
+  },
+  "load_seconds": {
+    "sub": {
+      "seconds": 14.4
+    },
+    "num": {
+      "seconds": 654.1
+    },
+    "pre": {
+      "seconds": 123.3
+    },
+    "tag": {
+      "seconds": 20.3
+    }
+  },
+  "bigquery_tables": {
+    "num": {
+      "rows": 6681857,
+      "bytes": 1139576502
+    },
+    "pre": {
+      "rows": 1300570,
+      "bytes": 201737122
+    },
+    "sub": {
+      "rows": 10214,
+      "bytes": 3190211
+    },
+    "tag": {
+      "rows": 118766,
+      "bytes": 33196727
+    }
+  },
+  "bigquery_total_bytes": 1377700562,
+  "sandbox_storage_limit_bytes": 10000000000
+}
