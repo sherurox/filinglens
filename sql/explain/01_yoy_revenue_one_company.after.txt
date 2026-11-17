@@ -1,0 +1,16 @@
+-- 01_yoy_revenue_one_company: median of 5 runs, execution 0.023 ms (after the index change)
+WindowAgg  (cost=20.58..20.69 rows=4 width=74) (actual time=0.016..0.021 rows=9.00 loops=1)
+  Window: w1 AS (ORDER BY fct_financials.value_date)
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=11
+  ->  Sort  (cost=20.57..20.58 rows=4 width=10) (actual time=0.014..0.014 rows=9.00 loops=1)
+        Sort Key: fct_financials.value_date
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=11
+        ->  Index Scan using ix_fct_cik_tag_duration on fct_financials  (cost=0.43..20.53 rows=4 width=10) (actual time=0.007..0.011 rows=9.00 loops=1)
+              Index Cond: ((cik = 320193) AND ((tag)::text = 'RevenueFromContractWithCustomerExcludingAssessedTax'::text) AND (duration_quarters = 4))
+              Filter: ((unit)::text = 'USD'::text)
+              Index Searches: 1
+              Buffers: shared hit=11
+Planning Time: 0.051 ms
+Execution Time: 0.030 ms

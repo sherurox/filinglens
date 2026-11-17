@@ -1,0 +1,2 @@
+query,result_rows,same_result,before_execution_ms,after_execution_ms,speedup,before_planning_ms,after_planning_ms,runs,index_change
+01_yoy_revenue_one_company,9,True,40.514,0.023,1761.48,0.076,0.056,5,"create index ix_fct_cik_tag_duration on marts.fct_financials (cik, tag, duration_quarters)"
