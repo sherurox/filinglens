@@ -161,36 +161,61 @@ def latest_per_key(df: Any, keys: list[str]) -> Any:
     return df.withColumn("_rn", F.row_number().over(window)).where("_rn = 1").drop("_rn")
 
 
-def partition_summary(spark: Any, table: str, partitioned: bool) -> list[dict[str, Any]]:
-    """Rows and data files per fiscal-year partition, from Iceberg's own metadata tables."""
+TABLE_FORMATS = ("iceberg", "delta")
+
+
+def partition_summary(
+    spark: Any, table: str, partitioned: bool, table_format: str = "iceberg"
+) -> list[dict[str, Any]]:
+    """Rows (and data files) per fiscal-year partition.
+
+    Iceberg: from its own metadata tables (no data scan). Delta has no per-partition metadata
+    table, so rows per fiscal year are counted, and the file total comes from DESCRIBE DETAIL.
+    """
+    if table_format == "iceberg":
+        if partitioned:
+            query = (
+                f"SELECT partition.fy AS fy, record_count, file_count "
+                f"FROM {table}.partitions ORDER BY fy"
+            )
+        else:
+            query = (
+                f"SELECT count(*) AS file_count, sum(record_count) AS record_count "
+                f"FROM {table}.files"
+            )
+        return [row.asDict() for row in spark.sql(query).collect()]
     if partitioned:
-        query = (
-            f"SELECT partition.fy AS fy, record_count, file_count "
-            f"FROM {table}.partitions ORDER BY fy"
-        )
-    else:
-        query = (
-            f"SELECT count(*) AS file_count, sum(record_count) AS record_count FROM {table}.files"
-        )
-    return [row.asDict() for row in spark.sql(query).collect()]
+        query = f"SELECT fy, count(*) AS record_count FROM {table} GROUP BY fy ORDER BY fy"
+        return [row.asDict() for row in spark.sql(query).collect()]
+    detail = spark.sql(f"DESCRIBE DETAIL {table}").collect()[0].asDict()
+    rows = spark.sql(f"SELECT count(*) AS record_count FROM {table}").collect()[0].asDict()
+    return [{"file_count": detail["numFiles"], "record_count": rows["record_count"]}]
 
 
-def build_tables(spark: Any, extracted: Path) -> dict[str, dict[str, Any]]:
-    """Write sub, tag, num and pre. num and pre take their fiscal year from sub."""
+def build_tables(
+    spark: Any, extracted: Path, namespace: str = NAMESPACE, table_format: str = "iceberg"
+) -> dict[str, dict[str, Any]]:
+    """Write sub, tag, num and pre. num and pre take their fiscal year from sub.
+
+    Iceberg locally (Hadoop catalog); Delta on Databricks, where custom storage (and so a
+    custom Iceberg catalog) isn't available. The transforms are identical for both.
+    """
+    if table_format not in TABLE_FORMATS:
+        raise ValueError(f"table_format must be one of {TABLE_FORMATS}, not {table_format!r}")
     from pyspark.sql import functions as F
 
-    spark.sql(f"CREATE NAMESPACE IF NOT EXISTS {NAMESPACE}")
+    spark.sql(f"CREATE NAMESPACE IF NOT EXISTS {namespace}")
     stats: dict[str, dict[str, Any]] = {}
     sub_fy = None
     for name in ("sub", "tag", "num", "pre"):  # sub first: num and pre join to it
         started = time.perf_counter()
-        table = f"{NAMESPACE}.{name}"
+        table = f"{namespace}.{name}"
         raw = read_member(spark, extracted, name)
         raw_rows = raw.count()
         df = latest_per_key(typed(raw, TYPES[name]), KEYS[name])
         if name in ("num", "pre"):
             df = df.join(F.broadcast(sub_fy), "adsh", "left")  # sub is small: no big shuffle
-        writer = df.writeTo(table).using("iceberg")
+        writer = df.writeTo(table).using(table_format)
         if name in PARTITIONED:
             writer = writer.partitionedBy(F.col("fy"))
         writer.createOrReplace()
@@ -202,7 +227,7 @@ def build_tables(spark: Any, extracted: Path) -> dict[str, dict[str, Any]]:
             "duplicates_removed": raw_rows - rows,
             "rows_without_fy": written.where("fy IS NULL").count() if name in PARTITIONED else 0,
             "seconds": round(time.perf_counter() - started, 1),
-            "partitions": partition_summary(spark, table, name in PARTITIONED),
+            "partitions": partition_summary(spark, table, name in PARTITIONED, table_format),
         }
         if name == "sub":
             sub_fy = written.select("adsh", "fy")

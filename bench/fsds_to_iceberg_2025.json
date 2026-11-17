@@ -1,0 +1,195 @@
+{
+  "command": "uv run python -m filinglens.spark.fsds_to_iceberg --zips data/subset_2025/zips --extracted data/subset_2025/extracted --warehouse data/subset_2025/warehouse --stats bench/fsds_to_iceberg_2025.json",
+  "finished_utc": "2026-11-17T09:59:20+00:00",
+  "spark_version": "4.1.4",
+  "iceberg_runtime": "org.apache.iceberg:iceberg-spark-runtime-4.1_2.13:1.12.0",
+  "catalog": "Iceberg Hadoop catalog (local filesystem)",
+  "master": "local[*]",
+  "cpu_threads": 24,
+  "driver_memory": "10g",
+  "spark_local_dir": "data/spark-tmp",
+  "quarters": 4,
+  "first_quarter": "2025q1",
+  "last_quarter": "2025q4",
+  "extract_seconds": 5.2,
+  "extracted_bytes": 2583459356,
+  "warehouse_bytes": 291990120,
+  "total_seconds": 45.7,
+  "tables": {
+    "sub": {
+      "raw_rows": 26085,
+      "rows": 26085,
+      "duplicates_removed": 0,
+      "rows_without_fy": 1400,
+      "seconds": 5.1,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 1400,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 1,
+          "file_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 4,
+          "file_count": 1
+        },
+        {
+          "fy": 2022,
+          "record_count": 19,
+          "file_count": 1
+        },
+        {
+          "fy": 2023,
+          "record_count": 112,
+          "file_count": 1
+        },
+        {
+          "fy": 2024,
+          "record_count": 6422,
+          "file_count": 1
+        },
+        {
+          "fy": 2025,
+          "record_count": 17142,
+          "file_count": 1
+        },
+        {
+          "fy": 2026,
+          "record_count": 983,
+          "file_count": 1
+        },
+        {
+          "fy": 2027,
+          "record_count": 2,
+          "file_count": 1
+        }
+      ]
+    },
+    "tag": {
+      "raw_rows": 348770,
+      "rows": 329861,
+      "duplicates_removed": 18909,
+      "rows_without_fy": 0,
+      "seconds": 2.1,
+      "partitions": [
+        {
+          "file_count": 25,
+          "record_count": 329861
+        }
+      ]
+    },
+    "num": {
+      "raw_rows": 14621539,
+      "rows": 14621401,
+      "duplicates_removed": 138,
+      "rows_without_fy": 902986,
+      "seconds": 22.1,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 902986,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 115,
+          "file_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 765,
+          "file_count": 1
+        },
+        {
+          "fy": 2022,
+          "record_count": 10359,
+          "file_count": 1
+        },
+        {
+          "fy": 2023,
+          "record_count": 53527,
+          "file_count": 1
+        },
+        {
+          "fy": 2024,
+          "record_count": 3770619,
+          "file_count": 1
+        },
+        {
+          "fy": 2025,
+          "record_count": 9525312,
+          "file_count": 2
+        },
+        {
+          "fy": 2026,
+          "record_count": 357448,
+          "file_count": 1
+        },
+        {
+          "fy": 2027,
+          "record_count": 270,
+          "file_count": 1
+        }
+      ]
+    },
+    "pre": {
+      "raw_rows": 2965835,
+      "rows": 2965835,
+      "duplicates_removed": 0,
+      "rows_without_fy": 185353,
+      "seconds": 5.6,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 185353,
+          "file_count": 1
+        },
+        {
+          "fy": 2018,
+          "record_count": 60,
+          "file_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 271,
+          "file_count": 1
+        },
+        {
+          "fy": 2022,
+          "record_count": 1705,
+          "file_count": 1
+        },
+        {
+          "fy": 2023,
+          "record_count": 11429,
+          "file_count": 1
+        },
+        {
+          "fy": 2024,
+          "record_count": 779080,
+          "file_count": 1
+        },
+        {
+          "fy": 2025,
+          "record_count": 1890659,
+          "file_count": 1
+        },
+        {
+          "fy": 2026,
+          "record_count": 97175,
+          "file_count": 1
+        },
+        {
+          "fy": 2027,
+          "record_count": 103,
+          "file_count": 1
+        }
+      ]
+    }
+  }
+}
