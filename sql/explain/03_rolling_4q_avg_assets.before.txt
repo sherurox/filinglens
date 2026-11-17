@@ -1,0 +1,49 @@
+-- 03_rolling_4q_avg_assets: median of 5 runs, execution 44.0 ms (before the index change)
+Sort  (cost=50369.11..50369.11 rows=1 width=46) (actual time=42.242..44.469 rows=1604.00 loops=1)
+  Sort Key: rolling.ticker, rolling.value_date
+  Sort Method: quicksort  Memory: 119kB
+  Buffers: shared hit=39077
+  ->  Subquery Scan on rolling  (cost=50274.65..50369.10 rows=1 width=46) (actual time=39.706..43.899 rows=1604.00 loops=1)
+        Filter: ((rolling.span_days >= 255) AND (rolling.span_days <= 290) AND (rolling.points = 4))
+        Rows Removed by Filter: 241
+        Buffers: shared hit=39077
+        ->  WindowAgg  (cost=50274.65..50360.27 rows=504 width=66) (actual time=39.700..43.704 rows=1845.00 loops=1)
+              Window: w4 AS (PARTITION BY f.cik ORDER BY f.value_date ROWS BETWEEN '3'::bigint PRECEDING AND CURRENT ROW)
+              Storage: Memory  Maximum Storage: 17kB
+              Buffers: shared hit=39077
+              ->  Gather Merge  (cost=50274.48..50347.67 rows=504 width=22) (actual time=39.685..42.474 rows=1845.00 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    Buffers: shared hit=39077
+                    ->  Incremental Sort  (cost=49274.46..49289.48 rows=210 width=22) (actual time=37.804..38.198 rows=615.00 loops=3)
+                          Sort Key: f.cik, f.value_date
+                          Presorted Key: f.cik
+                          Full-sort Groups: 18  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+                          Buffers: shared hit=39077
+                          Worker 0:  Full-sort Groups: 15  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
+                          Worker 1:  Full-sort Groups: 16  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
+                          ->  Merge Join  (cost=49274.23..49283.68 rows=210 width=22) (actual time=37.728..38.043 rows=615.00 loops=3)
+                                Merge Cond: (f.cik = c.cik)
+                                Buffers: shared hit=38943
+                                ->  Sort  (cost=49264.07..49267.22 rows=1260 width=18) (actual time=37.630..37.741 rows=3372.67 loops=3)
+                                      Sort Key: f.cik
+                                      Sort Method: quicksort  Memory: 244kB
+                                      Buffers: shared hit=38914
+                                      Worker 0:  Sort Method: quicksort  Memory: 223kB
+                                      Worker 1:  Sort Method: quicksort  Memory: 225kB
+                                      ->  Parallel Seq Scan on fct_financials f  (cost=0.00..49199.18 rows=1260 width=18) (actual time=0.025..37.127 rows=3431.33 loops=3)
+                                            Filter: (((tag)::text = 'Assets'::text) AND (duration_quarters = 0) AND ((unit)::text = 'USD'::text))
+                                            Rows Removed by Filter: 466765
+                                            Buffers: shared hit=38914
+                                ->  Sort  (cost=10.16..10.29 rows=50 width=8) (actual time=0.075..0.091 rows=607.67 loops=3)
+                                      Sort Key: c.cik
+                                      Sort Method: quicksort  Memory: 26kB
+                                      Buffers: shared hit=29
+                                      Worker 0:  Sort Method: quicksort  Memory: 26kB
+                                      Worker 1:  Sort Method: quicksort  Memory: 26kB
+                                      ->  Seq Scan on dim_company c  (cost=0.00..8.75 rows=50 width=8) (actual time=0.024..0.038 rows=50.00 loops=3)
+                                            Filter: ((sector)::text = 'retail'::text)
+                                            Rows Removed by Filter: 250
+                                            Buffers: shared hit=15
+Planning Time: 0.139 ms
+Execution Time: 44.532 ms

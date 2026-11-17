@@ -1,2 +1,9 @@
 query,result_rows,same_result,before_execution_ms,after_execution_ms,speedup,before_planning_ms,after_planning_ms,runs,index_change
-01_yoy_revenue_one_company,9,True,40.514,0.023,1761.48,0.076,0.056,5,"create index ix_fct_cik_tag_duration on marts.fct_financials (cik, tag, duration_quarters)"
+01_yoy_revenue_one_company,9,True,41.21,0.022,1873.18,0.082,0.044,5,"create index ix_fct_cik_tag_duration on marts.fct_financials (cik, tag, duration_quarters)"
+02_sector_revenue_rank,30,True,42.927,0.395,108.68,0.154,0.109,5,"create index ix_fct_tag_duration_date on marts.fct_financials (tag, duration_quarters, value_date)"
+03_rolling_4q_avg_assets,1604,True,44.0,3.117,14.12,0.145,0.108,5,"create index ix_fct_tag_duration_cik_date on marts.fct_financials (tag, duration_quarters, cik, value_date) include (unit, value)"
+04_first_year_tag_reported,9,True,39.302,0.441,89.12,0.079,0.045,5,"create index ix_fct_tag_cik_date on marts.fct_financials (tag, cik, value_date)"
+05_revenue_decline_streaks,30,True,45.167,2.471,18.28,0.198,0.149,5,"create index ix_fct_annual_usd_tag_cik_date on marts.fct_financials (tag, cik, value_date) include (value) where duration_quarters = 4 and unit = 'USD'"
+06_gross_margin_cte_pipeline,150,True,48.894,16.334,2.99,0.195,0.204,5,"create index ix_fct_value_year_duration on marts.fct_financials ((extract(year from value_date)), duration_quarters)"
+07_peer_self_join,10,True,70.599,0.486,145.27,0.219,0.191,5,"create index ix_fct_cik_tag_duration_date on marts.fct_financials (cik, tag, duration_quarters, value_date) include (unit, value)"
+08_net_margin_percentiles,6,True,43.759,0.506,86.48,0.212,0.184,5,"create index ix_fct_tag_duration_date_covering on marts.fct_financials (tag, duration_quarters, value_date) include (cik, unit, value)"

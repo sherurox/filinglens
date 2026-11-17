@@ -1,0 +1,45 @@
+-- 02_sector_revenue_rank: median of 5 runs, execution 42.927 ms (before the index change)
+Incremental Sort  (cost=54672.26..54683.63 rows=193 width=53) (actual time=38.062..42.033 rows=30.00 loops=1)
+  Sort Key: ranked.sector, ranked.sector_rank, ranked.ticker
+  Presorted Key: ranked.sector
+  Full-sort Groups: 1  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+  Buffers: shared hit=39307
+  ->  Subquery Scan on ranked  (cost=54670.50..54676.27 rows=193 width=53) (actual time=38.027..42.026 rows=30.00 loops=1)
+        Buffers: shared hit=39307
+        ->  WindowAgg  (cost=54670.50..54674.34 rows=193 width=53) (actual time=38.027..42.023 rows=30.00 loops=1)
+              Window: w1 AS (PARTITION BY c.sector ORDER BY r.revenue ROWS UNBOUNDED PRECEDING)
+              Run Condition: (rank() OVER w1 <= 5)
+              Storage: Memory  Maximum Storage: 17kB
+              Buffers: shared hit=39307
+              ->  Sort  (cost=54670.48..54670.96 rows=193 width=45) (actual time=38.023..41.998 rows=279.00 loops=1)
+                    Sort Key: c.sector, r.revenue DESC
+                    Sort Method: quicksort  Memory: 43kB
+                    Buffers: shared hit=39307
+                    ->  Hash Join  (cost=54654.35..54663.15 rows=193 width=45) (actual time=37.869..41.882 rows=279.00 loops=1)
+                          Hash Cond: (c.cik = r.cik)
+                          Buffers: shared hit=39307
+                          ->  Seq Scan on dim_company c  (cost=0.00..8.00 rows=300 width=39) (actual time=0.005..0.015 rows=300.00 loops=1)
+                                Buffers: shared hit=5
+                          ->  Hash  (cost=54651.94..54651.94 rows=193 width=18) (actual time=37.861..41.815 rows=279.00 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=39302
+                                ->  Subquery Scan on r  (cost=54613.13..54651.94 rows=193 width=18) (actual time=37.749..41.784 rows=279.00 loops=1)
+                                      Buffers: shared hit=39302
+                                      ->  Unique  (cost=54613.13..54650.01 rows=193 width=22) (actual time=37.747..41.766 rows=279.00 loops=1)
+                                            Buffers: shared hit=39302
+                                            ->  Gather Merge  (cost=54613.13..54649.23 rows=310 width=22) (actual time=37.747..41.734 rows=304.00 loops=1)
+                                                  Workers Planned: 2
+                                                  Workers Launched: 2
+                                                  Buffers: shared hit=39302
+                                                  ->  Sort  (cost=53613.11..53613.43 rows=129 width=22) (actual time=36.042..36.047 rows=101.33 loops=3)
+                                                        Sort Key: f.cik, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (f.tag)::text)), f.value_date DESC
+                                                        Sort Method: quicksort  Memory: 30kB
+                                                        Buffers: shared hit=39302
+                                                        Worker 0:  Sort Method: quicksort  Memory: 28kB
+                                                        Worker 1:  Sort Method: quicksort  Memory: 28kB
+                                                        ->  Parallel Seq Scan on fct_financials f  (cost=0.00..53608.58 rows=129 width=22) (actual time=0.258..35.972 rows=101.33 loops=3)
+                                                              Filter: ((value_date >= '2024-01-01'::date) AND (value_date < '2025-01-01'::date) AND (duration_quarters = 4) AND ((unit)::text = 'USD'::text) AND ((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[])))
+                                                              Rows Removed by Filter: 470095
+                                                              Buffers: shared hit=39196
+Planning Time: 0.152 ms
+Execution Time: 42.060 ms

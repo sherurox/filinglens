@@ -13,7 +13,9 @@ from filinglens.sql.explain_bench import (
     parse_times,
     result_digest,
     strip_sql,
+    table_access,
     write_outputs,
+    write_results_md,
 )
 
 
@@ -131,3 +133,29 @@ def test_write_outputs_saves_plans_and_merges_csv_rows(tmp_path: Path):
         rows = list(csv.DictReader(f))
     assert [row["query"] for row in rows] == ["00_old", "01_demo"]
     assert rows[1]["index_change"] == "CREATE INDEX ix_demo ON marts.fct_financials (cik)"
+
+
+def test_table_access_skips_wrapper_scans_and_strips_costs():
+    plan = (
+        "-- 01_demo: header\n"
+        "Sort  (cost=1.00..2.00 rows=1 width=4)\n"
+        "  ->  Subquery Scan on ranked  (cost=1.00..2.00 rows=1 width=4)\n"
+        "        ->  Index Only Scan using ix_a on fct_financials f  (cost=0.43..8.45 rows=1)\n"
+        "              Heap Fetches: 0\n"
+    )
+    assert table_access(plan) == "Index Only Scan using ix_a on fct_financials f"
+    assert table_access("Seq Scan on dim_company c  (cost=0.00..8.00 rows=300 width=8)") == ""
+
+
+def test_write_results_md_builds_one_row_per_query(tmp_path: Path):
+    db = FakeDatabase(result=[(1,)])
+    r = bench_query(db, SPEC, runs=1, tables=[])
+    csv_path = tmp_path / "sql_explain.csv"
+    write_outputs([r], tmp_path / "explain", csv_path)
+    out = tmp_path / "RESULTS.md"
+    write_results_md(csv_path, tmp_path / "explain", out)
+    text = out.read_text()
+    assert "do not edit" in text.splitlines()[0]
+    row = text.splitlines()[-1]
+    assert row.startswith("| `01_demo` | 1 | True | 10.0 | 2.0 | x5.0 | Seq Scan on fct_financials")
+    assert "| Index Scan on fct_financials |" in row

@@ -1,0 +1,55 @@
+-- 08_net_margin_percentiles: median of 5 runs, execution 0.506 ms (after the index change)
+GroupAggregate  (cost=132.16..132.21 rows=1 width=116) (actual time=0.511..0.592 rows=6.00 loops=1)
+  Group Key: c.sector
+  Buffers: shared hit=65
+  CTE facts
+    ->  Index Only Scan using ix_fct_tag_duration_date_covering on fct_financials  (cost=0.55..60.20 rows=598 width=58) (actual time=0.011..0.085 rows=575.00 loops=1)
+          Index Cond: ((tag = ANY ('{NetIncomeLoss,Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[])) AND (duration_quarters = 4) AND (value_date >= '2024-01-01'::date) AND (value_date < '2025-01-01'::date))
+          Filter: ((unit)::text = 'USD'::text)
+          Rows Removed by Filter: 4
+          Heap Fetches: 0
+          Index Searches: 5
+          Buffers: shared hit=60
+  ->  Sort  (cost=71.96..71.96 rows=1 width=60) (actual time=0.492..0.499 rows=251.00 loops=1)
+        Sort Key: c.sector
+        Sort Method: quicksort  Memory: 36kB
+        Buffers: shared hit=65
+        ->  Hash Join  (cost=62.81..71.95 rows=1 width=60) (actual time=0.419..0.462 rows=251.00 loops=1)
+              Hash Cond: (c.cik = facts_1.cik)
+              Buffers: shared hit=65
+              ->  Seq Scan on dim_company c  (cost=0.00..8.00 rows=300 width=16) (actual time=0.003..0.013 rows=300.00 loops=1)
+                    Buffers: shared hit=5
+              ->  Hash  (cost=62.80..62.80 rows=1 width=64) (actual time=0.415..0.415 rows=251.00 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 25kB
+                    Buffers: shared hit=60
+                    ->  Merge Join  (cost=55.69..62.80 rows=1 width=64) (actual time=0.260..0.397 rows=251.00 loops=1)
+                          Merge Cond: (r.cik = facts_1.cik)
+                          Join Filter: (r.value_date = facts_1.value_date)
+                          Buffers: shared hit=60
+                          ->  Subquery Scan on r  (cost=42.14..48.83 rows=100 width=36) (actual time=0.207..0.256 rows=278.00 loops=1)
+                                Filter: (r.revenue > '0'::numeric)
+                                Rows Removed by Filter: 1
+                                Buffers: shared hit=60
+                                ->  Unique  (cost=42.14..45.09 rows=299 width=40) (actual time=0.207..0.235 rows=279.00 loops=1)
+                                      Buffers: shared hit=60
+                                      ->  Sort  (cost=42.14..43.62 rows=591 width=40) (actual time=0.207..0.214 rows=304.00 loops=1)
+                                            Sort Key: facts.cik, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (facts.tag)::text)), facts.value_date DESC
+                                            Sort Method: quicksort  Memory: 37kB
+                                            Buffers: shared hit=60
+                                            ->  CTE Scan on facts  (cost=0.00..14.93 rows=591 width=40) (actual time=0.077..0.176 rows=304.00 loops=1)
+                                                  Filter: ((tag)::text <> 'NetIncomeLoss'::text)
+                                                  Rows Removed by Filter: 271
+                                                  Storage: Memory  Maximum Storage: 57kB
+                                                  Buffers: shared hit=60
+                          ->  Materialize  (cost=13.55..13.68 rows=7 width=36) (actual time=0.052..0.095 rows=268.00 loops=1)
+                                Storage: Memory  Maximum Storage: 17kB
+                                ->  Unique  (cost=13.55..13.59 rows=7 width=36) (actual time=0.051..0.079 rows=268.00 loops=1)
+                                      ->  Sort  (cost=13.55..13.57 rows=7 width=36) (actual time=0.051..0.058 rows=271.00 loops=1)
+                                            Sort Key: facts_1.cik, facts_1.value_date DESC
+                                            Sort Method: quicksort  Memory: 35kB
+                                            ->  CTE Scan on facts facts_1  (cost=0.00..13.46 rows=7 width=36) (actual time=0.000..0.028 rows=271.00 loops=1)
+                                                  Filter: ((tag)::text = 'NetIncomeLoss'::text)
+                                                  Rows Removed by Filter: 304
+                                                  Storage: Memory  Maximum Storage: 57kB
+Planning Time: 0.167 ms
+Execution Time: 0.614 ms

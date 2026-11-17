@@ -1,0 +1,51 @@
+-- 06_gross_margin_cte_pipeline: median of 5 runs, execution 16.334 ms (after the index change)
+Sort  (cost=38237.89..38237.90 rows=1 width=100) (actual time=17.029..17.035 rows=150.00 loops=1)
+  Sort Key: d.sector, (round((('100'::numeric * (annual_2024.value - annual_2024_1.value)) / NULLIF(annual_2024.value, '0'::numeric)), 2)) DESC, d.ticker
+  Sort Method: quicksort  Memory: 34kB
+  Buffers: shared hit=16869
+  CTE annual_2024
+    ->  Bitmap Heap Scan on fct_financials  (cost=637.45..37096.03 rows=23320 width=57) (actual time=2.328..12.740 rows=21251.00 loops=1)
+          Recheck Cond: ((EXTRACT(year FROM value_date) = '2024'::numeric) AND (duration_quarters = 4))
+          Filter: ((unit)::text = 'USD'::text)
+          Rows Removed by Filter: 810
+          Heap Blocks: exact=16776
+          Buffers: shared hit=16864
+          ->  Bitmap Index Scan on ix_fct_value_year_duration  (cost=0.00..631.62 rows=24719 width=0) (actual time=1.026..1.027 rows=22061.00 loops=1)
+                Index Cond: ((EXTRACT(year FROM value_date) = '2024'::numeric) AND (duration_quarters = 4))
+                Index Searches: 1
+                Buffers: shared hit=88
+  ->  Hash Join  (cost=1132.70..1141.85 rows=1 width=100) (actual time=16.897..16.966 rows=150.00 loops=1)
+        Hash Cond: (d.cik = annual_2024_1.cik)
+        Buffers: shared hit=16869
+        ->  Seq Scan on dim_company d  (cost=0.00..8.00 rows=300 width=20) (actual time=0.003..0.015 rows=300.00 loops=1)
+              Buffers: shared hit=5
+        ->  Hash  (cost=1132.69..1132.69 rows=1 width=68) (actual time=16.887..16.888 rows=150.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 19kB
+              Buffers: shared hit=16864
+              ->  Merge Join  (cost=1125.43..1132.69 rows=1 width=68) (actual time=16.785..16.870 rows=150.00 loops=1)
+                    Merge Cond: (annual_2024.cik = annual_2024_1.cik)
+                    Join Filter: (annual_2024.value_date = annual_2024_1.value_date)
+                    Buffers: shared hit=16864
+                    ->  Unique  (cost=596.25..597.76 rows=191 width=40) (actual time=15.804..15.834 rows=279.00 loops=1)
+                          Buffers: shared hit=16864
+                          ->  Sort  (cost=596.25..597.00 rows=303 width=40) (actual time=15.804..15.814 rows=303.00 loops=1)
+                                Sort Key: annual_2024.cik, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (annual_2024.tag)::text)), annual_2024.value_date DESC
+                                Sort Method: quicksort  Memory: 37kB
+                                Buffers: shared hit=16864
+                                ->  CTE Scan on annual_2024  (cost=0.00..583.76 rows=303 width=40) (actual time=2.343..15.761 rows=304.00 loops=1)
+                                      Filter: ((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[]))
+                                      Rows Removed by Filter: 20947
+                                      Storage: Memory  Maximum Storage: 2166kB
+                                      Buffers: shared hit=16864
+                    ->  Materialize  (cost=529.19..531.04 rows=100 width=36) (actual time=0.977..1.000 rows=150.00 loops=1)
+                          Storage: Memory  Maximum Storage: 17kB
+                          ->  Unique  (cost=529.19..529.79 rows=100 width=40) (actual time=0.975..0.990 rows=150.00 loops=1)
+                                ->  Sort  (cost=529.19..529.49 rows=121 width=40) (actual time=0.975..0.979 rows=152.00 loops=1)
+                                      Sort Key: annual_2024_1.cik, (array_position('{CostOfRevenue,CostOfGoodsAndServicesSold}'::text[], (annual_2024_1.tag)::text)), annual_2024_1.value_date DESC
+                                      Sort Method: quicksort  Memory: 31kB
+                                      ->  CTE Scan on annual_2024 annual_2024_1  (cost=0.00..525.00 rows=121 width=40) (actual time=0.006..0.957 rows=152.00 loops=1)
+                                            Filter: ((tag)::text = ANY ('{CostOfRevenue,CostOfGoodsAndServicesSold}'::text[]))
+                                            Rows Removed by Filter: 21099
+                                            Storage: Memory  Maximum Storage: 2166kB
+Planning Time: 0.177 ms
+Execution Time: 17.062 ms

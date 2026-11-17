@@ -1,0 +1,45 @@
+-- 02_sector_revenue_rank: median of 5 runs, execution 0.395 ms (after the index change)
+Incremental Sort  (cost=1241.69..1252.74 rows=188 width=53) (actual time=0.429..0.430 rows=30.00 loops=1)
+  Sort Key: ranked.sector, ranked.sector_rank, ranked.ticker
+  Presorted Key: ranked.sector
+  Full-sort Groups: 1  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+  Buffers: shared hit=322
+  ->  Subquery Scan on ranked  (cost=1239.98..1245.60 rows=188 width=53) (actual time=0.397..0.425 rows=30.00 loops=1)
+        Buffers: shared hit=322
+        ->  WindowAgg  (cost=1239.98..1243.72 rows=188 width=53) (actual time=0.396..0.423 rows=30.00 loops=1)
+              Window: w1 AS (PARTITION BY c.sector ORDER BY r.revenue ROWS UNBOUNDED PRECEDING)
+              Run Condition: (rank() OVER w1 <= 5)
+              Storage: Memory  Maximum Storage: 17kB
+              Buffers: shared hit=322
+              ->  Sort  (cost=1239.96..1240.43 rows=188 width=45) (actual time=0.395..0.402 rows=279.00 loops=1)
+                    Sort Key: c.sector, r.revenue DESC
+                    Sort Method: quicksort  Memory: 43kB
+                    Buffers: shared hit=322
+                    ->  Hash Join  (cost=1224.06..1232.86 rows=188 width=45) (actual time=0.248..0.290 rows=279.00 loops=1)
+                          Hash Cond: (c.cik = r.cik)
+                          Buffers: shared hit=322
+                          ->  Seq Scan on dim_company c  (cost=0.00..8.00 rows=300 width=39) (actual time=0.003..0.012 rows=300.00 loops=1)
+                                Buffers: shared hit=5
+                          ->  Hash  (cost=1221.71..1221.71 rows=188 width=18) (actual time=0.244..0.244 rows=279.00 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=317
+                                ->  Subquery Scan on r  (cost=1218.34..1221.71 rows=188 width=18) (actual time=0.179..0.225 rows=279.00 loops=1)
+                                      Buffers: shared hit=317
+                                      ->  Unique  (cost=1218.34..1219.83 rows=188 width=22) (actual time=0.179..0.208 rows=279.00 loops=1)
+                                            Buffers: shared hit=317
+                                            ->  Sort  (cost=1218.34..1219.08 rows=297 width=22) (actual time=0.179..0.187 rows=304.00 loops=1)
+                                                  Sort Key: f.cik, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (f.tag)::text)), f.value_date DESC
+                                                  Sort Method: quicksort  Memory: 37kB
+                                                  Buffers: shared hit=317
+                                                  ->  Bitmap Heap Scan on fct_financials f  (cost=22.52..1206.14 rows=297 width=22) (actual time=0.043..0.151 rows=304.00 loops=1)
+                                                        Recheck Cond: (((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[])) AND (duration_quarters = 4) AND (value_date >= '2024-01-01'::date) AND (value_date < '2025-01-01'::date))
+                                                        Filter: ((unit)::text = 'USD'::text)
+                                                        Rows Removed by Filter: 2
+                                                        Heap Blocks: exact=305
+                                                        Buffers: shared hit=317
+                                                        ->  Bitmap Index Scan on ix_fct_tag_duration_date  (cost=0.00..22.45 rows=316 width=0) (actual time=0.026..0.027 rows=306.00 loops=1)
+                                                              Index Cond: (((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[])) AND (duration_quarters = 4) AND (value_date >= '2024-01-01'::date) AND (value_date < '2025-01-01'::date))
+                                                              Index Searches: 4
+                                                              Buffers: shared hit=12
+Planning Time: 0.106 ms
+Execution Time: 0.446 ms

@@ -1,0 +1,51 @@
+-- 06_gross_margin_cte_pipeline: median of 5 runs, execution 48.894 ms (before the index change)
+Sort  (cost=51842.65..51842.65 rows=1 width=100) (actual time=47.760..50.416 rows=150.00 loops=1)
+  Sort Key: d.sector, (round((('100'::numeric * (r.revenue - c.cost_of_revenue)) / NULLIF(r.revenue, '0'::numeric)), 2)) DESC, d.ticker
+  Sort Method: quicksort  Memory: 34kB
+  Buffers: shared hit=38919
+  CTE annual_2024
+    ->  Gather  (cost=1000.00..51779.74 rows=1121 width=58) (actual time=0.161..45.534 rows=21251.00 loops=1)
+          Workers Planned: 2
+          Workers Launched: 2
+          Buffers: shared hit=38914
+          ->  Parallel Seq Scan on fct_financials  (cost=0.00..50667.64 rows=467 width=58) (actual time=0.025..42.467 rows=7083.67 loops=3)
+                Filter: ((duration_quarters = 4) AND ((unit)::text = 'USD'::text) AND (EXTRACT(year FROM value_date) = '2024'::numeric))
+                Rows Removed by Filter: 463113
+                Buffers: shared hit=38914
+  ->  Hash Join  (cost=54.06..62.90 rows=1 width=100) (actual time=47.607..47.698 rows=150.00 loops=1)
+        Hash Cond: ((c.cik = r.cik) AND (c.value_date = r.value_date))
+        Buffers: shared hit=38919
+        ->  Hash Join  (cost=25.43..34.23 rows=5 width=56) (actual time=46.029..46.075 rows=150.00 loops=1)
+              Hash Cond: (d.cik = c.cik)
+              Buffers: shared hit=38919
+              ->  Seq Scan on dim_company d  (cost=0.00..8.00 rows=300 width=20) (actual time=0.004..0.016 rows=300.00 loops=1)
+                    Buffers: shared hit=5
+              ->  Hash  (cost=25.37..25.37 rows=5 width=36) (actual time=46.022..46.024 rows=150.00 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 16kB
+                    Buffers: shared hit=38914
+                    ->  Subquery Scan on c  (cost=25.29..25.37 rows=5 width=36) (actual time=45.977..46.006 rows=150.00 loops=1)
+                          Buffers: shared hit=38914
+                          ->  Unique  (cost=25.29..25.32 rows=5 width=40) (actual time=45.976..45.996 rows=150.00 loops=1)
+                                Buffers: shared hit=38914
+                                ->  Sort  (cost=25.29..25.31 rows=5 width=40) (actual time=45.975..45.982 rows=152.00 loops=1)
+                                      Sort Key: annual_2024.cik, (array_position('{CostOfRevenue,CostOfGoodsAndServicesSold}'::text[], (annual_2024.tag)::text)), annual_2024.value_date DESC
+                                      Sort Method: quicksort  Memory: 31kB
+                                      Buffers: shared hit=38914
+                                      ->  CTE Scan on annual_2024  (cost=0.00..25.23 rows=5 width=40) (actual time=0.547..45.940 rows=152.00 loops=1)
+                                            Filter: ((tag)::text = ANY ('{CostOfRevenue,CostOfGoodsAndServicesSold}'::text[]))
+                                            Rows Removed by Filter: 21099
+                                            Storage: Memory  Maximum Storage: 2166kB
+                                            Buffers: shared hit=38914
+        ->  Hash  (cost=28.45..28.45 rows=12 width=36) (actual time=1.570..1.571 rows=279.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 24kB
+              ->  Subquery Scan on r  (cost=28.27..28.45 rows=12 width=36) (actual time=1.508..1.550 rows=279.00 loops=1)
+                    ->  Unique  (cost=28.27..28.33 rows=12 width=40) (actual time=1.508..1.534 rows=279.00 loops=1)
+                          ->  Sort  (cost=28.27..28.30 rows=12 width=40) (actual time=1.507..1.515 rows=304.00 loops=1)
+                                Sort Key: annual_2024_1.cik, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (annual_2024_1.tag)::text)), annual_2024_1.value_date DESC
+                                Sort Method: quicksort  Memory: 37kB
+                                ->  CTE Scan on annual_2024 annual_2024_1  (cost=0.00..28.06 rows=12 width=40) (actual time=0.012..1.469 rows=304.00 loops=1)
+                                      Filter: ((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[]))
+                                      Rows Removed by Filter: 20947
+                                      Storage: Memory  Maximum Storage: 2166kB
+Planning Time: 0.197 ms
+Execution Time: 50.446 ms

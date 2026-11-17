@@ -1,0 +1,21 @@
+-- 04_first_year_tag_reported: median of 5 runs, execution 0.441 ms (after the index change)
+Sort  (cost=262.31..262.81 rows=200 width=12) (actual time=0.562..0.563 rows=9.00 loops=1)
+  Sort Key: ((EXTRACT(year FROM first_seen.first_value_date))::integer)
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=1362
+  ->  HashAggregate  (cost=251.66..254.66 rows=200 width=12) (actual time=0.559..0.560 rows=9.00 loops=1)
+        Group Key: (EXTRACT(year FROM first_seen.first_value_date))::integer
+        Batches: 1  Memory Usage: 32kB
+        Buffers: shared hit=1362
+        ->  Subquery Scan on first_seen  (cost=0.55..250.17 rows=299 width=4) (actual time=0.015..0.542 rows=174.00 loops=1)
+              Buffers: shared hit=1362
+              ->  GroupAggregate  (cost=0.55..245.68 rows=299 width=12) (actual time=0.014..0.519 rows=174.00 loops=1)
+                    Group Key: fct_financials.cik
+                    Buffers: shared hit=1362
+                    ->  Index Only Scan using ix_fct_tag_cik_date on fct_financials  (cost=0.55..221.77 rows=4184 width=12) (actual time=0.009..0.308 rows=4729.00 loops=1)
+                          Index Cond: (tag = 'OperatingLeaseRightOfUseAsset'::text)
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=1362
+Planning Time: 0.047 ms
+Execution Time: 0.575 ms

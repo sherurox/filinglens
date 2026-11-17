@@ -1,0 +1,68 @@
+-- 07_peer_self_join: median of 5 runs, execution 70.599 ms (before the index change)
+Limit  (cost=105081.00..105081.02 rows=10 width=46) (actual time=65.653..70.821 rows=10.00 loops=1)
+  Buffers: shared hit=77854
+  ->  Sort  (cost=105081.00..105081.11 rows=43 width=46) (actual time=65.652..70.819 rows=10.00 loops=1)
+        Sort Key: (round(peers.log_size_gap, 3)), peers.ticker
+        Sort Method: top-N heapsort  Memory: 26kB
+        Buffers: shared hit=77854
+        ->  Subquery Scan on peers  (cost=105079.32..105080.07 rows=43 width=46) (actual time=65.625..70.804 rows=49.00 loops=1)
+              Buffers: shared hit=77854
+              ->  Unique  (cost=105079.32..105079.53 rows=43 width=50) (actual time=65.622..70.795 rows=49.00 loops=1)
+                    Buffers: shared hit=77854
+                    ->  Sort  (cost=105079.32..105079.42 rows=43 width=50) (actual time=65.621..70.789 rows=50.00 loops=1)
+                          Sort Key: p.cik, (abs(ln((b.value / a.revenue)))), b.value_date
+                          Sort Method: quicksort  Memory: 27kB
+                          Buffers: shared hit=77854
+                          ->  Hash Join  (cost=52688.96..105078.15 rows=43 width=50) (actual time=38.796..70.765 rows=50.00 loops=1)
+                                Hash Cond: (b.cik = p.cik)
+                                Join Filter: ((b.value_date >= (a.value_date - 183)) AND (b.value_date <= (a.value_date + 183)))
+                                Rows Removed by Join Filter: 571
+                                Buffers: shared hit=77854
+                                ->  Gather  (cost=1000.00..53372.28 rows=2342 width=18) (actual time=0.197..31.680 rows=3460.00 loops=1)
+                                      Workers Planned: 2
+                                      Workers Launched: 2
+                                      Buffers: shared hit=38920
+                                      ->  Parallel Seq Scan on fct_financials b  (cost=0.00..52138.08 rows=976 width=18) (actual time=0.114..50.651 rows=1153.33 loops=3)
+                                            Filter: ((value > '0'::numeric) AND (duration_quarters = 4) AND ((unit)::text = 'USD'::text) AND ((tag)::text = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[])))
+                                            Rows Removed by Filter: 469043
+                                            Buffers: shared hit=38920
+                                ->  Hash  (cost=51688.34..51688.34 rows=50 width=18) (actual time=38.583..38.633 rows=49.00 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 11kB
+                                      Buffers: shared hit=38934
+                                      ->  Hash Join  (cost=51677.96..51688.34 rows=50 width=18) (actual time=38.533..38.624 rows=49.00 loops=1)
+                                            Hash Cond: ((p.sector)::text = (a.sector)::text)
+                                            Buffers: shared hit=38934
+                                            ->  Seq Scan on dim_company p  (cost=0.00..8.75 rows=299 width=20) (actual time=0.003..0.021 rows=299.00 loops=1)
+                                                  Filter: (cik <> 320193)
+                                                  Rows Removed by Filter: 1
+                                                  Buffers: shared hit=5
+                                            ->  Hash  (cost=51677.95..51677.95 rows=1 width=22) (actual time=38.526..38.574 rows=1.00 loops=1)
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                  Buffers: shared hit=38929
+                                                  ->  Subquery Scan on a  (cost=51677.94..51677.95 rows=1 width=22) (actual time=38.519..38.568 rows=1.00 loops=1)
+                                                        Buffers: shared hit=38929
+                                                        ->  Limit  (cost=51677.94..51677.94 rows=1 width=22) (actual time=38.518..38.566 rows=1.00 loops=1)
+                                                              Buffers: shared hit=38929
+                                                              ->  Sort  (cost=51677.94..51677.95 rows=4 width=22) (actual time=38.517..38.564 rows=1.00 loops=1)
+                                                                    Sort Key: f.value_date DESC
+                                                                    Sort Method: top-N heapsort  Memory: 25kB
+                                                                    Buffers: shared hit=38929
+                                                                    ->  Gather  (cost=1000.00..51677.92 rows=4 width=22) (actual time=19.387..38.549 rows=9.00 loops=1)
+                                                                          Workers Planned: 2
+                                                                          Workers Launched: 2
+                                                                          Buffers: shared hit=38929
+                                                                          ->  Nested Loop  (cost=0.00..50677.52 rows=2 width=22) (actual time=14.960..36.577 rows=3.00 loops=3)
+                                                                                Buffers: shared hit=38929
+                                                                                ->  Parallel Seq Scan on fct_financials f  (cost=0.00..50668.74 rows=2 width=18) (actual time=14.902..36.504 rows=3.00 loops=3)
+                                                                                      Filter: ((cik = 320193) AND ((tag)::text = 'RevenueFromContractWithCustomerExcludingAssessedTax'::text) AND (duration_quarters = 4) AND ((unit)::text = 'USD'::text))
+                                                                                      Rows Removed by Filter: 470194
+                                                                                      Buffers: shared hit=38914
+                                                                                ->  Materialize  (cost=0.00..8.76 rows=1 width=16) (actual time=0.019..0.022 rows=1.00 loops=9)
+                                                                                      Storage: Memory  Maximum Storage: 17kB
+                                                                                      Buffers: shared hit=15
+                                                                                      ->  Seq Scan on dim_company c  (cost=0.00..8.75 rows=1 width=16) (actual time=0.047..0.055 rows=1.00 loops=3)
+                                                                                            Filter: (cik = 320193)
+                                                                                            Rows Removed by Filter: 299
+                                                                                            Buffers: shared hit=15
+Planning Time: 0.287 ms
+Execution Time: 70.853 ms

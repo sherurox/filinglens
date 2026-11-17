@@ -1,0 +1,33 @@
+-- 03_rolling_4q_avg_assets: median of 5 runs, execution 3.117 ms (after the index change)
+Sort  (cost=250.74..250.75 rows=1 width=46) (actual time=3.595..3.632 rows=1604.00 loops=1)
+  Sort Key: rolling.ticker, rolling.value_date
+  Sort Method: quicksort  Memory: 119kB
+  Buffers: shared hit=2766
+  ->  Subquery Scan on rolling  (cost=11.21..250.73 rows=1 width=46) (actual time=0.108..3.100 rows=1604.00 loops=1)
+        Filter: ((rolling.span_days >= 255) AND (rolling.span_days <= 290) AND (rolling.points = 4))
+        Rows Removed by Filter: 241
+        Buffers: shared hit=2766
+        ->  WindowAgg  (cost=11.21..242.63 rows=463 width=66) (actual time=0.105..2.925 rows=1845.00 loops=1)
+              Window: w4 AS (PARTITION BY f.cik ORDER BY f.value_date ROWS BETWEEN '3'::bigint PRECEDING AND CURRENT ROW)
+              Storage: Memory  Maximum Storage: 17kB
+              Buffers: shared hit=2766
+              ->  Merge Join  (cost=10.71..231.05 rows=463 width=22) (actual time=0.100..1.544 rows=1845.00 loops=1)
+                    Merge Cond: (f.cik = c.cik)
+                    Buffers: shared hit=2766
+                    ->  Index Only Scan using ix_fct_tag_duration_cik_date on fct_financials f  (cost=0.55..207.00 rows=2780 width=18) (actual time=0.017..0.937 rows=10116.00 loops=1)
+                          Index Cond: ((tag = 'Assets'::text) AND (duration_quarters = 0))
+                          Filter: ((unit)::text = 'USD'::text)
+                          Rows Removed by Filter: 72
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=2761
+                    ->  Sort  (cost=10.16..10.29 rows=50 width=8) (actual time=0.020..0.072 rows=1821.00 loops=1)
+                          Sort Key: c.cik
+                          Sort Method: quicksort  Memory: 26kB
+                          Buffers: shared hit=5
+                          ->  Seq Scan on dim_company c  (cost=0.00..8.75 rows=50 width=8) (actual time=0.003..0.016 rows=50.00 loops=1)
+                                Filter: ((sector)::text = 'retail'::text)
+                                Rows Removed by Filter: 250
+                                Buffers: shared hit=5
+Planning Time: 0.124 ms
+Execution Time: 3.680 ms

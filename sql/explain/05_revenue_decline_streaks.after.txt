@@ -1,0 +1,59 @@
+-- 05_revenue_decline_streaks: median of 5 runs, execution 2.471 ms (after the index change)
+Sort  (cost=563.34..563.34 rows=2 width=32) (actual time=2.861..2.863 rows=30.00 loops=1)
+  Sort Key: s.years DESC, c.ticker, s.first_year
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=964
+  ->  Hash Join  (cost=554.18..563.33 rows=2 width=32) (actual time=2.828..2.853 rows=30.00 loops=1)
+        Hash Cond: (c.cik = s.cik)
+        Buffers: shared hit=964
+        ->  Seq Scan on dim_company c  (cost=0.00..8.00 rows=300 width=20) (actual time=0.003..0.012 rows=300.00 loops=1)
+              Buffers: shared hit=5
+        ->  Hash  (cost=554.16..554.16 rows=2 width=24) (actual time=2.823..2.824 rows=30.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 10kB
+              Buffers: shared hit=959
+              ->  Subquery Scan on s  (cost=436.50..554.16 rows=2 width=24) (actual time=1.017..2.821 rows=30.00 loops=1)
+                    Buffers: shared hit=959
+                    ->  GroupAggregate  (cost=436.50..554.14 rows=2 width=32) (actual time=1.017..2.819 rows=30.00 loops=1)
+                          Group Key: declines.cik, declines.island
+                          Filter: (count(*) >= 3)
+                          Rows Removed by Filter: 349
+                          Buffers: shared hit=959
+                          ->  Incremental Sort  (cost=436.50..554.01 rows=5 width=20) (actual time=1.013..2.749 rows=548.00 loops=1)
+                                Sort Key: declines.cik, declines.island
+                                Presorted Key: declines.cik
+                                Full-sort Groups: 17  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
+                                Buffers: shared hit=959
+                                ->  Subquery Scan on declines  (cost=407.16..553.79 rows=5 width=20) (actual time=0.949..2.699 rows=548.00 loops=1)
+                                      Buffers: shared hit=959
+                                      ->  WindowAgg  (cost=407.16..553.79 rows=5 width=20) (actual time=0.949..2.673 rows=548.00 loops=1)
+                                            Window: w1 AS (PARTITION BY yearly.cik ORDER BY yearly.period_year ROWS UNBOUNDED PRECEDING)
+                                            Storage: Memory  Maximum Storage: 17kB
+                                            Buffers: shared hit=959
+                                            ->  Incremental Sort  (cost=407.16..553.69 rows=5 width=12) (actual time=0.948..2.592 rows=548.00 loops=1)
+                                                  Sort Key: yearly.cik, yearly.period_year
+                                                  Presorted Key: yearly.cik
+                                                  Full-sort Groups: 17  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
+                                                  Buffers: shared hit=959
+                                                  ->  Subquery Scan on yearly  (cost=370.58..553.46 rows=5 width=12) (actual time=0.872..2.543 rows=548.00 loops=1)
+                                                        Filter: ((yearly.revenue < yearly.prior_revenue) AND (yearly.prior_year = (yearly.period_year - 1)))
+                                                        Rows Removed by Filter: 2304
+                                                        Buffers: shared hit=959
+                                                        ->  WindowAgg  (cost=370.58..504.41 rows=2803 width=58) (actual time=0.865..2.363 rows=2852.00 loops=1)
+                                                              Window: w AS (PARTITION BY revenue.cik ORDER BY revenue.value_date)
+                                                              Storage: Memory  Maximum Storage: 17kB
+                                                              Buffers: shared hit=959
+                                                              ->  Subquery Scan on revenue  (cost=370.53..420.32 rows=2803 width=18) (actual time=0.862..1.328 rows=2852.00 loops=1)
+                                                                    Buffers: shared hit=959
+                                                                    ->  Unique  (cost=370.53..392.29 rows=2803 width=22) (actual time=0.862..1.162 rows=2852.00 loops=1)
+                                                                          Buffers: shared hit=959
+                                                                          ->  Sort  (cost=370.53..377.79 rows=2901 width=22) (actual time=0.861..0.945 rows=3464.00 loops=1)
+                                                                                Sort Key: f.cik, f.value_date, (array_position('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[], (f.tag)::text))
+                                                                                Sort Method: quicksort  Memory: 240kB
+                                                                                Buffers: shared hit=959
+                                                                                ->  Index Only Scan using ix_fct_annual_usd_tag_cik_date on fct_financials f  (cost=0.42..203.69 rows=2901 width=22) (actual time=0.009..0.423 rows=3464.00 loops=1)
+                                                                                      Index Cond: (tag = ANY ('{Revenues,RevenueFromContractWithCustomerExcludingAssessedTax,RevenueFromContractWithCustomerIncludingAssessedTax,SalesRevenueNet}'::text[]))
+                                                                                      Heap Fetches: 0
+                                                                                      Index Searches: 2
+                                                                                      Buffers: shared hit=959
+Planning Time: 0.142 ms
+Execution Time: 2.884 ms

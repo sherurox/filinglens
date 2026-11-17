@@ -1,19 +1,19 @@
--- 01_yoy_revenue_one_company: median of 5 runs, execution 40.514 ms (before the index change)
-WindowAgg  (cost=51670.39..51670.49 rows=4 width=74) (actual time=37.136..41.400 rows=9.00 loops=1)
+-- 01_yoy_revenue_one_company: median of 5 runs, execution 41.21 ms (before the index change)
+WindowAgg  (cost=51667.44..51667.51 rows=3 width=74) (actual time=37.195..41.615 rows=9.00 loops=1)
   Window: w1 AS (ORDER BY fct_financials.value_date)
   Storage: Memory  Maximum Storage: 17kB
   Buffers: shared hit=38914
-  ->  Sort  (cost=51670.37..51670.38 rows=4 width=10) (actual time=37.127..41.381 rows=9.00 loops=1)
+  ->  Sort  (cost=51667.42..51667.43 rows=3 width=10) (actual time=37.186..41.595 rows=9.00 loops=1)
         Sort Key: fct_financials.value_date
         Sort Method: quicksort  Memory: 25kB
         Buffers: shared hit=38914
-        ->  Gather  (cost=1000.00..51670.33 rows=4 width=10) (actual time=5.574..41.372 rows=9.00 loops=1)
+        ->  Gather  (cost=1000.00..51667.40 rows=3 width=10) (actual time=3.498..41.579 rows=9.00 loops=1)
               Workers Planned: 2
               Workers Launched: 2
               Buffers: shared hit=38914
-              ->  Parallel Seq Scan on fct_financials  (cost=0.00..50669.93 rows=2 width=10) (actual time=7.449..35.389 rows=3.00 loops=3)
+              ->  Parallel Seq Scan on fct_financials  (cost=0.00..50667.10 rows=1 width=10) (actual time=17.791..35.561 rows=3.00 loops=3)
                     Filter: ((cik = 320193) AND ((tag)::text = 'RevenueFromContractWithCustomerExcludingAssessedTax'::text) AND (duration_quarters = 4) AND ((unit)::text = 'USD'::text))
                     Rows Removed by Filter: 470194
                     Buffers: shared hit=38914
-Planning Time: 0.076 ms
-Execution Time: 41.415 ms
+Planning Time: 0.083 ms
+Execution Time: 41.631 ms

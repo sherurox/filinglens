@@ -1,0 +1,32 @@
+-- 04_first_year_tag_reported: median of 5 runs, execution 39.302 ms (before the index change)
+GroupAggregate  (cost=47523.81..47529.06 rows=200 width=12) (actual time=35.473..39.457 rows=9.00 loops=1)
+  Group Key: ((EXTRACT(year FROM first_seen.first_value_date))::integer)
+  Buffers: shared hit=38990
+  ->  Sort  (cost=47523.81..47524.56 rows=299 width=4) (actual time=35.471..39.447 rows=174.00 loops=1)
+        Sort Key: ((EXTRACT(year FROM first_seen.first_value_date))::integer)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=38990
+        ->  Subquery Scan on first_seen  (cost=47396.51..47511.52 rows=299 width=4) (actual time=35.023..39.434 rows=174.00 loops=1)
+              Buffers: shared hit=38990
+              ->  Finalize GroupAggregate  (cost=47396.51..47507.03 rows=299 width=12) (actual time=35.020..39.409 rows=174.00 loops=1)
+                    Group Key: fct_financials.cik
+                    Buffers: shared hit=38990
+                    ->  Gather Merge  (cost=47396.51..47500.45 rows=718 width=12) (actual time=35.013..39.369 rows=514.00 loops=1)
+                          Workers Planned: 2
+                          Workers Launched: 2
+                          Buffers: shared hit=38990
+                          ->  Partial GroupAggregate  (cost=46396.49..46417.55 rows=299 width=12) (actual time=33.233..33.439 rows=171.33 loops=3)
+                                Group Key: fct_financials.cik
+                                Buffers: shared hit=38990
+                                ->  Sort  (cost=46396.49..46402.51 rows=2410 width=12) (actual time=33.226..33.290 rows=1576.33 loops=3)
+                                      Sort Key: fct_financials.cik
+                                      Sort Method: quicksort  Memory: 103kB
+                                      Buffers: shared hit=38990
+                                      Worker 0:  Sort Method: quicksort  Memory: 94kB
+                                      Worker 1:  Sort Method: quicksort  Memory: 96kB
+                                      ->  Parallel Seq Scan on fct_financials  (cost=0.00..46261.11 rows=2410 width=12) (actual time=0.015..32.968 rows=1576.33 loops=3)
+                                            Filter: ((tag)::text = 'OperatingLeaseRightOfUseAsset'::text)
+                                            Rows Removed by Filter: 468620
+                                            Buffers: shared hit=38914
+Planning Time: 0.116 ms
+Execution Time: 39.479 ms
