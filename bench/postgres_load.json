@@ -1,0 +1,27 @@
+{
+  "command": "uv run python -m filinglens.sql.load_postgres",
+  "finished_utc": "2026-11-17T06:36:31+00:00",
+  "postgres_version": "PostgreSQL 18.7 (Debian 18.7-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "schema": "marts",
+  "copy_seconds": 2.1,
+  "tables": {
+    "dim_company": {
+      "duckdb_rows": 300,
+      "postgres_rows": 300
+    },
+    "dim_period": {
+      "duckdb_rows": 662,
+      "postgres_rows": 662
+    },
+    "dim_tag": {
+      "duckdb_rows": 101822,
+      "postgres_rows": 101822
+    },
+    "fct_financials": {
+      "duckdb_rows": 1410590,
+      "postgres_rows": 1410590
+    }
+  },
+  "postgres_total_bytes": 358342656,
+  "rows_match": true
+}

@@ -1,0 +1,40 @@
+# Local Postgres for the hand-written SQL in sql/ (FL-M1 T11–T12).
+# Start: docker compose up -d --wait     Stop: docker compose stop
+# Teardown (deletes the data; rebuild with filinglens.sql.load_postgres): docker compose down -v
+name: filinglens
+
+services:
+  postgres:
+    image: postgres:18  # stable major; the exact version is recorded in bench/postgres_load.json
+    container_name: filinglens-postgres
+    environment:
+      POSTGRES_DB: filinglens
+      POSTGRES_USER: filinglens
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:55432:5432"  # localhost only; 55432 avoids any Postgres already on 5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+    # Fixed settings so EXPLAIN ANALYZE timings are reproducible:
+    command:
+      - postgres
+      - -c
+      - shared_buffers=1GB  # the marts fit in cache: timings compare plans, not disk reads
+      - -c
+      - effective_cache_size=4GB
+      - -c
+      - work_mem=64MB
+      - -c
+      - jit=off  # JIT compile time would add noise to every analytic query
+      - -c
+      - track_io_timing=on  # BUFFERS output shows I/O time
+    shm_size: 1gb  # parallel workers use shared memory; Docker's default is 64 MB
+    mem_limit: 4g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U filinglens -d filinglens"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:
