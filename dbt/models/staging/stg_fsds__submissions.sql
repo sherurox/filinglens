@@ -25,4 +25,4 @@ select
     nciks as cik_count,
     aciks as additional_ciks,
     source_quarter
-from {{ source('fsds', 'sub') }}
+from {{ source('fsds', 'sub') }} as src

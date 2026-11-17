@@ -12,4 +12,4 @@ select
     footnote,
     fy as fiscal_year,
     source_quarter
-from {{ source('fsds', 'num') }}
+from {{ source('fsds', 'num') }} as src

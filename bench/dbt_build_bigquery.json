@@ -1,0 +1,476 @@
+{
+  "dbt_version": "1.12.7",
+  "generated_at": "2026-11-17T06:20:36.745935Z",
+  "command": "dbt build --target bigquery",
+  "target": "bigquery",
+  "elapsed_seconds": 29.93,
+  "counts": {
+    "model:success": 10,
+    "seed:success": 1,
+    "test:pass": 37,
+    "test:warn": 3
+  },
+  "total_bytes_processed": 4478061878,
+  "total_bytes_billed": 4722786304,
+  "nodes": [
+    {
+      "node": "model.filinglens.dim_company",
+      "status": "success",
+      "seconds": 2.97,
+      "rows_affected": 300,
+      "bytes_processed": 617198,
+      "bytes_billed": 20971520,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.dim_period",
+      "status": "success",
+      "seconds": 3.88,
+      "rows_affected": 662,
+      "bytes_processed": 631492633,
+      "bytes_billed": 632291328,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.dim_tag",
+      "status": "success",
+      "seconds": 5.65,
+      "rows_affected": 101822,
+      "bytes_processed": 974148948,
+      "bytes_billed": 975175680,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.fct_financials",
+      "status": "success",
+      "seconds": 7.39,
+      "rows_affected": 1410590,
+      "bytes_processed": 1029820705,
+      "bytes_billed": 1030750208,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.int_fsds__company_facts",
+      "status": "success",
+      "seconds": 1.12,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.int_fsds__periodic_filings",
+      "status": "success",
+      "seconds": 1.53,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.stg_fsds__numbers",
+      "status": "success",
+      "seconds": 1.04,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.stg_fsds__presentations",
+      "status": "success",
+      "seconds": 0.99,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.stg_fsds__submissions",
+      "status": "success",
+      "seconds": 1.38,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "model.filinglens.stg_fsds__tags",
+      "status": "success",
+      "seconds": 1.03,
+      "rows_affected": null,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": null
+    },
+    {
+      "node": "seed.filinglens.universe",
+      "status": "success",
+      "seconds": 4.99,
+      "rows_affected": 300,
+      "bytes_processed": null,
+      "bytes_billed": null,
+      "failures": null
+    },
+    {
+      "node": "test.filinglens.accepted_range_fct_financials_duration_quarters__4__0.2a0702a7d4",
+      "status": "pass",
+      "seconds": 1.27,
+      "rows_affected": 1,
+      "bytes_processed": 11284720,
+      "bytes_billed": 11534336,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.accepted_range_fct_financials_times_reported__1.d56eef0010",
+      "status": "pass",
+      "seconds": 1.33,
+      "rows_affected": 1,
+      "bytes_processed": 11284720,
+      "bytes_billed": 11534336,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.accepted_range_stg_fsds__numbers_duration_quarters__4__0.17c9b65b5a",
+      "status": "warn",
+      "seconds": 1.43,
+      "rows_affected": 1,
+      "bytes_processed": 53454856,
+      "bytes_billed": 53477376,
+      "failures": 703
+    },
+    {
+      "node": "test.filinglens.accepted_values_dim_company_sector__finance__manufacturing__mining_energy__retail__services__transport_utilities.2e6690fd57",
+      "status": "pass",
+      "seconds": 1.23,
+      "rows_affected": 1,
+      "bytes_processed": 3900,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.accepted_values_dim_period_period_type__instant__quarter__half_year__nine_months__annual.6b76a37855",
+      "status": "pass",
+      "seconds": 1.15,
+      "rows_affected": 1,
+      "bytes_processed": 6554,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.accepted_values_stg_fsds__submissions_fiscal_period__FY__Q1__Q2__Q3__Q4__H1__H2__M9__T1__T2__T3__CY.d1533f10ab",
+      "status": "pass",
+      "seconds": 1.41,
+      "rows_affected": 1,
+      "bytes_processed": 39816,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.accepted_values_universe_sector__finance__manufacturing__mining_energy__retail__services__transport_utilities.b18dcb15ec",
+      "status": "pass",
+      "seconds": 1.08,
+      "rows_affected": 1,
+      "bytes_processed": 3900,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.assert_dim_company_has_300_rows",
+      "status": "pass",
+      "seconds": 1.2,
+      "rows_affected": 1,
+      "bytes_processed": 0,
+      "bytes_billed": 0,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_dim_company_cik.2b3d612d15",
+      "status": "pass",
+      "seconds": 1.23,
+      "rows_affected": 1,
+      "bytes_processed": 2400,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_dim_company_ticker.e14b4c18fa",
+      "status": "pass",
+      "seconds": 1.23,
+      "rows_affected": 1,
+      "bytes_processed": 1567,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_dim_period_period_key.c301f67ece",
+      "status": "pass",
+      "seconds": 1.11,
+      "rows_affected": 1,
+      "bytes_processed": 5296,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_dim_tag_tag_key.6c420bd8b9",
+      "status": "pass",
+      "seconds": 1.32,
+      "rows_affected": 1,
+      "bytes_processed": 6890887,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_dim_tag_tag_label.f100560cbd",
+      "status": "pass",
+      "seconds": 1.19,
+      "rows_affected": 1,
+      "bytes_processed": 5648256,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_fct_financials_cik.fddab395b5",
+      "status": "pass",
+      "seconds": 1.22,
+      "rows_affected": 1,
+      "bytes_processed": 11284720,
+      "bytes_billed": 11534336,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_fct_financials_period_key.9efcde8f0a",
+      "status": "pass",
+      "seconds": 1.19,
+      "rows_affected": 1,
+      "bytes_processed": 11284720,
+      "bytes_billed": 11534336,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_fct_financials_tag_key.c5b0c0aa2a",
+      "status": "pass",
+      "seconds": 1.27,
+      "rows_affected": 1,
+      "bytes_processed": 77382443,
+      "bytes_billed": 77594624,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_fct_financials_value.6fc6386495",
+      "status": "pass",
+      "seconds": 1.33,
+      "rows_affected": 1,
+      "bytes_processed": 22569440,
+      "bytes_billed": 23068672,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_fct_financials_was_restated.03c30e55d0",
+      "status": "pass",
+      "seconds": 0.98,
+      "rows_affected": 1,
+      "bytes_processed": 1410590,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__numbers_accession_number.5f908ec911",
+      "status": "pass",
+      "seconds": 1.27,
+      "rows_affected": 1,
+      "bytes_processed": 147000854,
+      "bytes_billed": 147849216,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__numbers_value.82d1debc33",
+      "status": "warn",
+      "seconds": 1.66,
+      "rows_affected": 1,
+      "bytes_processed": 106460944,
+      "bytes_billed": 106954752,
+      "failures": 28048
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__submissions_accession_number.6eb60154e5",
+      "status": "pass",
+      "seconds": 1.3,
+      "rows_affected": 1,
+      "bytes_processed": 224708,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__submissions_cik.260a182959",
+      "status": "pass",
+      "seconds": 2.18,
+      "rows_affected": 1,
+      "bytes_processed": 81712,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__submissions_fiscal_year.7d1dfbbe3e",
+      "status": "warn",
+      "seconds": 1.73,
+      "rows_affected": 1,
+      "bytes_processed": 79632,
+      "bytes_billed": 10485760,
+      "failures": 260
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__submissions_form.37c6697080",
+      "status": "pass",
+      "seconds": 1.19,
+      "rows_affected": 1,
+      "bytes_processed": 61259,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_stg_fsds__tags_tag.f5709f650b",
+      "status": "pass",
+      "seconds": 1.63,
+      "rows_affected": 1,
+      "bytes_processed": 5782913,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.not_null_universe_cik.7cb0ebe3e1",
+      "status": "pass",
+      "seconds": 1.29,
+      "rows_affected": 1,
+      "bytes_processed": 2400,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.relationships_fct_financials_cik__cik__ref_dim_company_.f683c21521",
+      "status": "pass",
+      "seconds": 1.03,
+      "rows_affected": 1,
+      "bytes_processed": 11287120,
+      "bytes_billed": 20971520,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.relationships_fct_financials_period_key__period_key__ref_dim_period_.fd021cc5d2",
+      "status": "pass",
+      "seconds": 1.15,
+      "rows_affected": 1,
+      "bytes_processed": 11290016,
+      "bytes_billed": 20971520,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.relationships_fct_financials_tag_key__tag_key__ref_dim_tag_.82c0189396",
+      "status": "pass",
+      "seconds": 1.05,
+      "rows_affected": 1,
+      "bytes_processed": 84273330,
+      "bytes_billed": 84934656,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.relationships_stg_fsds__numbers_accession_number__accession_number__ref_stg_fsds__submissions_.0e63f8c712",
+      "status": "pass",
+      "seconds": 1.79,
+      "rows_affected": 1,
+      "bytes_processed": 147225562,
+      "bytes_billed": 147849216,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.relationships_stg_fsds__presentations_accession_number__accession_number__ref_stg_fsds__submissions_.bcf39a01d1",
+      "status": "pass",
+      "seconds": 1.52,
+      "rows_affected": 1,
+      "bytes_processed": 28837248,
+      "bytes_billed": 29360128,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_combination_of_columns_fct_financials_cik__tag__value_date__duration_quarters__unit.560509be3d",
+      "status": "pass",
+      "seconds": 0.99,
+      "rows_affected": 1,
+      "bytes_processed": 99230810,
+      "bytes_billed": 99614720,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_combination_of_columns_stg_fsds__tags_tag__tag_version.a8c6f53736",
+      "status": "pass",
+      "seconds": 1.31,
+      "rows_affected": 1,
+      "bytes_processed": 8211492,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_dim_company_cik.ab80a865e2",
+      "status": "pass",
+      "seconds": 1.34,
+      "rows_affected": 1,
+      "bytes_processed": 2400,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_dim_period_period_key.b8b7adf1b4",
+      "status": "pass",
+      "seconds": 1.21,
+      "rows_affected": 1,
+      "bytes_processed": 5296,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_dim_tag_tag_key.b368385320",
+      "status": "pass",
+      "seconds": 1.14,
+      "rows_affected": 1,
+      "bytes_processed": 6890887,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_key_by_hash_stg_fsds__numbers_accession_number__tag__tag_version__value_date__duration_quarters__unit__segments__coregistrant.cf8b69d1ed",
+      "status": "pass",
+      "seconds": 12.63,
+      "rows_affected": 1,
+      "bytes_processed": 922826258,
+      "bytes_billed": 923795456,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_key_by_hash_stg_fsds__presentations_accession_number__report_number__line_number.c110b8dd26",
+      "status": "pass",
+      "seconds": 2.43,
+      "rows_affected": 1,
+      "bytes_processed": 49421660,
+      "bytes_billed": 50331648,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_stg_fsds__submissions_accession_number.49511de70d",
+      "status": "pass",
+      "seconds": 1.52,
+      "rows_affected": 1,
+      "bytes_processed": 224708,
+      "bytes_billed": 10485760,
+      "failures": 0
+    },
+    {
+      "node": "test.filinglens.unique_universe_cik.28ad9a6855",
+      "status": "pass",
+      "seconds": 1.17,
+      "rows_affected": 1,
+      "bytes_processed": 2400,
+      "bytes_billed": 10485760,
+      "failures": 0
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-# Committed on purpose: no secrets. DuckDB is a local file.
+# Committed on purpose: no secrets. DuckDB is a local file; BigQuery signs in with gcloud's
+# application-default credentials (gcloud auth application-default login), so no key file.
 # Run dbt from inside dbt/ (cd dbt && uv run dbt ...): paths below are relative to dbt/.
 filinglens:
   target: duckdb
@@ -15,3 +16,14 @@ filinglens:
         preserve_insertion_order: false  # lets large scans and aggregations use less memory
         temp_directory: "../data/duckdb-tmp"  # spill on disk, not RAM-backed /tmp
         max_temp_directory_size: "40GB"  # hard cap: fail with an error instead of filling D:
+    bigquery:
+      type: bigquery
+      method: oauth  # gcloud application-default credentials
+      project: "{{ env_var('GCP_PROJECT_ID', 'set-GCP_PROJECT_ID') }}"
+      dataset: filinglens  # models, seed and test failures; raw tables are in filinglens_raw
+      location: US
+      threads: 4  # the work runs in BigQuery, not on the laptop
+      priority: interactive
+      job_execution_timeout_seconds: 600
+      job_retries: 1
+      maximum_bytes_billed: 20000000000  # 20 GB per query: a runaway query fails, the free 1 TB/month stays

@@ -34,4 +34,7 @@ jobs:
       - run: uv sync --locked
       # Parse needs no data or warehouse; --warn-error keeps the project deprecation-free.
       - run: uv run dbt --warn-error parse --no-partial-parse
+      # Parse again for BigQuery: parse never connects, so no credentials are needed, and
+      # adapter-specific deprecations (seen only with that adapter) still fail the build.
+      - run: uv run dbt --warn-error parse --no-partial-parse --target bigquery
       - run: uv run dbt ls --resource-type model --resource-type seed --resource-type test

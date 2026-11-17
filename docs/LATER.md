@@ -13,3 +13,4 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-17 | Fiscal-year mapping in dim_period (per company fiscal year end) | Calendar periods are comparable across companies; fiscal mapping needs per-company rules | FL-M1 T8 |
 | 2026-11-17 | Include 40-F / 20-F filers (IFRS taxonomy) in the marts | Universe company BNS files 40-F/6-K only; IFRS tags don't map 1:1 to US GAAP tags | FL-M1 T8 |
 | 2026-11-17 | terraform fmt/validate (and tflint) in CI | Planned for SS-M6 (platform milestone); M1 has 2 resources | FL-M1 T9 |
+| 2026-11-17 | dbt model contracts (enforced column data types) on staging and marts | Would have failed the BigQuery `stg_fsds__tags` view at build time when `tag` resolved to the whole row (a STRUCT); tests check values, not types | FL-M1 T10 |

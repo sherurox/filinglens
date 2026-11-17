@@ -12,4 +12,4 @@ select
     negating as is_negated,
     fy as fiscal_year,
     source_quarter
-from {{ source('fsds', 'pre') }}
+from {{ source('fsds', 'pre') }} as src

@@ -142,6 +142,38 @@ Notes:
 - Parquet byte sizes differ slightly between runs (parallel writes with `preserve_insertion_order = false`); row counts were identical in all three runs.
 - Teardown: `bq rm -r -f -d filinglens-515005:filinglens_raw`, or `terraform destroy` (README). Tables also expire after 60 days.
 
+## dbt on BigQuery (sandbox)
+
+- Command (from `dbt/`, after `set -a; source ../.env; set +a`): `uv run dbt build --target bigquery`, then `uv run python -m filinglens.bench.dbt_run_summary --out bench/dbt_build_bigquery.json` from the repo root (2026-11-17).
+- Same project, second target:
+  - Sources read `filinglens_raw` on BigQuery and the Iceberg tables on DuckDB (schema chosen from `target.type`).
+  - `unique_key_by_hash` hashes with `adapter.dispatch`: `hash(...)` on DuckDB, `farm_fingerprint(to_json_string(struct(...)))` on BigQuery (`dbt/macros/key_hash.sql`).
+- Result: 1 seed, 10 models, 40 tests: PASS=48, WARN=3, ERROR=0, SKIP=0, in 29.93 s. BigQuery processed 4,478,061,878 bytes and billed 4,722,786,304 (0.47% of the free 1 TB/month; at least 10 MB is billed per query). Guard: `maximum_bytes_billed` 20 GB per query.
+- Same marts on both engines:
+
+| Check | DuckDB | BigQuery |
+|---|---|---|
+| `fct_financials` rows | 1,410,590 | 1,410,590 |
+| restated facts | 51,866 | 51,866 |
+| companies with facts | 299 | 299 |
+| value dates | 2012-02-29 to 2026-08-31 | 2012-02-29 to 2026-08-31 |
+| `dim_company` / `dim_period` / `dim_tag` | 300 / 662 / 101,822 | 300 / 662 / 101,822 |
+
+- Staging warnings are smaller on BigQuery because it holds only the universe's filings:
+
+| Warning | DuckDB (all FSDS) | BigQuery (universe) |
+|---|---|---|
+| `duration_quarters` outside 0–4 | 25,077 | 703 |
+| null `value` | 4,891,874 | 28,048 |
+| blank `fiscal_year` | 10,773 | 260 |
+
+- Found on the way:
+  - The first BigQuery build failed in `dim_tag`. In BigQuery an unaliased table name is also a value (the whole row), so `select tag from ...tag` returned a STRUCT. DuckDB returned the column.
+  - Fix: every staging model aliases its source (`as src`). `INFORMATION_SCHEMA.COLUMNS` now shows `tag` as STRING in `stg_fsds__tags` and `dim_tag`.
+  - Model contracts are listed in `docs/LATER.md`.
+- Docs site: `uv run dbt docs generate --target bigquery --static` writes one self-contained file, copied to `docs/dbt/index.html` (2.7 MB; open it in a browser). It includes the BigQuery catalog: column types and row counts.
+- Teardown: `bq rm -r -f -d filinglens-515005:filinglens` (models and seed), or `terraform destroy` (README).
+
 ## Databricks Free Edition rerun
 
 [T15]
