@@ -228,4 +228,33 @@ Notes:
 
 ## Databricks Free Edition rerun
 
-[T15]
+- **What ran:** `notebooks/databricks_fsds_to_delta.py`, from a Databricks Git folder of this repo. It imports the same `build_tables` (typing, newest-quarter dedupe, fiscal-year join) and calls it with `table_format="delta"`.
+- **Free Edition limits that shaped the run:**
+  - It can't download from sec.gov, so the zips were **uploaded** to the Unity Catalog volume `/Volumes/workspace/filinglens/fsds/zips`.
+  - It has no custom storage, so the output is **Delta** tables in `workspace.filinglens`, not the local Iceberg Hadoop catalog.
+  - Compute is serverless only.
+- **Input: a subset of 4 quarters,** 2025q1, 2025q2, 2025q3, 2025q4: 400,411,293 bytes, chosen to keep the upload and the daily compute quota small.
+  - The notebook checked the uploaded zips' SHA-256 against the T5 manifest: {'2025q1': True, '2025q2': True, '2025q3': True, '2025q4': True}.
+- **Local baseline on the same 4 zips** (`bench/fsds_to_iceberg_2025.json`): `uv run python -m filinglens.spark.fsds_to_iceberg --zips data/subset_2025/zips --extracted data/subset_2025/extracted --warehouse data/subset_2025/warehouse --stats bench/fsds_to_iceberg_2025.json`.
+
+| Table | Rows, local Iceberg | Rows, Databricks Delta | Duplicates removed, local | Duplicates removed, Databricks | Rows without fy, local | Rows without fy, Databricks | Seconds, local | Seconds, Databricks |
+|---|---|---|---|---|---|---|---|---|
+| `sub` | 26,085 | 26,085 | 0 | 0 | 1,400 | 1,400 | 5.1 | 26.1 |
+| `tag` | 329,861 | 329,861 | 18,909 | 18,909 | 0 | 0 | 2.1 | 10.8 |
+| `num` | 14,621,401 | 14,621,401 | 138 | 138 | 902,986 | 902,986 | 22.1 | 33.0 |
+| `pre` | 2,965,835 | 2,965,835 | 0 | 0 | 185,353 | 185,353 | 5.6 | 13.6 |
+
+- **Rows identical on both platforms:** True.
+- **Rows per fiscal-year partition identical** (`sub`, `num`, `pre`): {'sub': True, 'num': True, 'pre': True}. `num` has fiscal years 2018–2027, plus rows without a fiscal year.
+- **Total time,** including unzipping:
+  - local: 45.7 s (extract 5.2 s);
+  - Databricks: 123.0 s (extract 24.0 s).
+  - The local extraction writes to the laptop's disk. On Databricks it writes into the volume, a network file system.
+- **Environments:**
+  - Local: Spark 4.1.4, local[*], 24 threads, driver memory 10g, Iceberg runtime org.apache.iceberg:iceberg-spark-runtime-4.1_2.13:1.12.0.
+  - Databricks: Free Edition serverless; runtime `client.6.5`, Spark 4.2.0, Python 3.12.3.
+- **Differences, and why they don't change the data:**
+  - The table format (Iceberg vs Delta) and the catalog (Hadoop catalog vs Unity Catalog) differ.
+  - The compute differs (one laptop vs serverless).
+  - The input bytes and the transform code are the same, and the outputs agree row for row and partition for partition.
+- **Teardown:** `DROP SCHEMA workspace.filinglens CASCADE` (tables, volume and zips), or delete the schema in Catalog Explorer.

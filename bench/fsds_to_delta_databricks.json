@@ -1,0 +1,174 @@
+{
+  "notebook": "notebooks/databricks_fsds_to_delta.py",
+  "finished_utc": "2026-11-17T10:04:17+00:00",
+  "platform": "Databricks Free Edition, serverless compute",
+  "databricks_runtime": "client.6.5",
+  "spark_version": "4.2.0",
+  "python": "3.12.3",
+  "table_format": "delta",
+  "namespace": "workspace.filinglens",
+  "quarters": [
+    "2025q1",
+    "2025q2",
+    "2025q3",
+    "2025q4"
+  ],
+  "zip_sha256_matches_t5": {
+    "2025q1": true,
+    "2025q2": true,
+    "2025q3": true,
+    "2025q4": true
+  },
+  "extract_seconds": 24.0,
+  "total_seconds": 123.0,
+  "tables": {
+    "sub": {
+      "raw_rows": 26085,
+      "rows": 26085,
+      "duplicates_removed": 0,
+      "rows_without_fy": 1400,
+      "seconds": 26.1,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 1400
+        },
+        {
+          "fy": 2018,
+          "record_count": 1
+        },
+        {
+          "fy": 2021,
+          "record_count": 4
+        },
+        {
+          "fy": 2022,
+          "record_count": 19
+        },
+        {
+          "fy": 2023,
+          "record_count": 112
+        },
+        {
+          "fy": 2024,
+          "record_count": 6422
+        },
+        {
+          "fy": 2025,
+          "record_count": 17142
+        },
+        {
+          "fy": 2026,
+          "record_count": 983
+        },
+        {
+          "fy": 2027,
+          "record_count": 2
+        }
+      ]
+    },
+    "tag": {
+      "raw_rows": 348770,
+      "rows": 329861,
+      "duplicates_removed": 18909,
+      "rows_without_fy": 0,
+      "seconds": 10.8,
+      "partitions": [
+        {
+          "file_count": 1,
+          "record_count": 329861
+        }
+      ]
+    },
+    "num": {
+      "raw_rows": 14621539,
+      "rows": 14621401,
+      "duplicates_removed": 138,
+      "rows_without_fy": 902986,
+      "seconds": 33.0,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 902986
+        },
+        {
+          "fy": 2018,
+          "record_count": 115
+        },
+        {
+          "fy": 2021,
+          "record_count": 765
+        },
+        {
+          "fy": 2022,
+          "record_count": 10359
+        },
+        {
+          "fy": 2023,
+          "record_count": 53527
+        },
+        {
+          "fy": 2024,
+          "record_count": 3770619
+        },
+        {
+          "fy": 2025,
+          "record_count": 9525312
+        },
+        {
+          "fy": 2026,
+          "record_count": 357448
+        },
+        {
+          "fy": 2027,
+          "record_count": 270
+        }
+      ]
+    },
+    "pre": {
+      "raw_rows": 2965835,
+      "rows": 2965835,
+      "duplicates_removed": 0,
+      "rows_without_fy": 185353,
+      "seconds": 13.6,
+      "partitions": [
+        {
+          "fy": null,
+          "record_count": 185353
+        },
+        {
+          "fy": 2018,
+          "record_count": 60
+        },
+        {
+          "fy": 2021,
+          "record_count": 271
+        },
+        {
+          "fy": 2022,
+          "record_count": 1705
+        },
+        {
+          "fy": 2023,
+          "record_count": 11429
+        },
+        {
+          "fy": 2024,
+          "record_count": 779080
+        },
+        {
+          "fy": 2025,
+          "record_count": 1890659
+        },
+        {
+          "fy": 2026,
+          "record_count": 97175
+        },
+        {
+          "fy": 2027,
+          "record_count": 103
+        }
+      ]
+    }
+  }
+}
