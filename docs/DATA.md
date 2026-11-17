@@ -7,6 +7,7 @@ Every number here comes from a command's output; the command is listed next to i
 | Dataset | Source | Terms |
 |---|---|---|
 | SEC EDGAR: 10-K documents, submissions JSON, `company_tickers.json` | sec.gov, data.sec.gov | SEC's webmaster FAQ states that government-created content and EDGAR public filings are free to access and reuse (https://www.sec.gov/files/about/webmaster-faq.htm). Access follows SEC fair access: at most 10 requests/s, with a declared User-Agent. |
+| SEC Financial Statement Data Sets (quarterly zips) | sec.gov (published by SEC's Division of Economic and Risk Analysis) | Same SEC terms as the row above: EDGAR public data, free to access and reuse; downloaded at most 8 requests/s with a declared User-Agent. |
 
 ## Company universe: `dbt/seeds/universe.csv`
 
@@ -33,7 +34,7 @@ Every number here comes from a command's output; the command is listed next to i
 - Spark 4.1.4 (local[*], 24 threads, driver memory 10g), Iceberg runtime 1.12.0, Iceberg Hadoop catalog (local filesystem).
 - Input: 35 quarters (2018q1–2026q3), 19,941,034,487 bytes of extracted text. Output: 2,825,014,937 bytes in `data/warehouse/`.
 - Total runtime: 186.4 s (extraction 0.1 s: files were already extracted by the first, failed run).
-- Laptop: [power mode], plugged in.
+- Laptop power settings were not recorded for this run; they are recorded from the ratio benchmark (T13) on.
 
 | Table | Raw rows | Rows | Duplicates removed | Rows without fy | Seconds | Partitioning |
 |---|---|---|---|---|---|---|
