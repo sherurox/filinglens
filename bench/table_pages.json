@@ -1,0 +1,37 @@
+{
+  "command": "uv run python -m filinglens.extract.table_pages",
+  "finished_utc": "2026-11-19T10:03:03+00:00",
+  "ground_truth": "cells from the HTML each image is rendered from (no hand labels)",
+  "filings_scanned": 50,
+  "pages": 50,
+  "by_split": {
+    "test": 40,
+    "dev": 10
+  },
+  "by_kind": {
+    "other": 44,
+    "income_statement": 3,
+    "cash_flow": 2,
+    "balance_sheet": 1
+  },
+  "by_sector": {
+    "finance": 9,
+    "manufacturing": 9,
+    "mining_energy": 8,
+    "retail": 8,
+    "services": 8,
+    "transport_utilities": 8
+  },
+  "by_year": {
+    "2019": 2,
+    "2020": 5,
+    "2021": 7,
+    "2022": 7,
+    "2023": 5,
+    "2024": 9,
+    "2025": 15
+  },
+  "numbers_total": 1840,
+  "rows_total": 669,
+  "pages_wider_than_letter": 0
+}
