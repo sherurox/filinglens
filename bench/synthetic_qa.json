@@ -1,0 +1,68 @@
+{
+  "command": "python -m filinglens.extract.synthetic_qa finalize",
+  "finished_utc": "2026-11-19T17:32:11+00:00",
+  "generator": "Qwen/Qwen3-4B-AWQ",
+  "prompt": "docs/labeling/synthetic_qa_prompt.md",
+  "prompt_version": 2,
+  "prepare": {
+    "command": "python -m filinglens.extract.synthetic_qa prepare",
+    "seed": 20261119,
+    "per_cell": 14,
+    "train_companies": 176,
+    "held_out_companies": 118,
+    "eligible_train_paragraphs": 66329,
+    "dropped_text_also_at_dev_or_test_company": 141,
+    "tasks": 420,
+    "task_companies": 159,
+    "by_sector": {
+      "finance": 70,
+      "manufacturing": 70,
+      "mining_energy": 70,
+      "retail": 70,
+      "services": 70,
+      "transport_utilities": 70
+    },
+    "by_year": {
+      "2019": 84,
+      "2020": 84,
+      "2022": 84,
+      "2024": 84,
+      "2025": 84
+    }
+  },
+  "pairs_generated": 840,
+  "pairs_kept": 550,
+  "kept_rate": 0.6548,
+  "problems": {
+    "evidence_length": 160,
+    "evidence_not_verbatim": 89,
+    "answer_length": 56,
+    "question_no_ticker": 40,
+    "question_copies_paragraph": 39,
+    "duplicate_question": 3,
+    "answer_not_from_paragraph": 1
+  },
+  "pairs_with_any_problem": 290,
+  "kept_by_type": {
+    "factual": 264,
+    "impact": 233,
+    "cause": 37,
+    "mitigation": 16
+  },
+  "kept_by_sector": {
+    "finance": 89,
+    "manufacturing": 85,
+    "mining_energy": 90,
+    "retail": 97,
+    "services": 99,
+    "transport_utilities": 90
+  },
+  "kept_companies": 152,
+  "kept_paragraphs": 357,
+  "leakage": {
+    "rows_from_non_train_companies": 0,
+    "rows_with_source_text_at_dev_or_test_company": 0,
+    "rows_not_marked_synthetic_train": 0
+  },
+  "output": "gold/synthetic/risk_qa.train.jsonl"
+}
