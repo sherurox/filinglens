@@ -193,6 +193,37 @@ def blocking(rows: list[dict[str, Any]], entries: int) -> dict[str, Any]:
     }
 
 
+def diagnostics(rows: list[dict[str, Any]], resolver: Resolver) -> dict[str, Any]:
+    """Tune half: how good the fuzzy stage's best guess is, and what blocking cost."""
+    ref_tokens: dict[int, set[str]] = {}
+    for cik, _, tokens in resolver.entries:
+        ref_tokens.setdefault(cik, set()).update(tokens)
+    listed = [r for r in rows if r["gold_in_reference"] and r["method"] in ("fuzzy", "none")]
+    share = sum(bool(set(normalize(r["name"])) & ref_tokens.get(r["cik"], set())) for r in listed)
+    bands = []
+    for i in range(5):
+        lo, hi = round(0.5 + 0.1 * i, 1), round(0.6 + 0.1 * i, 1)
+        band = [
+            r
+            for r in rows
+            if r["method"] == "fuzzy" and lo <= r["score"] and (r["score"] < hi or hi == 1.0)
+        ]
+        bands.append(
+            {
+                "score": [lo, hi],
+                "queries": len(band),
+                "best_candidate_right": sum(r["best_cik"] == r["cik"] for r in band),
+                "true_company_listed": sum(r["gold_in_reference"] for r in band),
+            }
+        )
+    return {
+        "listed_not_exact": len(listed),
+        "share_a_token_with_true_name": share,
+        "reachable_via_rare_token": sum(r["reachable"] for r in listed),
+        "fuzzy_score_bands": bands,
+    }
+
+
 def sample_pairs(
     rows: list[dict[str, Any]], threshold: float, margin: float, n: int, name: str, seed: int
 ) -> list[dict[str, Any]]:
@@ -278,6 +309,7 @@ def main() -> None:
         "eval_by_method": by_method(test, t, m),
         "eval_errors": errors(test, t, m),
         "blocking_eval": blocking(test, len(resolver.entries)),
+        "diagnostics_tune": diagnostics(tune, resolver),
         "resolve_seconds": resolve_seconds,
         "seconds": round(time.perf_counter() - started, 1),
     }
@@ -306,6 +338,7 @@ def main() -> None:
                 "eval_by_method": report["eval_by_method"],
                 "eval_errors": {k: report["eval_errors"][k] for k in ("wrong", "kinds", "methods")},
                 "blocking_eval": report["blocking_eval"],
+                "diagnostics_tune": report["diagnostics_tune"],
                 "d4_all_matches": precision["all_matches"],
                 "d4_non_exact_matches": precision["non_exact_matches"],
                 "seconds": report["seconds"],

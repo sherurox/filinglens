@@ -6,6 +6,7 @@ from filinglens.extract.entity_eval import (
     by_method,
     choose,
     decide,
+    diagnostics,
     errors,
     half,
     metrics,
@@ -106,3 +107,14 @@ def test_sample_pairs_and_precision(rows):
     summary = precision_of(pairs)
     assert (summary["pairs"], summary["correct"]) == (3, 2)
     assert summary["wilson_ci95"][0] < summary["precision"] < summary["wilson_ci95"][1]
+
+
+def test_diagnostics_bands_and_reach(rows):
+    resolver = Resolver(REFERENCE, max_df=3)
+    d = diagnostics(rows, resolver)
+    assert (d["listed_not_exact"], d["share_a_token_with_true_name"]) == (1, 1)
+    assert d["reachable_via_rare_token"] == 1
+    assert [b["score"] for b in d["fuzzy_score_bands"]][-1] == [0.9, 1.0]
+    assert sum(b["queries"] for b in d["fuzzy_score_bands"]) == sum(
+        r["method"] == "fuzzy" and r["score"] >= 0.5 for r in rows
+    )

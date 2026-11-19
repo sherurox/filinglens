@@ -1,6 +1,6 @@
 {
   "command": "python -m filinglens.extract.entity_eval",
-  "created": "2026-11-19T17:14:45+00:00",
+  "created": "2026-11-19T17:18:52+00:00",
   "check": "pred_cik == filer CIK in FSDS sub.txt (SEC identifier); no hand labels",
   "setting": {
     "threshold": 0.95,

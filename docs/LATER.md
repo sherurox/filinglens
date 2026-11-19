@@ -22,3 +22,5 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-17 | Dagster `backfill_policy` is beta (1.13); fallback is per-partition runs with a concurrency limit of 1 for the SEC pool | Keeps SEC's 10 req/s safe if the beta API changes | FL-M1 T14 |
 | 2026-11-17 | Risk-factor sections in annual-report-style 10-Ks (GE, C, NEM, FDX before FY2021): bare "RISK FACTORS" heading with no item heading after it | 4 companies; each needs its own end rule; 300-paragraph gold sample doesn't need them | FL-M2 T1 |
 | 2026-11-17 | Fetch Exhibit 13 (annual report) for filers that incorporate Item 1A by reference (BNY, USB, WFC) | New downloads; the text isn't in the 10-K document | FL-M2 T1 |
+| 2026-11-19 | Date-aware entity resolution (a name resolves to the CIK that was filing at the mention's date; predecessor/successor CIK links) | Most D4 errors are successor registrants with the same name; names alone can't separate them | FL-M2 T16 |
+| 2026-11-19 | Keep SEC state tags (`/PA`, `/OH`) as a tie-breaker when both names carry one | Moves 1–2 eval matches; precision-only change, not needed for D4 | FL-M2 T16 |

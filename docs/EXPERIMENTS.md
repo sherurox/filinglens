@@ -86,3 +86,28 @@ Findings:
 - Severity is weak for every model here (labeler kappa 0.303, baseline macro-F1 0.28): the labels themselves carry little signal.
 - On the agreed subset, accuracy rises (0.729) while macro-F1 falls (0.600): with 48 rows and 11 classes, a few rare classes move macro-F1 a lot; the wide CIs say the same.
 - These are the numbers M4's fine-tuned student must beat, on the same test split and the same silver labels.
+
+### Entity resolution: company names to CIKs (D4)
+
+Deviation from the spec: the spec asks for precision on 100 *hand-checked* pairs. Here the check is automatic, against SEC's own identifier. Each query is a (CIK, name) pair a filer used in FSDS `sub.txt` (2018q1–2026q3); the resolver sees only the name, matches it against current names in `company_tickers.json` (fetched 19 Nov 2026: 7,993 CIKs), and is right only if it returns the filer's own CIK. Filers that are not listed today stay in the queries: for them any match is a false merge.
+
+Resolver (`src/filinglens/extract/entities.py`): normalized name (punctuation, state tags such as `/DE/` and legal forms removed) → compact key (spaces removed) → fuzzy IDF-weighted token Jaccard over candidates that share a rare token (in ≤ 200 reference names). A key shared by two CIKs returns no match.
+
+Setting: companies split in half by `sha256('20261119:<cik>')`; threshold (0.50–0.95) and margin (0–0.2) chosen on the tune half by F0.5, then the eval half scored once (`bench/entity_eval.json`).
+
+| Half | Queries | True company listed | Matched | Correct | Precision | Recall | F0.5 |
+|---|---|---|---|---|---|---|---|
+| Tune (chosen: threshold 0.95, margin 0.2) | 7,376 | 4,111 | 3,262 | 3,225 | 0.9887 | 0.7845 | 0.9397 |
+| **Eval** | 7,524 | 4,240 | 3,390 | 3,343 | **0.9861** | 0.7884 | 0.939 |
+
+**D4** (`bench/entity_precision.json`, pairs in `bench/entity_pairs_100.csv`): 100 matches drawn at random from the eval half: **97 / 100 correct, precision 0.97 (Wilson 95% CI 0.916–0.990)**. All 100 are exact-name matches. A second sample that leaves out exact-name matches has only 2 pairs (both correct), because the chosen setting makes almost no non-exact matches.
+
+Eval matches by method: exact 3,341 / 3,388 correct (0.9861, CI 0.9816–0.9896); compact 1 / 1; fuzzy 1 / 1.
+
+Findings:
+- **The tune half switched fuzzy matching off.** F0.5 picked the strictest corner of the grid. In every fuzzy score band the best candidate is usually the wrong company (tune half: 0.8–0.9: 8 of 21 right; 0.7–0.8: 26 of 75; 0.6–0.7: 27 of 94; 0.5–0.6: 33 of 189). The resolver is in effect exact-name-or-nothing on this task.
+- **Misses are mostly renames, not blocking.** Of 880 tune-half listed companies whose name did not match exactly, only 237 share any token with the current name (II-VI → Coherent); 197 of those 237 are reachable through a rare token. The low pair completeness on the eval half (0.2328) is driven by renames.
+- **Errors (47 on eval, all exact-name):** 44 are filers not listed today whose normalized name equals a listed company's. Most are the same company under a successor SEC registrant (new CIK after a holding-company formation, merger or redomicile: Walt Disney, Caesars, Spectrum Brands, Noble), which a check by CIK counts as wrong. The rest are true name collisions (Trinity Capital Corp vs Trinity Capital Inc., United Bancshares /PA vs /OH, Regency Centers LP vs Corp). So the precision above is strict for "same registrant" and a lower bound for "same economic company".
+- Blocking compared 188,542 pairs instead of 33,003,097 (reduction ratio 0.9943) for the 4,129 eval queries without an exact match.
+
+Master table: `gold/company_master.csv` (300 companies: CIK, current name, tickers, exchanges, SIC, sector, EIN, state of incorporation, fiscal year end, former names, FSDS names; 181 have former names, 48 have several tickers). Dedup report: `bench/entities.json` (ticker file: 1,433 of 7,993 CIKs have several tickers, 8 normalized names belong to several CIKs; FSDS: 14,900 (CIK, name) pairs from 12,078 filers, 2,207 filers used more than one normalized name).

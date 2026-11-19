@@ -1,6 +1,6 @@
 {
   "command": "python -m filinglens.extract.entity_eval",
-  "created": "2026-11-19T17:14:45+00:00",
+  "created": "2026-11-19T17:18:52+00:00",
   "reference": {
     "source": "data/raw/company_tickers.json",
     "ciks": 7993
@@ -659,6 +659,58 @@
     "listed_fuzzy_queries": 889,
     "pair_completeness": 0.2328
   },
-  "resolve_seconds": 0.9,
+  "diagnostics_tune": {
+    "listed_not_exact": 880,
+    "share_a_token_with_true_name": 237,
+    "reachable_via_rare_token": 197,
+    "fuzzy_score_bands": [
+      {
+        "score": [
+          0.5,
+          0.6
+        ],
+        "queries": 189,
+        "best_candidate_right": 33,
+        "true_company_listed": 72
+      },
+      {
+        "score": [
+          0.6,
+          0.7
+        ],
+        "queries": 94,
+        "best_candidate_right": 27,
+        "true_company_listed": 36
+      },
+      {
+        "score": [
+          0.7,
+          0.8
+        ],
+        "queries": 75,
+        "best_candidate_right": 26,
+        "true_company_listed": 35
+      },
+      {
+        "score": [
+          0.8,
+          0.9
+        ],
+        "queries": 21,
+        "best_candidate_right": 8,
+        "true_company_listed": 9
+      },
+      {
+        "score": [
+          0.9,
+          1.0
+        ],
+        "queries": 4,
+        "best_candidate_right": 4,
+        "true_company_listed": 4
+      }
+    ]
+  },
+  "resolve_seconds": 0.8,
   "seconds": 0.9
 }
