@@ -1,0 +1,310 @@
+{
+  "command": "python -m filinglens.extract.entities build",
+  "created": "2026-11-19T17:11:25+00:00",
+  "tickers_file": "data/raw/company_tickers.json",
+  "tickers_file_fetched": "2026-11-19T17:11:17+00:00",
+  "fsds_zips": 35,
+  "fsds_quarters": [
+    "2018q1",
+    "2026q3"
+  ],
+  "submissions_missing": [],
+  "ticker_file": {
+    "rows": 10398,
+    "ciks": 7993,
+    "ciks_with_multiple_tickers": 1433,
+    "examples": [
+      {
+        "key": 927971,
+        "members": [
+          "AIQD",
+          "AIQU",
+          "BERZ",
+          "BMO",
+          "BNKD",
+          "BNKU",
+          "BRZD",
+          "BRZL",
+          "BULZ",
+          "CARD",
+          "CARU",
+          "DULL",
+          "FLYD",
+          "FLYU",
+          "FNGD",
+          "FNGO",
+          "FNGS",
+          "FNGU",
+          "GDXD",
+          "GDXU",
+          "GLLD",
+          "HYGD",
+          "HYGU",
+          "JETD",
+          "JETU",
+          "JPND",
+          "JPNU",
+          "LQDD",
+          "LQDU",
+          "MNGU",
+          "NRGD",
+          "NRGU",
+          "OILD",
+          "OILU",
+          "SMHD",
+          "SMHU",
+          "SPYU",
+          "TAWN",
+          "TPEI",
+          "WTID",
+          "WTIU",
+          "XLCD",
+          "XLCU",
+          "XLPD",
+          "XLPU"
+        ]
+      },
+      {
+        "key": 1026214,
+        "members": [
+          "FMCC",
+          "FMCCG",
+          "FMCCH",
+          "FMCCI",
+          "FMCCJ",
+          "FMCCK",
+          "FMCCL",
+          "FMCCM",
+          "FMCCN",
+          "FMCCO",
+          "FMCCP",
+          "FMCCS",
+          "FMCCT",
+          "FMCKI",
+          "FMCKJ",
+          "FMCKK",
+          "FMCKL",
+          "FMCKM",
+          "FMCKN",
+          "FMCKO",
+          "FMCKP",
+          "FREGP",
+          "FREJN",
+          "FREJO",
+          "FREJP"
+        ]
+      },
+      {
+        "key": 1393311,
+        "members": [
+          "PSA",
+          "PSA-PF",
+          "PSA-PG",
+          "PSA-PH",
+          "PSA-PI",
+          "PSA-PJ",
+          "PSA-PK",
+          "PSA-PL",
+          "PSA-PM",
+          "PSA-PN",
+          "PSA-PO",
+          "PSA-PP",
+          "PSA-PQ",
+          "PSA-PR",
+          "PSA-PS",
+          "PSA-PT",
+          "PSA-PU"
+        ]
+      },
+      {
+        "key": 70858,
+        "members": [
+          "BAC",
+          "BAC-PB",
+          "BAC-PE",
+          "BAC-PK",
+          "BAC-PL",
+          "BAC-PM",
+          "BAC-PN",
+          "BAC-PO",
+          "BAC-PP",
+          "BAC-PQ",
+          "BAC-PS",
+          "BACRP",
+          "BML-PG",
+          "BML-PH",
+          "BML-PJ",
+          "BML-PL",
+          "MER-PK"
+        ]
+      },
+      {
+        "key": 1415311,
+        "members": [
+          "AGQ",
+          "BOIL",
+          "EUO",
+          "GLL",
+          "KOLD",
+          "SCO",
+          "SVXY",
+          "UCO",
+          "UGL",
+          "ULE",
+          "UVXY",
+          "VIXM",
+          "VIXY",
+          "YCL",
+          "YCS",
+          "ZSL"
+        ]
+      }
+    ]
+  },
+  "ticker_file_name_collisions": {
+    "normalized_names_with_multiple_ciks": 8,
+    "examples": [
+      {
+        "key": "FIRST BANCORP",
+        "members": [
+          765207,
+          811589,
+          1057706
+        ]
+      },
+      {
+        "key": "BLUE OWL CAPITAL",
+        "members": [
+          1655888,
+          1823945
+        ]
+      },
+      {
+        "key": "FARMERS AND MERCHANTS BANCORP",
+        "members": [
+          792966,
+          1085913
+        ]
+      },
+      {
+        "key": "INDEPENDENT BANK",
+        "members": [
+          39311,
+          776901
+        ]
+      },
+      {
+        "key": "RESOLUTION MINERALS",
+        "members": [
+          2086869,
+          2102907
+        ]
+      }
+    ]
+  },
+  "fsds": {
+    "cik_name_pairs": 14900,
+    "ciks": 12078,
+    "ciks_with_multiple_normalized_names": 2207,
+    "normalized_names_with_multiple_ciks": 123,
+    "rename_examples": [
+      {
+        "key": 1162896,
+        "members": [
+          "CREEK ROAD MINERS",
+          "PRAIRIE OPERATING",
+          "WIZARD BRANDS",
+          "WIZARD ENTERTAINMENT",
+          "WIZARD WORLD"
+        ]
+      },
+      {
+        "key": 1527728,
+        "members": [
+          "DANDRIT BIOTECH USA",
+          "ENOCHIAN BIOSCIENCES",
+          "LUNAI BIOWORKS",
+          "RENOVARO",
+          "RENOVARO BIOSCIENCES"
+        ]
+      },
+      {
+        "key": 1533030,
+        "members": [
+          "AFC BUILDING TECHNOLOGY",
+          "ANDINA GOLD",
+          "CRYOMASS TECHNOLOGY",
+          "FIRST COLOMBIA DEVELOPMENT",
+          "REDWOOD GREEN"
+        ]
+      },
+      {
+        "key": 1556266,
+        "members": [
+          "BAIYU HOLDINGS",
+          "BAT GROUP",
+          "CHINA BAT GROUP",
+          "CHINA COMMERCIAL CREDIT",
+          "TD HOLDINGS"
+        ]
+      },
+      {
+        "key": 896493,
+        "members": [
+          "AULT ALLIANCE",
+          "AULT GLOBAL HOLDINGS",
+          "BITNILE HOLDINGS",
+          "DPW HOLDINGS",
+          "HYPERSCALE DATA"
+        ]
+      }
+    ],
+    "collision_examples": [
+      {
+        "key": "FIRST BANCORP",
+        "members": [
+          765207,
+          811589,
+          1057706
+        ]
+      },
+      {
+        "key": "1895 BANCORP OF WISCONSIN",
+        "members": [
+          1751692,
+          1847360
+        ]
+      },
+      {
+        "key": "AARONS",
+        "members": [
+          706688,
+          1821393
+        ]
+      },
+      {
+        "key": "ALBERTSONS COMPANIES",
+        "members": [
+          1646972,
+          1704956
+        ]
+      },
+      {
+        "key": "AMBRX BIOPHARMA",
+        "members": [
+          1836056,
+          1990550
+        ]
+      }
+    ]
+  },
+  "master": {
+    "companies": 300,
+    "in_ticker_file": 300,
+    "with_former_names": 181,
+    "with_multiple_tickers": 48,
+    "name_variants_total": 492,
+    "max_name_variants": 5
+  },
+  "seconds": 1.7
+}
