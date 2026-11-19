@@ -1,0 +1,56 @@
+<!-- Label Studio config for risk-factor paragraphs (FL-M2 T4). Rules: docs/LABELING_GUIDE.md.
+     Exported values are the aliases (category ids, severity 1-3, first-seen year). Severity and
+     first-seen year aren't marked required because not_a_risk items leave them empty; the gold
+     export (T6) checks that every risk item has both. -->
+<View>
+  <Header value="$title" size="5"/>
+  <View style="color: #555; font-style: italic; margin-bottom: 4px">
+    <Text name="heading" value="$heading" selectionEnabled="false"/>
+  </View>
+  <View style="font-size: 15px; line-height: 1.5; padding: 8px; border: 1px solid #ddd; border-radius: 4px">
+    <Text name="text" value="$text" selectionEnabled="false"/>
+  </View>
+
+  <Header value="1. Category: the source of the risk (guide section 3)" size="6"/>
+  <Choices name="category" toName="text" choice="single-radio" required="true" showInline="true">
+    <Choice value="Not a risk" alias="not_a_risk" hint="Intro, cross-reference, disclaimer, or text that isn't a risk factor"/>
+    <Choice value="Macro &amp; markets" alias="macro_market" hint="Economy, rates, inflation, FX, commodity prices"/>
+    <Choice value="Competition &amp; demand" alias="competition_demand" hint="Competitors, customers, market acceptance, innovation, reputation"/>
+    <Choice value="Regulatory &amp; legal" alias="regulatory_legal" hint="Laws, regulators, litigation, tax, IP, privacy laws"/>
+    <Choice value="Technology &amp; cyber" alias="technology_cyber" hint="Cyberattacks, breaches, IT failures, technology change, AI"/>
+    <Choice value="Operations &amp; supply" alias="operations_supply" hint="Suppliers, manufacturing, logistics, quality, disasters"/>
+    <Choice value="Financial &amp; capital" alias="financial_capital" hint="Debt, liquidity, credit losses, impairment, accounting, internal controls"/>
+    <Choice value="People" alias="people" hint="Key personnel, talent, labor, unions"/>
+    <Choice value="Health &amp; pandemic" alias="health_pandemic" hint="COVID-19, pandemics, public health, including their effects"/>
+    <Choice value="Climate &amp; environment" alias="climate_environment" hint="Climate change, carbon rules, ESG, contamination"/>
+    <Choice value="Geopolitical &amp; international" alias="geopolitical_international" hint="International operations, war, sanctions, tariffs"/>
+    <Choice value="Strategy &amp; corporate" alias="strategy_corporate" hint="Growth plans, execution, M&amp;A, governance, stock price, dividends"/>
+  </Choices>
+
+  <Header value="2. Severity (guide section 4; when torn, the lower level)" size="6"/>
+  <Choices name="severity" toName="text" choice="single-radio" showInline="true">
+    <Choice value="1 Generic" alias="1" hint="Could appear in most 10-Ks"/>
+    <Choice value="2 Specific" alias="2" hint="This company's exposure, but hypothetical"/>
+    <Choice value="3 Realized" alias="3" hint="Has happened to this company or is ongoing"/>
+  </Choices>
+
+  <Header value="3. First-seen year (guide section 5; check the candidates below)" size="6"/>
+  <Choices name="first_seen_year" toName="text" choice="single-radio" showInline="true">
+    <Choice value="2018 or earlier" alias="2018"/>
+    <Choice value="2019" alias="2019"/>
+    <Choice value="2020" alias="2020"/>
+    <Choice value="2021" alias="2021"/>
+    <Choice value="2022" alias="2022"/>
+    <Choice value="2023" alias="2023"/>
+    <Choice value="2024" alias="2024"/>
+    <Choice value="2025" alias="2025"/>
+  </Choices>
+
+  <Choices name="flags" toName="text" choice="multiple" showInline="true">
+    <Choice value="Unsure" alias="unsure" hint="You hesitated between two answers"/>
+  </Choices>
+  <TextArea name="note" toName="text" rows="2" maxSubmissions="1" placeholder="Optional note"/>
+
+  <Header value="Same company, earlier years: most similar paragraph per year" size="6"/>
+  <HyperText name="candidates" value="$candidates_html" inline="true" selectionEnabled="false"/>
+</View>
