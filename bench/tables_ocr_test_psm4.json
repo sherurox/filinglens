@@ -1,0 +1,379 @@
+{
+  "command": "uv run python -m filinglens.extract.tables ocr --split test --psm 4 --allow-test",
+  "finished_utc": "2026-11-19T10:04:30+00:00",
+  "method": "tesseract 5.5.0 --psm 4, rows by y-center",
+  "split": "test",
+  "seconds_total": 18.77,
+  "seconds_per_page": 0.469,
+  "overall": {
+    "tables": 40,
+    "gold_cells": 1582,
+    "correct_cells": 1089,
+    "cell_accuracy_micro": 0.6884,
+    "cell_accuracy_macro": 0.7015,
+    "cell_precision_micro": 0.7868,
+    "row_match_rate": 0.8879
+  },
+  "per_page": [
+    {
+      "page_id": "0000080661-26-000086-t22",
+      "gold_cells": 66,
+      "pred_cells": 66,
+      "correct": 66,
+      "gold_rows": 22,
+      "matched_rows": 22,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0000093410-26-000078-t174",
+      "gold_cells": 15,
+      "pred_cells": 15,
+      "correct": 15,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0000797468-21-000009-t316",
+      "gold_cells": 14,
+      "pred_cells": 12,
+      "correct": 12,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 0.8571
+    },
+    {
+      "page_id": "0000909832-25-000101-t13",
+      "gold_cells": 26,
+      "pred_cells": 26,
+      "correct": 0,
+      "gold_rows": 13,
+      "matched_rows": 0,
+      "accuracy": 0.0
+    },
+    {
+      "page_id": "0000895728-24-000007-t127",
+      "gold_cells": 18,
+      "pred_cells": 17,
+      "correct": 15,
+      "gold_rows": 6,
+      "matched_rows": 6,
+      "accuracy": 0.8333
+    },
+    {
+      "page_id": "0000821189-25-000011-t83",
+      "gold_cells": 57,
+      "pred_cells": 51,
+      "correct": 45,
+      "gold_rows": 19,
+      "matched_rows": 19,
+      "accuracy": 0.7895
+    },
+    {
+      "page_id": "0000063908-26-000035-t55",
+      "gold_cells": 17,
+      "pred_cells": 7,
+      "correct": 7,
+      "gold_rows": 9,
+      "matched_rows": 9,
+      "accuracy": 0.4118
+    },
+    {
+      "page_id": "0000896878-24-000039-t216",
+      "gold_cells": 34,
+      "pred_cells": 24,
+      "correct": 18,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 0.5294
+    },
+    {
+      "page_id": "0002007855-26-000013-t14",
+      "gold_cells": 14,
+      "pred_cells": 14,
+      "correct": 13,
+      "gold_rows": 7,
+      "matched_rows": 7,
+      "accuracy": 0.9286
+    },
+    {
+      "page_id": "0000004977-23-000055-t48",
+      "gold_cells": 12,
+      "pred_cells": 12,
+      "correct": 12,
+      "gold_rows": 6,
+      "matched_rows": 6,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0000895126-24-000013-t64",
+      "gold_cells": 32,
+      "pred_cells": 30,
+      "correct": 24,
+      "gold_rows": 9,
+      "matched_rows": 9,
+      "accuracy": 0.75
+    },
+    {
+      "page_id": "0001584509-21-000256-t34",
+      "gold_cells": 12,
+      "pred_cells": 12,
+      "correct": 12,
+      "gold_rows": 6,
+      "matched_rows": 6,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0001628280-26-012254-t79",
+      "gold_cells": 15,
+      "pred_cells": 13,
+      "correct": 12,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 0.8
+    },
+    {
+      "page_id": "0001564590-22-006303-t5",
+      "gold_cells": 29,
+      "pred_cells": 22,
+      "correct": 22,
+      "gold_rows": 29,
+      "matched_rows": 29,
+      "accuracy": 0.7586
+    },
+    {
+      "page_id": "0000092230-26-000030-t84",
+      "gold_cells": 50,
+      "pred_cells": 28,
+      "correct": 14,
+      "gold_rows": 7,
+      "matched_rows": 7,
+      "accuracy": 0.28
+    },
+    {
+      "page_id": "0001691303-25-000010-t12",
+      "gold_cells": 21,
+      "pred_cells": 13,
+      "correct": 9,
+      "gold_rows": 7,
+      "matched_rows": 4,
+      "accuracy": 0.4286
+    },
+    {
+      "page_id": "0001564590-19-023119-t190",
+      "gold_cells": 14,
+      "pred_cells": 14,
+      "correct": 10,
+      "gold_rows": 14,
+      "matched_rows": 11,
+      "accuracy": 0.7143
+    },
+    {
+      "page_id": "0001109357-25-000043-t136",
+      "gold_cells": 66,
+      "pred_cells": 65,
+      "correct": 64,
+      "gold_rows": 22,
+      "matched_rows": 22,
+      "accuracy": 0.9697
+    },
+    {
+      "page_id": "0001558370-23-001036-t102",
+      "gold_cells": 27,
+      "pred_cells": 25,
+      "correct": 21,
+      "gold_rows": 9,
+      "matched_rows": 8,
+      "accuracy": 0.7778
+    },
+    {
+      "page_id": "0001558370-24-003813-t41",
+      "gold_cells": 48,
+      "pred_cells": 46,
+      "correct": 45,
+      "gold_rows": 16,
+      "matched_rows": 16,
+      "accuracy": 0.9375
+    },
+    {
+      "page_id": "0001477333-25-000043-t36",
+      "gold_cells": 21,
+      "pred_cells": 19,
+      "correct": 18,
+      "gold_rows": 4,
+      "matched_rows": 4,
+      "accuracy": 0.8571
+    },
+    {
+      "page_id": "0000100517-23-000048-t25",
+      "gold_cells": 23,
+      "pred_cells": 19,
+      "correct": 15,
+      "gold_rows": 6,
+      "matched_rows": 5,
+      "accuracy": 0.6522
+    },
+    {
+      "page_id": "0001571949-25-000003-t21",
+      "gold_cells": 115,
+      "pred_cells": 112,
+      "correct": 97,
+      "gold_rows": 20,
+      "matched_rows": 20,
+      "accuracy": 0.8435
+    },
+    {
+      "page_id": "0000050863-20-000011-t421",
+      "gold_cells": 28,
+      "pred_cells": 24,
+      "correct": 12,
+      "gold_rows": 5,
+      "matched_rows": 3,
+      "accuracy": 0.4286
+    },
+    {
+      "page_id": "0000950170-24-023098-t39",
+      "gold_cells": 147,
+      "pred_cells": 133,
+      "correct": 92,
+      "gold_rows": 30,
+      "matched_rows": 27,
+      "accuracy": 0.6259
+    },
+    {
+      "page_id": "0000829224-24-000057-t73",
+      "gold_cells": 15,
+      "pred_cells": 16,
+      "correct": 2,
+      "gold_rows": 14,
+      "matched_rows": 1,
+      "accuracy": 0.1333
+    },
+    {
+      "page_id": "0000769397-23-000036-t36",
+      "gold_cells": 125,
+      "pred_cells": 73,
+      "correct": 44,
+      "gold_rows": 25,
+      "matched_rows": 25,
+      "accuracy": 0.352
+    },
+    {
+      "page_id": "0001276187-22-000020-t24",
+      "gold_cells": 32,
+      "pred_cells": 32,
+      "correct": 31,
+      "gold_rows": 11,
+      "matched_rows": 11,
+      "accuracy": 0.9688
+    },
+    {
+      "page_id": "0001858681-24-000031-t31",
+      "gold_cells": 20,
+      "pred_cells": 18,
+      "correct": 17,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 0.85
+    },
+    {
+      "page_id": "0000101829-21-000008-t86",
+      "gold_cells": 35,
+      "pred_cells": 28,
+      "correct": 17,
+      "gold_rows": 7,
+      "matched_rows": 7,
+      "accuracy": 0.4857
+    },
+    {
+      "page_id": "0001628280-22-004445-t125",
+      "gold_cells": 121,
+      "pred_cells": 111,
+      "correct": 86,
+      "gold_rows": 31,
+      "matched_rows": 27,
+      "accuracy": 0.7107
+    },
+    {
+      "page_id": "0000039911-25-000029-t66",
+      "gold_cells": 19,
+      "pred_cells": 23,
+      "correct": 12,
+      "gold_rows": 12,
+      "matched_rows": 8,
+      "accuracy": 0.6316
+    },
+    {
+      "page_id": "0001403161-20-000070-t55",
+      "gold_cells": 14,
+      "pred_cells": 15,
+      "correct": 4,
+      "gold_rows": 9,
+      "matched_rows": 9,
+      "accuracy": 0.2857
+    },
+    {
+      "page_id": "0001564590-21-037031-t172",
+      "gold_cells": 127,
+      "pred_cells": 113,
+      "correct": 89,
+      "gold_rows": 23,
+      "matched_rows": 21,
+      "accuracy": 0.7008
+    },
+    {
+      "page_id": "0001193125-21-049380-t788",
+      "gold_cells": 18,
+      "pred_cells": 18,
+      "correct": 18,
+      "gold_rows": 6,
+      "matched_rows": 6,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0001551152-25-000020-t95",
+      "gold_cells": 30,
+      "pred_cells": 29,
+      "correct": 18,
+      "gold_rows": 10,
+      "matched_rows": 7,
+      "accuracy": 0.6
+    },
+    {
+      "page_id": "0000950170-23-003174-t117",
+      "gold_cells": 20,
+      "pred_cells": 20,
+      "correct": 20,
+      "gold_rows": 10,
+      "matched_rows": 10,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0000064040-26-000013-t60",
+      "gold_cells": 36,
+      "pred_cells": 27,
+      "correct": 21,
+      "gold_rows": 6,
+      "matched_rows": 6,
+      "accuracy": 0.5833
+    },
+    {
+      "page_id": "0000896159-26-000005-t238",
+      "gold_cells": 21,
+      "pred_cells": 14,
+      "correct": 13,
+      "gold_rows": 5,
+      "matched_rows": 5,
+      "accuracy": 0.619
+    },
+    {
+      "page_id": "0001327567-25-000027-t16",
+      "gold_cells": 28,
+      "pred_cells": 28,
+      "correct": 27,
+      "gold_rows": 4,
+      "matched_rows": 4,
+      "accuracy": 0.9643
+    }
+  ]
+}

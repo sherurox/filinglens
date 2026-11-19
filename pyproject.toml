@@ -23,6 +23,7 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "pyarrow>=26.0.1",
     "pyspark>=4.1,<4.2",
+    "pytesseract>=0.3.13",
     "python-dotenv>=1.2.4",
     "scikit-learn>=1.9.1",
 ]
