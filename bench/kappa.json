@@ -1,0 +1,111 @@
+{
+  "command": "uv run python -m filinglens.extract.agreement",
+  "finished_utc": "2026-11-19T09:47:01+00:00",
+  "what": "agreement between two model labelers (silver), not human test-retest",
+  "raters": {
+    "a": "ibm-granite/granite-4.1-3b (FP8)",
+    "b": "Qwen/Qwen3-4B-AWQ"
+  },
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 20261119
+  },
+  "category": {
+    "n": 326,
+    "observed_agreement": 0.733,
+    "kappa": 0.697,
+    "ci95": [
+      0.644,
+      0.747
+    ],
+    "weights": "none"
+  },
+  "severity": {
+    "n": 326,
+    "observed_agreement": 0.813,
+    "kappa": 0.303,
+    "ci95": [
+      0.168,
+      0.422
+    ],
+    "weights": "none"
+  },
+  "severity_quadratic": {
+    "n": 326,
+    "observed_agreement": 0.813,
+    "kappa": 0.343,
+    "ci95": [
+      0.216,
+      0.454
+    ],
+    "weights": "quadratic"
+  },
+  "first_seen_year_quadratic": {
+    "n": 326,
+    "observed_agreement": 0.785,
+    "kappa": 0.781,
+    "ci95": [
+      0.695,
+      0.852
+    ],
+    "weights": "quadratic"
+  },
+  "top_category_disagreements": [
+    {
+      "pair": [
+        "competition_demand",
+        "people"
+      ],
+      "count": 10
+    },
+    {
+      "pair": [
+        "competition_demand",
+        "operations_supply"
+      ],
+      "count": 9
+    },
+    {
+      "pair": [
+        "macro_market",
+        "regulatory_legal"
+      ],
+      "count": 5
+    },
+    {
+      "pair": [
+        "financial_capital",
+        "regulatory_legal"
+      ],
+      "count": 5
+    },
+    {
+      "pair": [
+        "operations_supply",
+        "regulatory_legal"
+      ],
+      "count": 4
+    },
+    {
+      "pair": [
+        "financial_capital",
+        "macro_market"
+      ],
+      "count": 4
+    },
+    {
+      "pair": [
+        "financial_capital",
+        "operations_supply"
+      ],
+      "count": 4
+    },
+    {
+      "pair": [
+        "geopolitical_international",
+        "regulatory_legal"
+      ],
+      "count": 4
+    }
+  ]
+}
