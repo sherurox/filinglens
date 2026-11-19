@@ -1,0 +1,63 @@
+{
+  "command": "uv run python notebooks/explore_risk_taxonomy.py",
+  "paragraphs": 201516,
+  "after_dropping_bullets": 186222,
+  "with_heading_pct": 98.1,
+  "pct_matching_category": {
+    "macro_market": 4.2,
+    "competition_demand": 7.4,
+    "regulatory_legal": 25.2,
+    "technology_cyber": 8.4,
+    "operations_supply": 5.7,
+    "financial_capital": 8.2,
+    "people": 2.0,
+    "health_pandemic": 2.1,
+    "climate_environment": 5.1,
+    "geopolitical_international": 2.6,
+    "strategy_corporate": 8.6
+  },
+  "pct_matching_none": 37.5,
+  "pct_matching_two_or_more": 15.0,
+  "pct_by_year": {
+    "health_pandemic": {
+      "2018": 0.2,
+      "2019": 0.3,
+      "2020": 5.0,
+      "2021": 5.0,
+      "2022": 3.0,
+      "2023": 1.6,
+      "2024": 1.0,
+      "2025": 0.9
+    },
+    "geopolitical_international": {
+      "2018": 2.0,
+      "2019": 2.3,
+      "2020": 2.2,
+      "2021": 2.3,
+      "2022": 2.9,
+      "2023": 2.9,
+      "2024": 3.1,
+      "2025": 3.3
+    },
+    "macro_market": {
+      "2018": 4.5,
+      "2019": 4.6,
+      "2020": 4.2,
+      "2021": 4.0,
+      "2022": 4.3,
+      "2023": 4.2,
+      "2024": 4.1,
+      "2025": 4.0
+    }
+  },
+  "ai_mention_pct_by_year": {
+    "2018": 0.1,
+    "2019": 0.2,
+    "2020": 0.3,
+    "2021": 0.4,
+    "2022": 0.5,
+    "2023": 2.4,
+    "2024": 4.0,
+    "2025": 5.7
+  }
+}
