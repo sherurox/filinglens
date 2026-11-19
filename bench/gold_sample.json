@@ -1,0 +1,58 @@
+{
+  "command": "uv run python -m filinglens.extract.gold_sample",
+  "finished_utc": "2026-11-19T08:52:14+00:00",
+  "seed": 20261119,
+  "companies": 294,
+  "companies_by_split": {
+    "dev": 59,
+    "test": 59,
+    "train": 176
+  },
+  "paragraphs": 330,
+  "by_source": {
+    "boost:geopolitical_international": 20,
+    "boost:health_pandemic": 20,
+    "boost:people": 20,
+    "random": 270
+  },
+  "by_split": {
+    "dev": 72,
+    "test": 65,
+    "train": 193
+  },
+  "by_sector_year": {
+    "finance 2019": 12,
+    "finance 2020": 10,
+    "finance 2022": 12,
+    "finance 2024": 10,
+    "finance 2025": 10,
+    "manufacturing 2019": 9,
+    "manufacturing 2020": 11,
+    "manufacturing 2022": 13,
+    "manufacturing 2024": 10,
+    "manufacturing 2025": 9,
+    "mining_energy 2019": 9,
+    "mining_energy 2020": 10,
+    "mining_energy 2022": 12,
+    "mining_energy 2024": 10,
+    "mining_energy 2025": 10,
+    "retail 2019": 13,
+    "retail 2020": 11,
+    "retail 2022": 13,
+    "retail 2024": 10,
+    "retail 2025": 10,
+    "services 2019": 12,
+    "services 2020": 11,
+    "services 2022": 13,
+    "services 2024": 12,
+    "services 2025": 11,
+    "transport_utilities 2019": 11,
+    "transport_utilities 2020": 15,
+    "transport_utilities 2022": 10,
+    "transport_utilities 2024": 11,
+    "transport_utilities 2025": 10
+  },
+  "distinct_companies": 204,
+  "distinct_filings": 330,
+  "first_seen_suggested_before_own_year": 290
+}
