@@ -1,0 +1,45 @@
+{
+  "command": "uv run python -m filinglens.extract.gold_set",
+  "finished_utc": "2026-11-19T09:38:45+00:00",
+  "labels": "silver (model-labeled, not hand-labeled)",
+  "primary_labeler": "ibm-granite/granite-4.1-3b",
+  "check_labeler": "Qwen/Qwen3-4B-AWQ",
+  "rules": "docs/labeling/silver_prompt.md (condensed docs/LABELING_GUIDE.md v1.0)",
+  "sampled": 330,
+  "kept": 327,
+  "dropped": {
+    "primary answer broke the rules": 3
+  },
+  "by_split": {
+    "dev": 71,
+    "test": 65,
+    "train": 191
+  },
+  "agree_category_by_split": {
+    "train": 139,
+    "dev": 52,
+    "test": 48
+  },
+  "categories": {
+    "regulatory_legal": 72,
+    "competition_demand": 45,
+    "macro_market": 41,
+    "operations_supply": 40,
+    "financial_capital": 30,
+    "health_pandemic": 23,
+    "geopolitical_international": 19,
+    "people": 18,
+    "strategy_corporate": 15,
+    "technology_cyber": 13,
+    "climate_environment": 11
+  },
+  "files": {
+    "gold/splits.csv": "a526e57ee1860a0b10c5338a55148206df3e6c69cc6dfa04ac8a75f2dc3752d4",
+    "gold/risk_sample.csv": "03161da2709eb008caf8a71d7331c470fef5d266c2da421eec23fab576d4b736",
+    "gold/risk_paragraphs.train.jsonl": "f20313634f89a36db91ec4a76a39f49bfc1e3b68236a0de4297cd35ece24c62b",
+    "gold/risk_paragraphs.dev.jsonl": "1e2079dcd46f53248c207cabe9c875db6d171d111df39d7a01d81f777561cac2",
+    "gold/risk_paragraphs.test.jsonl": "6b475c4e12a408221e452fbf91bc559f9d7d3547ca696af9f79317ca6ad62d4a",
+    "gold/silver_raw/ibm-granite-granite-4-1-3b.jsonl": "45648c51a6dd43abb0104773966065ddf2709851964fc6d565ddba48ba81870c",
+    "gold/silver_raw/qwen-qwen3-4b-awq.jsonl": "6e4d2d169dea44e9c00be513441f779b54163f78a06977c60cb32f2e863a7c2b"
+  }
+}
