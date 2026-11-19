@@ -6,7 +6,7 @@ Every number here comes from a command's output; the command is listed next to i
 
 | Dataset | Source | Terms |
 |---|---|---|
-| SEC EDGAR: 10-K documents, submissions JSON, `company_tickers.json` | sec.gov, data.sec.gov | SEC's webmaster FAQ states that government-created content and EDGAR public filings are free to access and reuse (https://www.sec.gov/files/about/webmaster-faq.htm). Access follows SEC fair access: at most 10 requests/s, with a declared User-Agent. |
+| SEC EDGAR: 10-K documents, Exhibit 21 documents and filing index pages, submissions JSON, `company_tickers.json` | sec.gov, data.sec.gov | SEC's webmaster FAQ states that government-created content and EDGAR public filings are free to access and reuse (https://www.sec.gov/files/about/webmaster-faq.htm). Access follows SEC fair access: at most 10 requests/s, with a declared User-Agent. |
 | SEC Financial Statement Data Sets (quarterly zips) | sec.gov (published by SEC's Division of Economic and Risk Analysis) | Same SEC terms as the row above: EDGAR public data, free to access and reuse; downloaded at most 8 requests/s with a declared User-Agent. |
 
 ## Company universe: `dbt/seeds/universe.csv`
@@ -259,3 +259,93 @@ Notes:
   - The compute differs (one laptop vs serverless).
   - The input bytes and the transform code are the same, and the outputs agree row for row and partition for partition.
 - **Teardown:** `DROP SCHEMA workspace.filinglens CASCADE` (tables, volume and zips), or delete the schema in Catalog Explorer.
+
+## FL-M2: labels, tables, entities, synthetic Q&A and the knowledge graph
+
+Results and their discussion are in [EXPERIMENTS.md](EXPERIMENTS.md). This section describes the data.
+
+### Deviation from the spec: silver labels, not hand labels
+
+The spec asks for a hand-labeled gold set, a re-label a week later (kappa) and 100 hand-checked entity pairs. All three were replaced by automatic methods (decided 19 Nov 2026):
+- **Risk paragraphs** are labeled by a local open-weight model following the committed guide ([LABELING_GUIDE.md](LABELING_GUIDE.md) v1.0, condensed into [labeling/silver_prompt.md](labeling/silver_prompt.md)). These are **silver labels**: no person labeled them, and every F1 against them measures agreement with the labeling model, not correctness.
+- **Agreement** is Cohen's kappa between two different model labelers, not a human test-retest.
+- **Entity-resolution precision** is checked against SEC's own identifier (CIK), not by hand.
+- **Table cells** need no labels: the ground truth is the HTML each page image is rendered from.
+- The files under `gold/` keep that directory name for the layout the spec describes; `gold/MANIFEST.json` records `"labels": "silver (model-labeled, not hand-labeled)"`.
+
+### Risk-factor corpus: `data/interim/risk_paragraphs.parquet` (git-ignored)
+
+- Command: `uv run python -m filinglens.extract.risk_corpus` (2026-11-17, 49.6 s, 8 workers). Stats: `bench/risk_corpus.json`.
+- 2,258 10-Ks: Item 1A found in 2,207 (2,177 by an "Item 1A" heading, 30 by a bare "Risk Factors" heading), 43 too short, 8 without a heading; 295 of 300 companies have at least one.
+- 201,516 paragraphs of at least 30 words (median 106 words, p95 271, max 835); from 21,504 (2018) to 27,833 (2024) per year.
+- Known misses (LATER.md): annual-report layouts (GE, C, NEM, FDX before FY2021), Item 1A incorporated by reference from Exhibit 13 (BNY, USB, WFC), a 40-F filer (BNS).
+
+### Silver risk-paragraph set: `gold/risk_paragraphs.{train,dev,test}.jsonl`
+
+- **Sample** (`uv run python -m filinglens.extract.gold_sample`, seed 20261119; `bench/gold_sample.json`): 330 paragraphs from 330 filings and 204 companies: 270 random (9 per sector × year for 2019, 2020, 2022, 2024, 2025) plus 20 each boosted by keywords for people, health_pandemic and geopolitical_international (rare categories); at most one paragraph per filing and 3 per company; 40–400 words, no summary bullets.
+- **Splits by company** (sha256 of seed and CIK, within sector): 294 companies, 176 train / 59 dev / 59 test (`gold/splits.csv`). A company's paragraphs are all in one split.
+- **Labels:** category (11 risk categories + `not_a_risk`), severity (1 generic, 2 specific, 3 realized), first-seen year (earliest year the same risk appears in the company's earlier 10-Ks; candidates suggested by word overlap).
+  - Primary labeler `ibm-granite/granite-4.1-3b` (FP8 at load): 327 of 330 answers follow the rules (`bench/silver_ibm-granite-granite-4-1-3b.json`, 91.1 s, peak 7,695 MiB).
+  - Check labeler `Qwen/Qwen3-4B-AWQ`: 328 of 330 (`bench/silver_qwen-qwen3-4b-awq.json`, 310.1 s, peak 7,759 MiB).
+  - Greedy decoding, constrained to a JSON schema; rule checks mark violations invalid instead of fixing them.
+- **Kept** (`uv run python -m filinglens.extract.gold_set`; `gold/MANIFEST.json` with SHA-256 of every file): 327 rows: train 191, dev 71, test 65. The two labelers agree on the category for 139 / 52 / 48 of them.
+- Categories (primary labeler): regulatory_legal 72, competition_demand 45, macro_market 41, operations_supply 40, financial_capital 30, health_pandemic 23, geopolitical_international 19, people 18, strategy_corporate 15, technology_cyber 13, climate_environment 11. Severity: 1 → 10, 2 → 268, 3 → 49.
+- **Test guard:** `gold_set.load_split("test")` raises unless called with `allow_test=True`; every test-split run in `bench/` has `--allow-test` in its command.
+- Limits: silver labels (see above); severity carries little signal (kappa 0.303); 65 test rows over 11 categories give wide intervals.
+
+### Table pages: `gold/tables/`
+
+- Command: `uv run python -m filinglens.extract.table_pages` (seed 20261119; `bench/table_pages.json`).
+- 50 pages, one 10-K table each from 50 different companies (8–9 per sector, 2019–2025): 10 dev, 40 test. Rendered by Chromium (Playwright) at letter width and 2× scale; 0 pages wider than the page.
+- Ground truth: each row's label and numbers, taken from the same HTML (716 rows and 2,012 numbers in all 50 pages; 1,708 cells on the 40 test pages). No hand labels.
+- The page set was drawn twice: a fix to number parsing ("—%" as nil) changed which tables qualified. Only the second draw is used; EXPERIMENTS.md keeps the first as history.
+
+### Entity resolution inputs and master table
+
+- `company_tickers.json`: one request through the rate-limited client on 19 Nov 2026 (`uv run python -m filinglens.extract.entities fetch-tickers`); 7,993 CIKs, 1,433 of them with several tickers. A snapshot: names and tickers change.
+- FSDS `sub.txt` names, read from the 35 zips already downloaded: 14,900 (CIK, name) pairs from 12,078 filers, 2018q1–2026q3 (`data/interim/entities/fsds_names.csv`).
+- Master table `gold/company_master.csv` (`uv run python -m filinglens.extract.entities build`; `bench/entities.json`): the 300 companies with CIK, current name, tickers, exchanges, SIC, sector, EIN, state of incorporation, fiscal year end, former names and FSDS names; 181 have former names, 48 several tickers.
+
+### Synthetic Q&A: `gold/synthetic/risk_qa.train.jsonl`
+
+- **What:** 550 question-answer pairs about risk paragraphs, each with an exact evidence quote and the source paragraph ID. Every row has `synthetic: true` and `split: "train"`. They are never used for evaluation.
+- **Generator:** `Qwen/Qwen3-4B-AWQ` (Apache-2.0), greedy, JSON schema, prompt [labeling/synthetic_qa_prompt.md](labeling/synthetic_qa_prompt.md) version 2. Commands: `synthetic_qa prepare`, then `generate` (GPU environment), then `finalize`; stats in `bench/synthetic_qa.json` and `bench/synthetic_qa_run.json` (156.0 s, peak 7,985 MiB).
+- **Sources:** 176 train companies only. Of 66,329 eligible train paragraphs, 141 were dropped because the same text also appears at a dev or test company (copied boilerplate). 420 paragraphs drawn: 70 per sector, 84 per year, at most one per filing, from 159 companies.
+- **Checks:** 840 pairs generated, 550 kept (0.6548) from 357 paragraphs and 152 companies. Dropped for: evidence longer than 40 words (160), evidence not a verbatim quote (89), answer too long (56), ticker missing from the question (40), question copies 8+ words from the source (39), duplicate question (3), answer not from the source (1).
+- **Leakage test** (finalize writes nothing unless all are 0): rows from non-train companies 0; rows whose source text appears at a dev or test company 0; rows not marked synthetic/train 0.
+- Types kept: factual 264, impact 233, cause 37, mitigation 16.
+- Limits: the checks prove the evidence quote is real, not that the answer is fully correct; greedy decoding makes the questions formulaic; few cause and mitigation questions.
+
+### Exhibit 21 and the knowledge graph
+
+- **Exhibit 21** (`uv run python -m filinglens.kg.exhibits`; `bench/ex21_download.json`): each company's latest 10-K (299 for fiscal 2025, 1 for 2020). The filing index page gives each document's exhibit type. 290 companies have an EX-21 (300 files), 10 have none. 590 requests in 74.8 s, **max 8 in any 1-second window**; cached in `data/raw/ex21/`, so a rerun makes 0 requests.
+- **Graph** (`uv run python -m filinglens.kg.build graph`; `bench/kg_stats.json`, 49.0 s):
+  - Nodes 47,612: 300 companies, 44,407 subsidiaries, 2,905 people. Edges 47,757: has_subsidiary 44,407, has_director 2,463, has_officer 792, signed 94 (no recognized title), same_as 1 (a subsidiary that is itself one of the 300 companies, matched with the T13 resolver).
+  - At least one subsidiary parsed for 282 companies; of the 290 with an EX-21, 8 gave no rows (one of them a PDF, which isn't parsed). Median 33.5 subsidiaries per company, max 2,772 (Ventas). Signers found for 293 companies (median 12); a CEO recognized for 257, a CFO for 253.
+  - Top companies by degree: Ventas 2,787, HCA Healthcare 2,324, Comcast 1,489, Blackstone 1,438, Apollo Global Management 1,363.
+  - 203 people sign the 10-K of 2 or more of the 300 companies (board interlocks); 215 company pairs share a person. The most connected sign for 3 companies each (for example Brad D. Smith, Marissa A. Mayer, Susan C. Schwab, Teri List).
+  - 136 connected components; the largest has 28,813 nodes and 152 companies.
+- **Postgres** (`uv run python -m filinglens.kg.build load`; `bench/kg_load.json`): tables `kg.nodes` and `kg.edges` in the compose Postgres 18.7, with primary keys, foreign keys and an index on `(dst, kind)`; loaded with COPY in 1.5 s. The SQL count of people on 2+ companies (203) equals NetworkX's.
+- Limits: a person is identified by first and last name, so namesakes merge; attorney-in-fact signatures are skipped (for example SO); some titles keep a name prefix; 43 companies have no recognized CEO; subsidiary lists are one snapshot, and their parsing has no ground truth (counts, not accuracy).
+
+### Models and libraries added in FL-M2
+
+| Name | Version | License | Used for |
+|---|---|---|---|
+| ibm-granite/granite-4.1-3b | Hugging Face | Apache-2.0 | primary silver labeler (FP8 at load) |
+| Qwen/Qwen3-4B-AWQ | Hugging Face | Apache-2.0 | check labeler; synthetic Q&A generator |
+| Qwen/Qwen3-1.7B | Hugging Face | Apache-2.0 | prompted extraction baseline (M4's student base) |
+| Qwen/Qwen3-VL-2B-Instruct | Hugging Face | Apache-2.0 | table extraction (FP8) |
+| vLLM | 0.34.0 | Apache-2.0 | local inference (separate GPU environment, `bench/silver_gpu_env.txt`) |
+| PyTorch | 2.14.0+cu132 | BSD-3-Clause | vLLM backend |
+| transformers | 5.22.2 | Apache-2.0 | model loading |
+| xgrammar | 0.2.8 | Apache-2.0 | JSON-schema constrained decoding |
+| nvidia-ml-py | 13.615.71 | BSD-3-Clause | peak GPU memory sampling |
+| lxml | 6.1.3 | BSD-3-Clause | HTML parsing (Item 1A, tables, EX-21, signatures) |
+| pyarrow | 26.0.1 | Apache-2.0 | Parquet |
+| Playwright + Chromium | 1.65.2 (Playwright's bundled Chromium) | Apache-2.0 (Playwright), BSD-3-Clause (Chromium) | rendering table pages |
+| Pillow | 13.0.0 | MIT-CMU | images |
+| pytesseract + Tesseract OCR | 0.3.13; Tesseract 5.5.0 (apt) | Apache-2.0 | OCR baseline |
+| scikit-learn | 1.9.1 | BSD-3-Clause | macro-F1, kappa cross-check |
+| NetworkX | 3.7 | BSD-3-Clause | graph analysis |
+| Label Studio | 1.23.2 (Docker) | Apache-2.0 | set up in T4; unused after the silver-label decision; torn down |

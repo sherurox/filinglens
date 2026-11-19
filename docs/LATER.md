@@ -24,3 +24,10 @@ Ideas that came up during the build but are not in docs/SPEC.md. They stay here 
 | 2026-11-17 | Fetch Exhibit 13 (annual report) for filers that incorporate Item 1A by reference (BNY, USB, WFC) | New downloads; the text isn't in the 10-K document | FL-M2 T1 |
 | 2026-11-19 | Date-aware entity resolution (a name resolves to the CIK that was filing at the mention's date; predecessor/successor CIK links) | Most D4 errors are successor registrants with the same name; names alone can't separate them | FL-M2 T16 |
 | 2026-11-19 | Keep SEC state tags (`/PA`, `/OH`) as a tie-breaker when both names carry one | Moves 1–2 eval matches; precision-only change, not needed for D4 | FL-M2 T16 |
+| 2026-11-19 | Freeze evaluation sets by ID (table pages, silver test rows) so later parser fixes recompute values but never change membership | The "—%" fix redrew all 50 table pages; acceptable once, but every later fix would do it again | FL-M2 T10 |
+| 2026-11-19 | Hand-check the 65 silver test rows (or a sample) to turn the test split into real gold | User decision 19 Nov 2026: fully automated labels; needed before any claim of correctness rather than agreement | FL-M2 T5 |
+| 2026-11-19 | M4 ablation "gold only" has no gold data: rename to "silver only" or drop (needs a spec change) | Decide at the start of M4 | FL-M2 T5 |
+| 2026-11-19 | Person identity by SEC reporting-owner CIK (Forms 3/4) instead of first + last name | Namesakes merge today; needs new downloads per company | FL-M2 T15 |
+| 2026-11-19 | Signatures given by an attorney-in-fact ("*" next to directors' names), and titles that keep a name prefix | SO lists 1 signer; WEC titles start with the name; counts are still right | FL-M2 T15 |
+| 2026-11-19 | Exhibit 21 history (every year, not the latest only) and OCR for the 1 PDF exhibit | A snapshot is enough for the graph; 8× the requests | FL-M2 T15 |
+| 2026-11-19 | Synthetic Q&A with sampling (temperature > 0) and per-type quotas | Greedy gives few cause (37) and mitigation (16) questions | FL-M2 T14 |
