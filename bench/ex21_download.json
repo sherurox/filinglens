@@ -1,0 +1,22 @@
+{
+  "command": "uv run python -m filinglens.kg.exhibits",
+  "finished_utc": "2026-11-19T17:38:30+00:00",
+  "companies": 300,
+  "status": {
+    "ok": 290,
+    "no_ex21": 10
+  },
+  "exhibit_files": 300,
+  "report_years": {
+    "2020": 1,
+    "2025": 299
+  },
+  "requests": 590,
+  "elapsed_s": 74.8,
+  "max_requests_in_any_1s_window": 8,
+  "limiter": {
+    "rate_per_s": 8.0,
+    "capacity": 1.0
+  },
+  "failed": []
+}
