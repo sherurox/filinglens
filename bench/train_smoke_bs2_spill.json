@@ -1,0 +1,55 @@
+{
+  "command": "python -m filinglens.train.smoke_qlora --note AC power, Windows Best performance",
+  "utc": "2026-11-19T18:13:32+00:00",
+  "note": "AC power, Windows Best performance",
+  "model": "Qwen/Qwen3-1.7B",
+  "quant": "nf4 + double quant, bf16 compute",
+  "lora": {
+    "rank": 16,
+    "alpha": 32,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "trainable_params": 17432576,
+  "total_params": 1738007552,
+  "batch_size": 2,
+  "seq_len": 1024,
+  "gradient_checkpointing": true,
+  "steps": 10,
+  "load_s": 3.8,
+  "weights_after_load_mib": 1950,
+  "peak_allocated_mib": 7300,
+  "peak_reserved_mib": 8186,
+  "gpu_total_mib": 8124,
+  "gpu_free_at_end_mib": 0,
+  "sec_per_step": 3.373,
+  "tokens_per_s": 607,
+  "losses": [
+    13.2664,
+    12.8717,
+    12.5888,
+    12.42,
+    12.2925,
+    12.1992,
+    12.1268,
+    12.0691,
+    12.0351,
+    11.9995
+  ],
+  "env": {
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "python": "3.12.16",
+    "torch": "2.15.0+cu132",
+    "cuda": "13.2",
+    "transformers": "5.23.0",
+    "peft": "0.22.0",
+    "bitsandbytes": "0.50.2"
+  }
+}
