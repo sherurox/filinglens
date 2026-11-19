@@ -15,7 +15,7 @@ import json
 import platform
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import bitsandbytes
@@ -96,8 +96,10 @@ def main() -> None:
     free_b, total_b = torch.cuda.mem_get_info()
 
     record = {
-        "command": " ".join([Path(sys.executable).name, "-m", "filinglens.train.smoke_qlora", *sys.argv[1:]]),
-        "utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "command": " ".join(
+            [Path(sys.executable).name, "-m", "filinglens.train.smoke_qlora", *sys.argv[1:]]
+        ),
+        "utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "note": a.note,
         "model": a.model,
         "quant": "nf4 + double quant, bf16 compute",
@@ -129,9 +131,22 @@ def main() -> None:
     }
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(record, indent=2) + "\n")
-    print(json.dumps({k: record[k] for k in (
-        "peak_allocated_mib", "peak_reserved_mib", "sec_per_step", "tokens_per_s",
-        "trainable_params", "losses")}, indent=2))
+    print(
+        json.dumps(
+            {
+                k: record[k]
+                for k in (
+                    "peak_allocated_mib",
+                    "peak_reserved_mib",
+                    "sec_per_step",
+                    "tokens_per_s",
+                    "trainable_params",
+                    "losses",
+                )
+            },
+            indent=2,
+        )
+    )
     print(f"wrote {a.out}")
 
 
