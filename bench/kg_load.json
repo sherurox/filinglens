@@ -1,0 +1,23 @@
+{
+  "command": "uv run python -m filinglens.kg.build load",
+  "finished_utc": "2026-11-19T17:54:32+00:00",
+  "postgres_version": "18.7 (Debian 18.7-1.pgdg13+2)",
+  "rows_by_kind": {
+    "nodes": {
+      "subsidiary": 44407,
+      "person": 2905,
+      "company": 300
+    },
+    "edges": {
+      "has_subsidiary": 44407,
+      "has_director": 2463,
+      "has_officer": 792,
+      "signed": 94,
+      "same_as": 1
+    }
+  },
+  "people_on_2plus_companies_sql": 203,
+  "people_on_2plus_companies_networkx": 203,
+  "sql_matches_networkx": true,
+  "seconds": 1.5
+}

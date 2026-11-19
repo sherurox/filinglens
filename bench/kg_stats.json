@@ -1,0 +1,288 @@
+{
+  "command": "uv run python -m filinglens.kg.build graph",
+  "finished_utc": "2026-11-19T17:54:30+00:00",
+  "coverage": {
+    "ex21_pdf": 1,
+    "companies": 300,
+    "with_subsidiaries": 282,
+    "with_signers": 293,
+    "with_ceo": 257,
+    "with_cfo": 253,
+    "dangling_edges_dropped": 0
+  },
+  "nodes": 47612,
+  "edges": 47757,
+  "nodes_by_kind": {
+    "subsidiary": 44407,
+    "person": 2905,
+    "company": 300
+  },
+  "edges_by_kind": {
+    "has_subsidiary": 44407,
+    "has_director": 2463,
+    "has_officer": 792,
+    "signed": 94,
+    "same_as": 1
+  },
+  "connected_components": 136,
+  "largest_component_nodes": 28813,
+  "companies_in_largest_component": 152,
+  "subsidiaries_per_company": {
+    "median": 33.5,
+    "max": 2772,
+    "companies_with_none": 18
+  },
+  "signers_per_company": {
+    "median": 12.0,
+    "max": 21,
+    "companies_with_none": 7
+  },
+  "people_on_2plus_companies": 203,
+  "company_pairs_sharing_a_person": 215,
+  "top_companies_by_degree": [
+    {
+      "id": "company:740260",
+      "label": "Ventas, Inc.",
+      "degree": 2787
+    },
+    {
+      "id": "company:860730",
+      "label": "HCA Healthcare, Inc.",
+      "degree": 2324
+    },
+    {
+      "id": "company:1166691",
+      "label": "COMCAST CORP",
+      "degree": 1489
+    },
+    {
+      "id": "company:1393818",
+      "label": "Blackstone Inc.",
+      "degree": 1438
+    },
+    {
+      "id": "company:1858681",
+      "label": "Apollo Global Management, Inc.",
+      "degree": 1363
+    },
+    {
+      "id": "company:1404912",
+      "label": "KKR & Co. Inc.",
+      "degree": 1277
+    },
+    {
+      "id": "company:97745",
+      "label": "THERMO FISHER SCIENTIFIC INC.",
+      "degree": 1231
+    },
+    {
+      "id": "company:2041610",
+      "label": "Skydance Corp",
+      "degree": 1126
+    },
+    {
+      "id": "company:726728",
+      "label": "REALTY INCOME CORP",
+      "degree": 1089
+    },
+    {
+      "id": "company:766704",
+      "label": "WELLTOWER INC.",
+      "degree": 947
+    }
+  ],
+  "top_people_by_degree": [
+    {
+      "id": "person:jack fusco",
+      "label": "Jack A. Fusco",
+      "degree": 4
+    },
+    {
+      "id": "person:kaes van hof",
+      "label": "Kaes Van’t Hof",
+      "degree": 4
+    },
+    {
+      "id": "person:ari bousbib",
+      "label": "Ari Bousbib",
+      "degree": 3
+    },
+    {
+      "id": "person:brad smith",
+      "label": "Brad D. Smith",
+      "degree": 3
+    },
+    {
+      "id": "person:brian cornell",
+      "label": "Brian C. Cornell",
+      "degree": 3
+    },
+    {
+      "id": "person:brian niccol",
+      "label": "Brian Niccol",
+      "degree": 3
+    },
+    {
+      "id": "person:carl eschenbach",
+      "label": "Carl Eschenbach",
+      "degree": 3
+    },
+    {
+      "id": "person:charles scharf",
+      "label": "Charles W. Scharf",
+      "degree": 3
+    },
+    {
+      "id": "person:dara khosrowshahi",
+      "label": "Dara Khosrowshahi",
+      "degree": 3
+    },
+    {
+      "id": "person:david goeckeler",
+      "label": "David V. Goeckeler",
+      "degree": 3
+    }
+  ],
+  "top_interlocked_people": [
+    {
+      "id": "person:brad smith",
+      "label": "Brad D. Smith",
+      "companies": 3
+    },
+    {
+      "id": "person:elinor mertz",
+      "label": "Elinor Mertz",
+      "companies": 3
+    },
+    {
+      "id": "person:hugh johnston",
+      "label": "Hugh F. Johnston",
+      "companies": 3
+    },
+    {
+      "id": "person:linnie haynesworth",
+      "label": "Linnie M. Haynesworth",
+      "companies": 3
+    },
+    {
+      "id": "person:lydia kennard",
+      "label": "Lydia H. Kennard",
+      "companies": 3
+    },
+    {
+      "id": "person:marissa mayer",
+      "label": "Marissa A. Mayer",
+      "companies": 3
+    },
+    {
+      "id": "person:maynard webb",
+      "label": "Maynard Webb",
+      "companies": 3
+    },
+    {
+      "id": "person:perry traquina",
+      "label": "Perry M. Traquina",
+      "companies": 3
+    },
+    {
+      "id": "person:susan schwab",
+      "label": "Susan C. Schwab",
+      "companies": 3
+    },
+    {
+      "id": "person:teri list",
+      "label": "Teri List",
+      "companies": 3
+    }
+  ],
+  "samples": [
+    {
+      "ticker": "ABT",
+      "subsidiaries": [
+        "Abbott Biologicals, LLC | Delaware",
+        "Abbott Cardiovascular Inc. | Delaware",
+        "Abbott Cardiovascular Systems Inc. | California",
+        "Abbott Delaware LLC | Delaware"
+      ],
+      "signers": [
+        "ROBERT B. FORD | Chairman of the Board and Chief Executive Officer | ceo,director",
+        "PHILIP P. BOUDREAU | Finance and Chief Financial Officer (principal financial officer) | cfo",
+        "JOHN A. MCCOY, JR. | Vice President, Finance and Controller(principal accounting officer) | cao",
+        "NITA AHUJA | Director of Abbott Laboratories | director",
+        "ROBERT J. ALPERN | Director of Abbott Laboratories | director"
+      ]
+    },
+    {
+      "ticker": "SO",
+      "subsidiaries": [],
+      "signers": [
+        "Melissa K. Caen |  | "
+      ]
+    },
+    {
+      "ticker": "WEC",
+      "subsidiaries": [
+        "ATC Holding LLC | Wisconsin",
+        "American Transmission Company LLC | Wisconsin",
+        "ATC Development Manager, Inc. | Delaware",
+        "ATC Holdco LLC | Delaware"
+      ],
+      "signers": [
+        "SCOTT J. LAUBER | President and Chief Executive Officer | ceo",
+        "XIA LIU | Xia Liu, Executive Vice President and Chief Financial Officer -- | cfo",
+        "WILLIAM J. GUC | William J. Guc, Vice President and Controller -- | cao",
+        "GALE E. KLAPPA | Gale E. Klappa, Non-Executive Chairman of the Board | director",
+        "WARNER L. BAXTER | Warner L. Baxter, Director | director"
+      ]
+    },
+    {
+      "ticker": "AMZN",
+      "subsidiaries": [
+        "Amazon.com Services LLC | Delaware",
+        "Amazon.com Sales, Inc. | Delaware",
+        "Amazon Data Services, Inc. | Delaware",
+        "Amazon Web Services, Inc. | Delaware"
+      ],
+      "signers": [
+        "Andrew R. Jassy | President and Chief Executive Officer (Principal Executive Officer) and Director | ceo,director",
+        "Brian T. Olsavsky | Senior Vice President and Chief Financial Officer (Principal Financial Officer) | cfo",
+        "Shelley L. Reynolds | Vice President, Worldwide Controller (Principal Accounting Officer) | cao",
+        "Jeffrey P. Bezos | Executive Chair | director",
+        "Keith B. Alexander | Director | director"
+      ]
+    },
+    {
+      "ticker": "EXPE",
+      "subsidiaries": [
+        "Cruise, LLC | United States - WA",
+        "EG Corporate Travel Holdings LLC | United States - DE",
+        "Expedia, Inc. | United States - WA",
+        "Expedia Treasury US, LLC | United States - DE"
+      ],
+      "signers": [
+        "ARIANE GORIN | Chief Executive Officer and Director | ceo,director",
+        "SCOTT SCHENKEL | Chief Financial Officer | cfo",
+        "LANCE SOLIDAY | Senior Vice President, Chief Accounting Officer | cao",
+        "BARRY DILLER | Chairman of the Board, Senior Executive and Director | director",
+        "BEVERLY ANDERSON | Director | director"
+      ]
+    },
+    {
+      "ticker": "SHOP",
+      "subsidiaries": [
+        "Shopify LLC | Delaware",
+        "Shopify Holdings (USA) 2 Inc. | Delaware",
+        "Shopify International Limited | Ireland",
+        "Shopify Commerce Singapore Pte. Ltd. | Singapore"
+      ],
+      "signers": [
+        "Tobias Lütke | Chief Executive Officer and Chairman of the Board of Directors (principal executive officer) | ceo,director",
+        "Jeff Hoffmeister | Chief Financial Officer (principal financial officer) | cfo",
+        "Darryl Arvai | Vice President, Corporate Controller (principal accounting officer) | cao",
+        "Joe Natale | Director | director",
+        "Gail Goodman | Director | director"
+      ]
+    }
+  ],
+  "seconds": 49.0
+}
