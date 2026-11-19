@@ -1,0 +1,38 @@
+{
+  "command": "python -m filinglens.extract.silver_label --model ibm-granite/granite-4.1-3b --quantization fp8 --gpu-memory-utilization 0.80 --enforce-eager",
+  "finished_utc": "2026-11-19T09:27:50+00:00",
+  "model": "ibm-granite/granite-4.1-3b",
+  "quantization": "fp8",
+  "max_model_len": 4096,
+  "gpu_memory_utilization": 0.8,
+  "enforce_eager": true,
+  "elapsed_s_incl_model_load": 91.1,
+  "peak_gpu_memory_mib": 7695,
+  "output": "data/interim/silver/ibm-granite-granite-4-1-3b.jsonl",
+  "tasks": 330,
+  "valid": 327,
+  "invalid_problems": {
+    "not_a_risk with severity or year": 2,
+    "risk without severity": 1,
+    "risk without first_seen_year": 1
+  },
+  "categories": {
+    "regulatory_legal": 72,
+    "competition_demand": 45,
+    "macro_market": 41,
+    "operations_supply": 40,
+    "financial_capital": 30,
+    "health_pandemic": 23,
+    "geopolitical_international": 19,
+    "people": 18,
+    "strategy_corporate": 15,
+    "technology_cyber": 13,
+    "climate_environment": 11
+  },
+  "severity": {
+    "1": 10,
+    "2": 268,
+    "3": 49
+  },
+  "unsure": 0
+}

@@ -1,0 +1,36 @@
+{
+  "command": "python -m filinglens.extract.silver_label --model Qwen/Qwen3-4B-AWQ --quantization awq_marlin --gpu-memory-utilization 0.80 --enforce-eager",
+  "finished_utc": "2026-11-19T09:33:02+00:00",
+  "model": "Qwen/Qwen3-4B-AWQ",
+  "quantization": "awq_marlin",
+  "max_model_len": 4096,
+  "gpu_memory_utilization": 0.8,
+  "enforce_eager": true,
+  "elapsed_s_incl_model_load": 310.1,
+  "peak_gpu_memory_mib": 7759,
+  "output": "data/interim/silver/qwen-qwen3-4b-awq.jsonl",
+  "tasks": 330,
+  "valid": 328,
+  "invalid_problems": {
+    "not_a_risk with severity or year": 2
+  },
+  "categories": {
+    "regulatory_legal": 80,
+    "operations_supply": 53,
+    "people": 31,
+    "geopolitical_international": 29,
+    "strategy_corporate": 27,
+    "health_pandemic": 25,
+    "financial_capital": 22,
+    "competition_demand": 22,
+    "macro_market": 19,
+    "technology_cyber": 13,
+    "climate_environment": 7
+  },
+  "severity": {
+    "1": 5,
+    "2": 285,
+    "3": 38
+  },
+  "unsure": 0
+}
