@@ -30,6 +30,8 @@ from filinglens.extract.table_pages import (
         ("-7", "-7"),
         ("2025", "2025"),
         ("—", "—"),
+        ("—%", "—"),
+        ("$—", "—"),
         ("Net sales", None),
         ("1,23", None),
         ("N/A", None),

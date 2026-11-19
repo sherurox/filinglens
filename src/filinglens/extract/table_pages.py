@@ -52,9 +52,9 @@ KINDS = {
 def canonical(text: str) -> str | None:
     """A number cell as a canonical string ("(1,234)" -> "-1234", "12.5%" -> "12.5"), or None."""
     t = text.replace(" ", "")
-    if DASH.match(t):
-        return "—"
     core = t.strip("$()%")
+    if DASH.match(core):  # "—", "—%", "$ —": nil
+        return "—"
     if not NUMBER.match(core):
         return None
     negative = t.startswith("(") or t.startswith("$(") or core.startswith("-")

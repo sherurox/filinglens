@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.tables_vlm --variant image+ocr --split test --allow-test --quantization fp8",
+  "finished_utc": "2026-11-19T10:39:45+00:00",
+  "model": "Qwen/Qwen3-VL-2B-Instruct",
+  "quantization": "fp8",
+  "variant": "image+ocr",
+  "prompt_version": 2,
+  "split": "test",
+  "pages": 40,
+  "valid_json": 38,
+  "elapsed_s_incl_model_load": 399.4,
+  "peak_gpu_memory_mib": 7889,
+  "max_pixels": 1600000,
+  "predictions": "data/interim/tables/tables_vlm_image_ocr_test_p2.jsonl"
+}

@@ -1,0 +1,108 @@
+{
+  "command": "uv run python -m filinglens.extract.tables score --split dev --pred data/interim/tables/tables_vlm_image_dev_p2.jsonl",
+  "finished_utc": "2026-11-19T10:27:08+00:00",
+  "split": "dev",
+  "predictions": "data/interim/tables/tables_vlm_image_dev_p2.jsonl",
+  "pages_missing": 0,
+  "overall": {
+    "tables": 10,
+    "gold_cells": 304,
+    "correct_cells": 184,
+    "cell_accuracy_micro": 0.6053,
+    "cell_accuracy_macro": 0.6386,
+    "cell_precision_micro": 0.6643,
+    "row_match_rate": 0.734
+  },
+  "per_page": [
+    {
+      "page_id": "0000798354-22-000004-t79",
+      "gold_cells": 36,
+      "pred_cells": 33,
+      "correct": 33,
+      "gold_rows": 12,
+      "matched_rows": 11,
+      "accuracy": 0.9167
+    },
+    {
+      "page_id": "0001783879-22-000044-t7",
+      "gold_cells": 21,
+      "pred_cells": 21,
+      "correct": 18,
+      "gold_rows": 7,
+      "matched_rows": 6,
+      "accuracy": 0.8571
+    },
+    {
+      "page_id": "0001596532-26-000013-t13",
+      "gold_cells": 46,
+      "pred_cells": 10,
+      "correct": 0,
+      "gold_rows": 9,
+      "matched_rows": 1,
+      "accuracy": 0.0
+    },
+    {
+      "page_id": "0000051143-26-000010-t7",
+      "gold_cells": 14,
+      "pred_cells": 14,
+      "correct": 14,
+      "gold_rows": 7,
+      "matched_rows": 7,
+      "accuracy": 1.0
+    },
+    {
+      "page_id": "0000875320-26-000056-t60",
+      "gold_cells": 18,
+      "pred_cells": 16,
+      "correct": 16,
+      "gold_rows": 9,
+      "matched_rows": 8,
+      "accuracy": 0.8889
+    },
+    {
+      "page_id": "0001564590-20-014397-t46",
+      "gold_cells": 54,
+      "pred_cells": 52,
+      "correct": 48,
+      "gold_rows": 18,
+      "matched_rows": 16,
+      "accuracy": 0.8889
+    },
+    {
+      "page_id": "0001558370-23-001840-t426",
+      "gold_cells": 21,
+      "pred_cells": 18,
+      "correct": 18,
+      "gold_rows": 7,
+      "matched_rows": 6,
+      "accuracy": 0.8571
+    },
+    {
+      "page_id": "0001070412-23-000015-t52",
+      "gold_cells": 24,
+      "pred_cells": 32,
+      "correct": 5,
+      "gold_rows": 8,
+      "matched_rows": 3,
+      "accuracy": 0.2083
+    },
+    {
+      "page_id": "0001573516-26-000090-t63",
+      "gold_cells": 16,
+      "pred_cells": 25,
+      "correct": 4,
+      "gold_rows": 8,
+      "matched_rows": 2,
+      "accuracy": 0.25
+    },
+    {
+      "page_id": "0000027904-23-000003-t63",
+      "gold_cells": 54,
+      "pred_cells": 56,
+      "correct": 28,
+      "gold_rows": 9,
+      "matched_rows": 9,
+      "accuracy": 0.5185
+    }
+  ]
+}

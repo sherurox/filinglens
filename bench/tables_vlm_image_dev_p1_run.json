@@ -1,0 +1,14 @@
+{
+  "command": "python -m filinglens.extract.tables_vlm --variant image --split dev --quantization fp8",
+  "finished_utc": "2026-11-19T10:19:13+00:00",
+  "model": "Qwen/Qwen3-VL-2B-Instruct",
+  "quantization": "fp8",
+  "variant": "image",
+  "split": "dev",
+  "pages": 10,
+  "valid_json": 10,
+  "elapsed_s_incl_model_load": 162.4,
+  "peak_gpu_memory_mib": 7902,
+  "max_pixels": 1600000,
+  "predictions": "data/interim/tables/tables_vlm_image_dev.jsonl"
+}

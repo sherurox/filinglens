@@ -1,6 +1,6 @@
 {
   "command": "uv run python -m filinglens.extract.table_pages",
-  "finished_utc": "2026-11-19T10:03:03+00:00",
+  "finished_utc": "2026-11-19T10:23:48+00:00",
   "ground_truth": "cells from the HTML each image is rendered from (no hand labels)",
   "filings_scanned": 50,
   "pages": 50,
@@ -9,10 +9,10 @@
     "dev": 10
   },
   "by_kind": {
-    "other": 44,
-    "income_statement": 3,
+    "other": 43,
     "cash_flow": 2,
-    "balance_sheet": 1
+    "balance_sheet": 3,
+    "income_statement": 2
   },
   "by_sector": {
     "finance": 9,
@@ -31,7 +31,7 @@
     "2024": 9,
     "2025": 15
   },
-  "numbers_total": 1840,
-  "rows_total": 669,
+  "numbers_total": 2012,
+  "rows_total": 716,
   "pages_wider_than_letter": 0
 }
