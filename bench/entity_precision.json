@@ -1,0 +1,35 @@
+{
+  "command": "python -m filinglens.extract.entity_eval",
+  "created": "2026-11-19T17:14:45+00:00",
+  "check": "pred_cik == filer CIK in FSDS sub.txt (SEC identifier); no hand labels",
+  "setting": {
+    "threshold": 0.95,
+    "margin": 0.2
+  },
+  "all_matches": {
+    "pairs": 100,
+    "correct": 97,
+    "precision": 0.97,
+    "wilson_ci95": [
+      0.9155,
+      0.9897
+    ],
+    "methods": {
+      "exact": 100
+    }
+  },
+  "non_exact_matches": {
+    "pairs": 2,
+    "correct": 2,
+    "precision": 1.0,
+    "wilson_ci95": [
+      0.3424,
+      1.0
+    ],
+    "methods": {
+      "fuzzy": 1,
+      "compact": 1
+    }
+  },
+  "pairs_file": "bench/entity_pairs_100.csv"
+}

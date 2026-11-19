@@ -1,0 +1,664 @@
+{
+  "command": "python -m filinglens.extract.entity_eval",
+  "created": "2026-11-19T17:14:45+00:00",
+  "reference": {
+    "source": "data/raw/company_tickers.json",
+    "ciks": 7993
+  },
+  "reference_names": 7993,
+  "queries": {
+    "source": "data/interim/entities/fsds_names.csv",
+    "total": 14900,
+    "tune": 7376,
+    "eval": 7524,
+    "methods_eval": {
+      "none": 1257,
+      "fuzzy": 2872,
+      "exact": 3388,
+      "ambiguous": 6,
+      "compact": 1
+    }
+  },
+  "split": "sha256('20261119:<cik>') first byte even = tune, odd = eval",
+  "selection_rule": "max F0.5 on tune; ties -> higher threshold, then higher margin",
+  "sweep_tune": [
+    {
+      "threshold": 0.5,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3641,
+      "correct": 3319,
+      "precision": 0.9116,
+      "recall": 0.8073,
+      "f0_5": 0.8886
+    },
+    {
+      "threshold": 0.5,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3602,
+      "correct": 3316,
+      "precision": 0.9206,
+      "recall": 0.8066,
+      "f0_5": 0.8953
+    },
+    {
+      "threshold": 0.5,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3577,
+      "correct": 3313,
+      "precision": 0.9262,
+      "recall": 0.8059,
+      "f0_5": 0.8993
+    },
+    {
+      "threshold": 0.5,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3523,
+      "correct": 3308,
+      "precision": 0.939,
+      "recall": 0.8047,
+      "f0_5": 0.9086
+    },
+    {
+      "threshold": 0.55,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3513,
+      "correct": 3298,
+      "precision": 0.9388,
+      "recall": 0.8022,
+      "f0_5": 0.9079
+    },
+    {
+      "threshold": 0.55,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3492,
+      "correct": 3297,
+      "precision": 0.9442,
+      "recall": 0.802,
+      "f0_5": 0.9118
+    },
+    {
+      "threshold": 0.55,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3484,
+      "correct": 3296,
+      "precision": 0.946,
+      "recall": 0.8018,
+      "f0_5": 0.9132
+    },
+    {
+      "threshold": 0.55,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3465,
+      "correct": 3293,
+      "precision": 0.9504,
+      "recall": 0.801,
+      "f0_5": 0.9162
+    },
+    {
+      "threshold": 0.6,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3452,
+      "correct": 3286,
+      "precision": 0.9519,
+      "recall": 0.7993,
+      "f0_5": 0.9169
+    },
+    {
+      "threshold": 0.6,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3441,
+      "correct": 3286,
+      "precision": 0.955,
+      "recall": 0.7993,
+      "f0_5": 0.9192
+    },
+    {
+      "threshold": 0.6,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3435,
+      "correct": 3285,
+      "precision": 0.9563,
+      "recall": 0.7991,
+      "f0_5": 0.9201
+    },
+    {
+      "threshold": 0.6,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3424,
+      "correct": 3282,
+      "precision": 0.9585,
+      "recall": 0.7983,
+      "f0_5": 0.9215
+    },
+    {
+      "threshold": 0.65,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3396,
+      "correct": 3269,
+      "precision": 0.9626,
+      "recall": 0.7952,
+      "f0_5": 0.9237
+    },
+    {
+      "threshold": 0.65,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3390,
+      "correct": 3269,
+      "precision": 0.9643,
+      "recall": 0.7952,
+      "f0_5": 0.925
+    },
+    {
+      "threshold": 0.65,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3388,
+      "correct": 3269,
+      "precision": 0.9649,
+      "recall": 0.7952,
+      "f0_5": 0.9254
+    },
+    {
+      "threshold": 0.65,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3383,
+      "correct": 3269,
+      "precision": 0.9663,
+      "recall": 0.7952,
+      "f0_5": 0.9264
+    },
+    {
+      "threshold": 0.7,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3358,
+      "correct": 3259,
+      "precision": 0.9705,
+      "recall": 0.7928,
+      "f0_5": 0.9289
+    },
+    {
+      "threshold": 0.7,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3352,
+      "correct": 3259,
+      "precision": 0.9723,
+      "recall": 0.7928,
+      "f0_5": 0.9301
+    },
+    {
+      "threshold": 0.7,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3351,
+      "correct": 3259,
+      "precision": 0.9725,
+      "recall": 0.7928,
+      "f0_5": 0.9303
+    },
+    {
+      "threshold": 0.7,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3349,
+      "correct": 3259,
+      "precision": 0.9731,
+      "recall": 0.7928,
+      "f0_5": 0.9308
+    },
+    {
+      "threshold": 0.75,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3310,
+      "correct": 3245,
+      "precision": 0.9804,
+      "recall": 0.7893,
+      "f0_5": 0.9351
+    },
+    {
+      "threshold": 0.75,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3307,
+      "correct": 3245,
+      "precision": 0.9813,
+      "recall": 0.7893,
+      "f0_5": 0.9358
+    },
+    {
+      "threshold": 0.75,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3306,
+      "correct": 3245,
+      "precision": 0.9815,
+      "recall": 0.7893,
+      "f0_5": 0.936
+    },
+    {
+      "threshold": 0.75,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3306,
+      "correct": 3245,
+      "precision": 0.9815,
+      "recall": 0.7893,
+      "f0_5": 0.936
+    },
+    {
+      "threshold": 0.8,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3283,
+      "correct": 3233,
+      "precision": 0.9848,
+      "recall": 0.7864,
+      "f0_5": 0.9375
+    },
+    {
+      "threshold": 0.8,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3282,
+      "correct": 3233,
+      "precision": 0.9851,
+      "recall": 0.7864,
+      "f0_5": 0.9377
+    },
+    {
+      "threshold": 0.8,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3281,
+      "correct": 3233,
+      "precision": 0.9854,
+      "recall": 0.7864,
+      "f0_5": 0.9379
+    },
+    {
+      "threshold": 0.8,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3281,
+      "correct": 3233,
+      "precision": 0.9854,
+      "recall": 0.7864,
+      "f0_5": 0.9379
+    },
+    {
+      "threshold": 0.85,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3265,
+      "correct": 3226,
+      "precision": 0.9881,
+      "recall": 0.7847,
+      "f0_5": 0.9394
+    },
+    {
+      "threshold": 0.85,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3265,
+      "correct": 3226,
+      "precision": 0.9881,
+      "recall": 0.7847,
+      "f0_5": 0.9394
+    },
+    {
+      "threshold": 0.85,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3264,
+      "correct": 3226,
+      "precision": 0.9884,
+      "recall": 0.7847,
+      "f0_5": 0.9396
+    },
+    {
+      "threshold": 0.85,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3264,
+      "correct": 3226,
+      "precision": 0.9884,
+      "recall": 0.7847,
+      "f0_5": 0.9396
+    },
+    {
+      "threshold": 0.9,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.9,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.9,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.9,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.95,
+      "margin": 0.0,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.95,
+      "margin": 0.05,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.95,
+      "margin": 0.1,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    },
+    {
+      "threshold": 0.95,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    }
+  ],
+  "chosen": {
+    "threshold": 0.95,
+    "margin": 0.2,
+    "tune": {
+      "threshold": 0.95,
+      "margin": 0.2,
+      "queries": 7376,
+      "gold_in_reference": 4111,
+      "matched": 3262,
+      "correct": 3225,
+      "precision": 0.9887,
+      "recall": 0.7845,
+      "f0_5": 0.9397
+    }
+  },
+  "eval": {
+    "threshold": 0.95,
+    "margin": 0.2,
+    "queries": 7524,
+    "gold_in_reference": 4240,
+    "matched": 3390,
+    "correct": 3343,
+    "precision": 0.9861,
+    "recall": 0.7884,
+    "f0_5": 0.939
+  },
+  "eval_by_method": {
+    "exact": {
+      "matched": 3388,
+      "correct": 3341,
+      "precision": 0.9861,
+      "ci95": [
+        0.9816,
+        0.9896
+      ]
+    },
+    "compact": {
+      "matched": 1,
+      "correct": 1,
+      "precision": 1.0,
+      "ci95": [
+        0.2065,
+        1.0
+      ]
+    },
+    "fuzzy": {
+      "matched": 1,
+      "correct": 1,
+      "precision": 1.0,
+      "ci95": [
+        0.2065,
+        1.0
+      ]
+    }
+  },
+  "eval_errors": {
+    "wrong": 47,
+    "kinds": {
+      "true company listed (wrong CIK chosen)": 3,
+      "true company not listed (false merge)": 44
+    },
+    "methods": {
+      "exact": 47
+    },
+    "examples": [
+      {
+        "name": "ALBERTSONS COMPANIES, LLC",
+        "cik": 1704956,
+        "best_name": "Albertsons Companies, Inc.",
+        "best_cik": 1646972,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "AMERICAN NATIONAL GROUP INC",
+        "cik": 1801075,
+        "best_name": "American National Group Inc.",
+        "best_cik": 1039828,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "AMESITE INC.",
+        "cik": 1707258,
+        "best_name": "Amesite Inc.",
+        "best_cik": 1807166,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "ANGEL STUDIOS, INC.",
+        "cik": 1671941,
+        "best_name": "Angel Studios, Inc.",
+        "best_cik": 1865200,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "ANGLOGOLD ASHANTI LTD",
+        "cik": 1067428,
+        "best_name": "AngloGold Ashanti PLC",
+        "best_cik": 1973832,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "APOLLO GLOBAL MANAGEMENT LLC",
+        "cik": 1411494,
+        "best_name": "Apollo Global Management, Inc.",
+        "best_cik": 1858681,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "APOLLO GLOBAL MANAGEMENT, INC.",
+        "cik": 1411494,
+        "best_name": "Apollo Global Management, Inc.",
+        "best_cik": 1858681,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "ATLAS ENERGY SOLUTIONS INC.",
+        "cik": 1910950,
+        "best_name": "Atlas Energy Solutions Inc.",
+        "best_cik": 1984060,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BBX CAPITAL CORP",
+        "cik": 315858,
+        "best_name": "BBX Capital, Inc.",
+        "best_cik": 1814974,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BENITEC BIOPHARMA LTD/ADR",
+        "cik": 1552795,
+        "best_name": "Benitec Biopharma Inc.",
+        "best_cik": 1808898,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BIGLARI HOLDINGS INC.",
+        "cik": 93859,
+        "best_name": "Biglari Holdings Inc.",
+        "best_cik": 1726173,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BLACKROCK INC.",
+        "cik": 1364742,
+        "best_name": "BlackRock, Inc.",
+        "best_cik": 2012383,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BRISTOW GROUP INC",
+        "cik": 73887,
+        "best_name": "Bristow Group Inc.",
+        "best_cik": 1525221,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BROOKFIELD ASSET MANAGEMENT INC.",
+        "cik": 1001085,
+        "best_name": "Brookfield Asset Management Ltd.",
+        "best_cik": 1937926,
+        "method": "exact",
+        "score": 1.0
+      },
+      {
+        "name": "BROOKFIELD BUSINESS CORP",
+        "cik": 1871130,
+        "best_name": "Brookfield Business Corp",
+        "best_cik": 1654795,
+        "method": "exact",
+        "score": 1.0
+      }
+    ]
+  },
+  "blocking_eval": {
+    "max_df": 200,
+    "fuzzy_queries": 4129,
+    "comparisons": 188542,
+    "all_pairs": 33003097,
+    "reduction_ratio": 0.994287,
+    "listed_fuzzy_queries": 889,
+    "pair_completeness": 0.2328
+  },
+  "resolve_seconds": 0.9,
+  "seconds": 0.9
+}

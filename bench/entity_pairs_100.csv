@@ -1,0 +1,103 @@
+sample,query,gold_cik,pred_cik,matched_name,method,score,margin,gold_in_reference,correct
+all_matches,"ARROW ELECTRONICS, INC",7536,7536,"ARROW ELECTRONICS, INC.",exact,1.0,1.0,True,True
+all_matches,FLANIGANS ENTERPRISES INC,12040,12040,FLANIGANS ENTERPRISES INC,exact,1.0,1.0,True,True
+all_matches,"CRANE NXT, CO.",25445,25445,"Crane NXT, Co.",exact,1.0,1.0,True,True
+all_matches,GENERAL ELECTRIC CO,40545,40545,GENERAL ELECTRIC CO,exact,1.0,1.0,True,True
+all_matches,HNI CORP,48287,48287,HNI CORP,exact,1.0,1.0,True,True
+all_matches,KEWAUNEE SCIENTIFIC CORP /DE/,55529,55529,KEWAUNEE SCIENTIFIC CORP /DE/,exact,1.0,1.0,True,True
+all_matches,NEONODE INC.,87050,87050,Neonode Inc.,exact,1.0,1.0,True,True
+all_matches,TEXAS INSTRUMENTS INC,97476,97476,TEXAS INSTRUMENTS INC,exact,1.0,1.0,True,True
+all_matches,UNITED FIRE GROUP INC,101199,101199,UNITED FIRE GROUP INC,exact,1.0,1.0,True,True
+all_matches,ELME COMMUNITIES,104894,104894,Elme Communities,exact,1.0,1.0,True,True
+all_matches,"WW INTERNATIONAL, INC.",105319,105319,"WW INTERNATIONAL, INC.",exact,1.0,1.0,True,True
+all_matches,"L3HARRIS TECHNOLOGIES, INC. /DE/",202058,202058,"L3HARRIS TECHNOLOGIES, INC. /DE/",exact,1.0,1.0,True,True
+all_matches,"MERCK & CO., INC.",310158,310158,"Merck & Co., Inc.",exact,1.0,1.0,True,True
+all_matches,AON PLC,315293,315293,Aon plc,exact,1.0,1.0,True,True
+all_matches,"STAR EQUITY HOLDINGS, INC.",707388,1210708,"Star Equity Holdings, Inc.",exact,1.0,1.0,False,False
+all_matches,UNITED BANCORP INC /OH/,731653,731653,UNITED BANCORP INC /OH/,exact,1.0,1.0,True,True
+all_matches,F&M BANK CORP,740806,740806,F&M BANK CORP,exact,1.0,1.0,True,True
+all_matches,"DSS, INC.",771999,771999,"DSS, INC.",exact,1.0,1.0,True,True
+all_matches,KADANT INC,886346,886346,KADANT INC,exact,1.0,1.0,True,True
+all_matches,"GRUPO TELEVISA, S.A.B.",912892,912892,"GRUPO TELEVISA, S.A.B.",exact,1.0,1.0,True,True
+all_matches,IMAX CORP,921582,921582,IMAX CORP,exact,1.0,1.0,True,True
+all_matches,DESWELL INDUSTRIES INC,946936,946936,DESWELL INDUSTRIES INC,exact,1.0,1.0,True,True
+all_matches,CREDICORP LTD,1001290,1001290,CREDICORP LTD,exact,1.0,1.0,True,True
+all_matches,"SPAR GROUP, INC.",1004989,1004989,"SPAR Group, Inc.",exact,1.0,1.0,True,True
+all_matches,"INNOVEX INTERNATIONAL, INC.",1042893,1042893,"Innovex International, Inc.",exact,1.0,1.0,True,True
+all_matches,COMPX INTERNATIONAL INC,1049606,1049606,COMPX INTERNATIONAL INC,exact,1.0,1.0,True,True
+all_matches,COGNIZANT TECHNOLOGY SOLUTIONS CORP,1058290,1058290,COGNIZANT TECHNOLOGY SOLUTIONS CORP,exact,1.0,1.0,True,True
+all_matches,PROSPERITY BANCSHARES INC,1068851,1068851,PROSPERITY BANCSHARES INC,exact,1.0,1.0,True,True
+all_matches,RGC RESOURCES INC,1069533,1069533,RGC RESOURCES INC,exact,1.0,1.0,True,True
+all_matches,BLACKBERRY LTD,1070235,1070235,BLACKBERRY Ltd,exact,1.0,1.0,True,True
+all_matches,NORTHWEST BIOTHERAPEUTICS INC,1072379,1072379,NORTHWEST BIOTHERAPEUTICS INC,exact,1.0,1.0,True,True
+all_matches,SOUTHERN FIRST BANCSHARES INC,1090009,1090009,SOUTHERN FIRST BANCSHARES INC,exact,1.0,1.0,True,True
+all_matches,COSCIENS BIOPHARMA INC.,1113423,1113423,COSCIENS Biopharma Inc.,exact,1.0,1.0,True,True
+all_matches,HORNBECK OFFSHORE SERVICES INC /LA,1131227,866829,"HORNBECK OFFSHORE SERVICES, INC.",exact,1.0,1.0,False,False
+all_matches,NOMURA HOLDINGS INC,1163653,1163653,NOMURA HOLDINGS INC,exact,1.0,1.0,True,True
+all_matches,ENANTA PHARMACEUTICALS INC,1177648,1177648,ENANTA PHARMACEUTICALS INC,exact,1.0,1.0,True,True
+all_matches,"STAR EQUITY HOLDINGS, INC.",1210708,1210708,"Star Equity Holdings, Inc.",exact,1.0,1.0,True,True
+all_matches,GRAN TIERRA ENERGY INC.,1273441,1273441,GRAN TIERRA ENERGY INC.,exact,1.0,1.0,True,True
+all_matches,ORIGIN AGRITECH LTD,1321851,1321851,Origin Agritech LTD,exact,1.0,1.0,True,True
+all_matches,BOISE CASCADE CO,1328581,1328581,BOISE CASCADE Co,exact,1.0,1.0,True,True
+all_matches,AVRICORE HEALTH INC.,1355736,1355736,Avricore Health Inc.,exact,1.0,1.0,True,True
+all_matches,"PROTARA THERAPEUTICS, INC.",1359931,1359931,"Protara Therapeutics, Inc.",exact,1.0,1.0,True,True
+all_matches,ENERGY FUELS INC,1385849,1385849,ENERGY FUELS INC,exact,1.0,1.0,True,True
+all_matches,"FORUM ENERGY TECHNOLOGIES, INC.",1401257,1401257,"FORUM ENERGY TECHNOLOGIES, INC.",exact,1.0,1.0,True,True
+all_matches,CUENTAS INC.,1424657,1424657,Cuentas Inc.,exact,1.0,1.0,True,True
+all_matches,"AVIDBANK HOLDINGS, INC.",1443575,1443575,"Avidbank Holdings, Inc.",exact,1.0,1.0,True,True
+all_matches,"BLUEONE TECHNOLOGIES, INC.",1496690,1496690,"BlueOne Technologies, Inc.",exact,1.0,1.0,True,True
+all_matches,"LIGHTINTHEBOX HOLDING CO., LTD.",1523836,1523836,"LightInTheBox Holding Co., Ltd.",exact,1.0,1.0,True,True
+all_matches,"CALCIMEDICA, INC.",1534133,1534133,"CalciMedica, Inc.",exact,1.0,1.0,True,True
+all_matches,"SOUND FINANCIAL BANCORP, INC.",1541119,1541119,"Sound Financial Bancorp, Inc.",exact,1.0,1.0,True,True
+all_matches,PREMIER AIR CHARTER HOLDINGS INC.,1570937,1570937,Premier Air Charter Holdings Inc.,exact,1.0,1.0,True,True
+all_matches,BRAEMAR HOTELS & RESORTS INC.,1574085,1574085,Braemar Hotels & Resorts Inc.,exact,1.0,1.0,True,True
+all_matches,"VILLAGE FARMS INTERNATIONAL, INC.",1584549,1584549,"Village Farms International, Inc.",exact,1.0,1.0,True,True
+all_matches,ELEMENT SOLUTIONS INC,1590714,1590714,Element Solutions Inc,exact,1.0,1.0,True,True
+all_matches,"LIGHTSTONE VALUE PLUS REIT IV, INC.",1619312,1619312,"Lightstone Value Plus REIT IV, Inc.",exact,1.0,1.0,True,True
+all_matches,"STOKE THERAPEUTICS, INC.",1623526,1623526,"Stoke Therapeutics, Inc.",exact,1.0,1.0,True,True
+all_matches,ENTERA BIO LTD.,1638097,1638097,Entera Bio Ltd.,exact,1.0,1.0,True,True
+all_matches,RIVER FINANCIAL CORP,1641601,1641601,River Financial Corp,exact,1.0,1.0,True,True
+all_matches,"SIGYN THERAPEUTICS, INC.",1642159,1642159,"Sigyn Therapeutics, Inc.",exact,1.0,1.0,True,True
+all_matches,BEONE MEDICINES LTD.,1651308,1651308,BeOne Medicines Ltd.,exact,1.0,1.0,True,True
+all_matches,"GENERATION INCOME PROPERTIES, INC.",1651721,1651721,"GENERATION INCOME PROPERTIES, INC.",exact,1.0,1.0,True,True
+all_matches,"ANGEL STUDIOS, INC.",1671941,1865200,"Angel Studios, Inc.",exact,1.0,1.0,False,False
+all_matches,"DIANTHUS THERAPEUTICS, INC. /DE/",1690585,1690585,"Dianthus Therapeutics, Inc. /DE/",exact,1.0,1.0,True,True
+all_matches,AKSO HEALTH GROUP,1702318,1702318,Akso Health Group,exact,1.0,1.0,True,True
+all_matches,HAMILTON BEACH BRANDS HOLDING CO,1709164,1709164,Hamilton Beach Brands Holding Co,exact,1.0,1.0,True,True
+all_matches,GREENTREE HOSPITALITY GROUP LTD.,1724755,1724755,GreenTree Hospitality Group Ltd.,exact,1.0,1.0,True,True
+all_matches,"KALARIS THERAPEUTICS, INC.",1754068,1754068,"Kalaris Therapeutics, Inc.",exact,1.0,1.0,True,True
+all_matches,"AVITA MEDICAL, INC.",1762303,1762303,"AVITA Medical, Inc.",exact,1.0,1.0,True,True
+all_matches,E-HOME HOUSEHOLD SERVICE HOLDINGS LTD,1769768,1769768,E-Home Household Service Holdings Ltd,exact,1.0,1.0,True,True
+all_matches,PERELLA WEINBERG PARTNERS,1777835,1777835,Perella Weinberg Partners,exact,1.0,1.0,True,True
+all_matches,"SEEQC, INC.",1779977,1779977,"SeeQC, Inc.",exact,1.0,1.0,True,True
+all_matches,YALLA GROUP LTD,1794350,1794350,Yalla Group Ltd,exact,1.0,1.0,True,True
+all_matches,"XPONENTIAL FITNESS, INC.",1802156,1802156,"Xponential Fitness, Inc.",exact,1.0,1.0,True,True
+all_matches,COMPASS PATHWAYS PLC,1816590,1816590,COMPASS Pathways plc,exact,1.0,1.0,True,True
+all_matches,"MEDIAALPHA, INC.",1818383,1818383,"MediaAlpha, Inc.",exact,1.0,1.0,True,True
+all_matches,MEDIROM HEALTHCARE TECHNOLOGIES INC.,1819704,1819704,Medirom Healthcare Technologies Inc.,exact,1.0,1.0,True,True
+all_matches,"JOBY AVIATION, INC.",1819848,1819848,"Joby Aviation, Inc.",exact,1.0,1.0,True,True
+all_matches,"DOUBLEVERIFY HOLDINGS, INC.",1819928,1819928,"DoubleVerify Holdings, Inc.",exact,1.0,1.0,True,True
+all_matches,"RIGETTI COMPUTING, INC.",1838359,1838359,"Rigetti Computing, Inc.",exact,1.0,1.0,True,True
+all_matches,"TRUGOLF HOLDINGS, INC.",1857086,1857086,"TruGolf Holdings, Inc.",exact,1.0,1.0,True,True
+all_matches,ARBE ROBOTICS LTD.,1861841,1861841,Arbe Robotics Ltd.,exact,1.0,1.0,True,True
+all_matches,CRESCENT ENERGY CO,1866175,1866175,Crescent Energy Co,exact,1.0,1.0,True,True
+all_matches,"ARHAUS, INC.",1875444,1875444,"Arhaus, Inc.",exact,1.0,1.0,True,True
+all_matches,"AMAZE HOLDINGS, INC.",1880343,1880343,"AMAZE HOLDINGS, INC.",exact,1.0,1.0,True,True
+all_matches,JUSHI HOLDINGS INC.,1909747,1909747,Jushi Holdings Inc.,exact,1.0,1.0,True,True
+all_matches,"PRINCETON BANCORP, INC.",1913971,1913971,"Princeton Bancorp, Inc.",exact,1.0,1.0,True,True
+all_matches,"CADRENAL THERAPEUTICS, INC.",1937993,1937993,"Cadrenal Therapeutics, Inc.",exact,1.0,1.0,True,True
+all_matches,GARDEN STAGE LTD,1954269,1954269,Garden Stage Ltd,exact,1.0,1.0,True,True
+all_matches,BURKE & HERBERT FINANCIAL SERVICES CORP.,1964333,1964333,Burke & Herbert Financial Services Corp.,exact,1.0,1.0,True,True
+all_matches,RYDE GROUP LTD,1971115,1971115,Ryde Group Ltd,exact,1.0,1.0,True,True
+all_matches,"AIMEI HEALTH TECHNOLOGY CO., LTD.",1979005,1979005,"Aimei Health Technology Co., Ltd.",exact,1.0,1.0,True,True
+all_matches,"CANTOR EQUITY PARTNERS I, INC.",2027708,2027708,"Cantor Equity Partners I, Inc.",exact,1.0,1.0,True,True
+all_matches,CANARY XRP ETF,2039505,2039505,Canary XRP ETF,exact,1.0,1.0,True,True
+all_matches,"LAKE SHORE BANCORP, INC. /MD/",2059653,2059653,"Lake Shore Bancorp, Inc. /MD/",exact,1.0,1.0,True,True
+all_matches,SILVER BOW MINING CORP.,2067674,2067674,SILVER BOW MINING CORP.,exact,1.0,1.0,True,True
+all_matches,NEW AMERICA ACQUISITION I CORP.,2074878,2074878,New America Acquisition I Corp.,exact,1.0,1.0,True,True
+all_matches,INSIGHT DIGITAL PARTNERS II,2079292,2079292,Insight Digital Partners II,exact,1.0,1.0,True,True
+all_matches,YORK SPACE SYSTEMS INC.,2086587,2086587,York Space Systems Inc.,exact,1.0,1.0,True,True
+all_matches,EINRIDE AB,2095096,2095096,Einride AB,exact,1.0,1.0,True,True
+all_matches,APOGEE ACQUISITION CORP,2102123,2102123,Apogee Acquisition Corp,exact,1.0,1.0,True,True
+non_exact_matches,GALLAGHER ARTHUR J & CO,354190,354190,Arthur J. Gallagher & Co.,fuzzy,1.0,0.7402,True,True
+non_exact_matches,TREX ACQUISITION CORP.,1437750,1437750,T-REX Acquisition Corp.,compact,1.0,1.0,True,True
