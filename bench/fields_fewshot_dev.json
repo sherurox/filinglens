@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.extract.fields score --variant fewshot --split dev",
+  "finished_utc": "2026-11-19T10:51:24+00:00",
+  "split": "dev",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "predictions": "data/interim/fields/fields_fewshot_dev.jsonl",
+  "all_rows": {
+    "rows": 71,
+    "rule_valid": 67,
+    "category_macro_f1": 0.5075,
+    "category_macro_f1_ci95": [
+      0.34,
+      0.6
+    ],
+    "category_accuracy": 0.5493,
+    "severity_macro_f1": 0.4285,
+    "first_seen_exact": 0.6338,
+    "first_seen_within_1y": 0.7746
+  },
+  "rows_where_silver_labelers_agree": {
+    "rows": 52,
+    "rule_valid": 50,
+    "category_macro_f1": 0.6105,
+    "category_macro_f1_ci95": [
+      0.411,
+      0.705
+    ],
+    "category_accuracy": 0.6731,
+    "severity_macro_f1": 0.4612,
+    "first_seen_exact": 0.6923,
+    "first_seen_within_1y": 0.8269
+  }
+}

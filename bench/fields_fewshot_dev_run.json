@@ -1,0 +1,25 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant fewshot --split dev",
+  "finished_utc": "2026-11-19T10:48:53+00:00",
+  "split": "dev",
+  "model": "Qwen/Qwen3-1.7B",
+  "variant": "fewshot",
+  "examples": [
+    "0001564590-21-009770:3",
+    "0001193125-26-082531:39",
+    "0001571949-21-000003:33",
+    "0001628280-20-001947:53",
+    "0000100517-26-000023:25",
+    "0001035267-20-000032:59",
+    "0000003570-20-000043:73",
+    "0000354950-22-000070:48",
+    "0000107263-21-000006:39",
+    "0001108524-19-000009:53",
+    "0001744489-22-000213:22"
+  ],
+  "rows": 71,
+  "valid": 67,
+  "elapsed_s_incl_model_load": 50.6,
+  "peak_gpu_memory_mib": 7799,
+  "predictions": "data/interim/fields/fields_fewshot_dev.jsonl"
+}

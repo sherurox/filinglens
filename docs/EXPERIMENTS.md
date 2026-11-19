@@ -60,3 +60,29 @@ History (kept for honesty, not comparable with the table above):
 - The ground-truth fix redrew the 50 pages; all numbers in the table above are on the current draw.
 
 Limits: pages are rendered from HTML, so they are cleaner than scanned annual reports; one table per page; 2B model in FP8 (the vision encoder may be quantized too); single run per setting.
+
+### Prompted extraction baseline (the bar M4 must beat)
+
+Model: `Qwen/Qwen3-1.7B` (Apache-2.0, BF16), the base of M4's student. It gets the silver labeler's rules (`docs/labeling/silver_prompt.md`), each paragraph with its heading and earlier-year candidates, and the same JSON schema (`src/filinglens/extract/fields.py`). Answers that break the rules, and `not_a_risk` answers, count as wrong. Labels are silver, so every score is **agreement with the silver labeler (Granite 4.1 3B)**, not correctness.
+
+Variant choice on dev (71 paragraphs), rule fixed in advance: the higher category macro-F1 runs on test once (`bench/fields_{zero,fewshot}_dev.json`).
+
+| Variant (dev) | Category macro-F1 (95% CI) | Category accuracy | Severity macro-F1 | First-seen exact / within 1 year |
+|---|---|---|---|---|
+| **zero-shot (chosen)** | **0.5792** (0.401–0.679) | 0.6761 | 0.3618 | 0.4366 / 0.5493 |
+| few-shot (one train example per category) | 0.5075 (0.340–0.600) | 0.5493 | 0.4285 | 0.6338 / 0.7746 |
+
+**Test** (65 paragraphs, zero-shot, run once; `bench/fields_zero_test.json`):
+
+| Rows | Rule-valid | **Category macro-F1** (95% CI) | Category accuracy | Severity macro-F1 | First-seen exact / within 1 year |
+|---|---|---|---|---|---|
+| All test rows | 64 / 65 | **0.6295** (0.474–0.712) | 0.6615 | 0.2832 | 0.4308 / 0.5846 |
+| Rows where both silver labelers agree on the category | 47 / 48 | 0.6001 (0.464–0.666) | 0.7292 | 0.2667 | 0.3542 / 0.5417 |
+
+Runs (`bench/fields_*_run.json`): 45.7 s for the 65 test paragraphs including model load; peak GPU memory 7,799 MiB (display included).
+
+Findings:
+- The few-shot examples improved severity and first-seen year on dev but lowered category F1, so the pre-set rule chose zero-shot; M4 can revisit examples per field.
+- Severity is weak for every model here (labeler kappa 0.303, baseline macro-F1 0.28): the labels themselves carry little signal.
+- On the agreed subset, accuracy rises (0.729) while macro-F1 falls (0.600): with 48 rows and 11 classes, a few rare classes move macro-F1 a lot; the wide CIs say the same.
+- These are the numbers M4's fine-tuned student must beat, on the same test split and the same silver labels.

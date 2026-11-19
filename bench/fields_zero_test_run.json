@@ -1,0 +1,13 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split test --allow-test",
+  "finished_utc": "2026-11-19T10:49:43+00:00",
+  "split": "test",
+  "model": "Qwen/Qwen3-1.7B",
+  "variant": "zero",
+  "examples": [],
+  "rows": 65,
+  "valid": 64,
+  "elapsed_s_incl_model_load": 45.7,
+  "peak_gpu_memory_mib": 7799,
+  "predictions": "data/interim/fields/fields_zero_test.jsonl"
+}

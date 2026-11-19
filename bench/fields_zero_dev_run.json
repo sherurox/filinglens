@@ -1,0 +1,13 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev",
+  "finished_utc": "2026-11-19T10:47:58+00:00",
+  "split": "dev",
+  "model": "Qwen/Qwen3-1.7B",
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 67,
+  "elapsed_s_incl_model_load": 127.1,
+  "peak_gpu_memory_mib": 7799,
+  "predictions": "data/interim/fields/fields_zero_dev.jsonl"
+}
