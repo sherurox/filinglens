@@ -69,6 +69,10 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.18.0  # Apache-2.0; same version as the mlflow client in both venvs
     container_name: filinglens-mlflow
+    environment:
+      # No background job runner: we don't use server jobs (GenAI features); it costs ~GBs of RAM
+      # and its endpoints were unauthenticated (CVE-2026-0545).
+      MLFLOW_SERVER_ENABLE_JOB_EXECUTION: "false"
     command:
       - mlflow
       - server
@@ -76,8 +80,6 @@ services:
       - 0.0.0.0  # inside the container; the port below is published on localhost only
       - --port
       - "5000"
-      - --workers
-      - "1"  # one user; also keeps memory well under the limit
       - --workers
       - "1"  # one user; also keeps memory well under the limit
       - --backend-store-uri
