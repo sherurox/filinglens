@@ -1,0 +1,88 @@
+{
+  "command": "uv run python -m filinglens.train.teacher_inputs --allow-test",
+  "finished_utc": "2026-11-20T16:59:34+00:00",
+  "seed": 20261120,
+  "per_cell": 300,
+  "per_filing": 10,
+  "pool": {
+    "train_companies": 176,
+    "held_out_companies": 118,
+    "eligible_train_paragraphs": 66329,
+    "dropped_in_gold_sample": 193,
+    "dropped_text_also_at_dev_or_test_company": 140,
+    "pool_paragraphs": 65996
+  },
+  "draw": {
+    "cells": 30,
+    "cells_short_of_per_cell": {
+      "finance 2019": 250,
+      "finance 2020": 250,
+      "finance 2022": 260,
+      "finance 2024": 270,
+      "finance 2025": 250,
+      "manufacturing 2019": 280,
+      "manufacturing 2020": 264,
+      "manufacturing 2022": 280,
+      "manufacturing 2024": 280,
+      "manufacturing 2025": 270,
+      "mining_energy 2019": 240,
+      "mining_energy 2020": 250,
+      "mining_energy 2022": 280,
+      "mining_energy 2024": 290,
+      "mining_energy 2025": 290,
+      "retail 2019": 280,
+      "retail 2020": 290,
+      "services 2019": 240,
+      "services 2020": 270,
+      "services 2022": 280,
+      "transport_utilities 2019": 270,
+      "transport_utilities 2020": 270,
+      "transport_utilities 2022": 280,
+      "transport_utilities 2024": 290
+    },
+    "skipped_while_drawing": {
+      "filing_cap": 47427,
+      "repeated_text": 2447
+    }
+  },
+  "teacher_pool": {
+    "rows": 8274,
+    "companies": 175,
+    "filings": 828,
+    "by_sector": {
+      "finance": 1280,
+      "manufacturing": 1374,
+      "mining_energy": 1350,
+      "retail": 1470,
+      "services": 1390,
+      "transport_utilities": 1410
+    },
+    "by_year": {
+      "2019": 1560,
+      "2020": 1594,
+      "2022": 1680,
+      "2024": 1730,
+      "2025": 1710
+    },
+    "words_median": 119.0,
+    "words_p95": 268,
+    "with_earlier_year_candidates": 8104
+  },
+  "held_out_rows": {
+    "dev": 71,
+    "test": 65
+  },
+  "test_written": true,
+  "leakage": {
+    "rows_not_from_train_company": 0,
+    "rows_with_text_at_dev_or_test_company": 0,
+    "rows_in_gold_sample": 0
+  },
+  "files": {
+    "dev.jsonl": "a2255ad27d2e8657ac7d848fca8e1f07e1e1497772b877a707cd862de1d8abe6",
+    "pool.jsonl": "e90708cfa66fd30c73d999e631bc61901668d649de0d5453548c310292113293",
+    "silver_prompt.md": "522c963b11da07c881f8988f55edda4084d652f095e9a63bb7835abae56d77ad",
+    "test.jsonl": "23bb51d3287abf431137a7b56cf92ce628e03db6208a1d70e1fd96e665c0668c"
+  },
+  "manifest_sha256": "82ab17e6d514507d9f70c52b7d4887f6faf0b5f0f1f2b046c3010302d572770a"
+}
