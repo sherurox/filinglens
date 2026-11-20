@@ -1,0 +1,13 @@
+{
+  "examples_in": 191,
+  "examples_kept": 191,
+  "dropped_too_long": 0,
+  "dropped_ids": [],
+  "tokens_total": 346748,
+  "tokens_median": 1758,
+  "tokens_max": 4039,
+  "completion_tokens_median": 56,
+  "optimizer_steps": 48,
+  "first_example_prompt_ends_with": "not have<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "first_example_loss_text": "{\"rationale\":\"The paragraph discusses estimation methods and their potential impact on business progress, not financial results or operations. It falls under financial/capital risk but is about accounting estimates, not operational or financial performance risks.\",\"category\":\"financial_capital\",\"severity\":2,\"first_seen_year\":2018,\"unsure\":false}<|im_end|>"
+}
