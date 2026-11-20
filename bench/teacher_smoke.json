@@ -1,0 +1,74 @@
+{
+  "source": "Kaggle notebook shreyask007/filinglens-teacher, interactive session, 20 Nov 2026; copied verbatim from the cell output (driver.json and pool_first200_shard0of1_run.json)",
+  "driver": {
+    "commit": "73dbfb5",
+    "mode": "smoke",
+    "n": 200,
+    "model": "Qwen/Qwen3-8B-AWQ",
+    "gpus": [
+      "0, Tesla T4, 15360 MiB, 580.178.04",
+      "1, Tesla T4, 15360 MiB, 580.178.04"
+    ],
+    "versions": [
+      "torch                                    2.14.0+cu132",
+      "transformers                             5.20.2",
+      "vllm                                     0.34.0"
+    ],
+    "wall_s_incl_install": 583.5,
+    "fixes_applied_in_the_cell": [
+      "pip install --ignore-requires-python (Kaggle Python 3.13 vs repo pin <3.13)",
+      "pip uninstall torchaudio (built for CUDA 13.0, torch is cu132; transformers imports it)",
+      "sh() prints step output before failing"
+    ]
+  },
+  "run": {
+    "command": "python -m filinglens.train.kaggle_teacher --inputs /kaggle/input --out-dir /kaggle/working/teacher --split pool --limit 200",
+    "finished_utc": "2026-11-20T22:57:46+00:00",
+    "model": "Qwen/Qwen3-8B-AWQ",
+    "vllm": "0.34.0",
+    "torch": "2.14.0+cu132",
+    "gpu": "Tesla T4",
+    "inputs_manifest": "2026-11-20T16:59:34+00:00",
+    "split": "pool",
+    "limit": 200,
+    "shard": 0,
+    "num_shards": 1,
+    "max_model_len": 6144,
+    "gpu_memory_utilization": 0.9,
+    "elapsed_s_incl_model_load": 568.4,
+    "rows_per_s_incl_load": 0.352,
+    "output": "pool_first200_shard0of1.jsonl",
+    "rows": 200,
+    "rule_valid": 193,
+    "invalid_problems": {
+      "risk without first_seen_year": 4,
+      "not_a_risk with severity or year": 3
+    },
+    "categories": {
+      "regulatory_legal": 54,
+      "financial_capital": 27,
+      "operations_supply": 25,
+      "strategy_corporate": 18,
+      "competition_demand": 15,
+      "macro_market": 15,
+      "technology_cyber": 12,
+      "health_pandemic": 7,
+      "not_a_risk": 6,
+      "geopolitical_international": 5,
+      "climate_environment": 5,
+      "people": 4
+    },
+    "first_token_consistent": 199,
+    "first_token_inconsistent": 1,
+    "confidence_errors": {},
+    "chosen_category_confidence_median": 0.9999999815849557,
+    "unsure": 0
+  },
+  "vllm_log": {
+    "engine_init_s": 143.18,
+    "generation_200_prompts": "05:49",
+    "kv_cache_tokens": 38912,
+    "weights_plus_non_torch_gib": 5.93,
+    "kv_cache_gib": 5.34
+  }
+}

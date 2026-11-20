@@ -17,17 +17,20 @@ import time
 from pathlib import Path
 
 COMMIT = "main"
-MODE = "smoke"
-N = 200  # pool rows (a balanced prefix of pool.jsonl); for "full", set after the smoke test
+MODE = "full"
+N = 7200  # pool rows: the largest exactly balanced prefix (240 per cell x 30 cells)
 MODEL = "Qwen/Qwen3-8B-AWQ"
 OUT = Path("/kaggle/working/teacher")
 PY = sys.executable
 
 
 def sh(cmd: str) -> str:
+    """Run a shell step; print its output first, then stop if it failed."""
     print("+", cmd, flush=True)
-    done = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
-    print(done.stdout[-4000:], done.stderr[-2000:], sep="\n", flush=True)
+    done = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    print(done.stdout[-4000:], done.stderr[-3000:], sep="\n", flush=True)
+    if done.returncode != 0:
+        raise SystemExit(f"step failed (exit {done.returncode}): {cmd}")
     return done.stdout
 
 
@@ -36,7 +39,13 @@ OUT.mkdir(parents=True, exist_ok=True)
 gpus = sh("nvidia-smi --query-gpu=index,name,memory.total,driver_version --format=csv,noheader")
 sh(f"{PY} -m pip install -q uv")
 sh(f"{PY} -m uv pip install --python {PY} -q vllm --torch-backend=auto")
-sh(f'{PY} -m pip install -q --no-deps "git+https://github.com/sherurox/filinglens@{COMMIT}"')
+# Kaggle's torchaudio is built for another CUDA than the torch vLLM brings, and transformers
+# imports torchaudio when present (crash on 20 Nov); nothing here uses audio.
+sh(f"{PY} -m pip uninstall -y -q torchaudio")
+# Kaggle runs Python 3.13; the repo pins <3.13 for its Spark/Dagster stack. Only pure-Python
+# modules are used here (--no-deps), so the pin is ignored for this install.
+REPO = f"git+https://github.com/sherurox/filinglens@{COMMIT}"
+sh(f'{PY} -m pip install -q --no-deps --ignore-requires-python "{REPO}"')
 sh(f"{PY} -c \"from huggingface_hub import snapshot_download; snapshot_download('{MODEL}')\"")
 versions = sh(f"{PY} -m pip list 2>/dev/null | grep -i -E '^(vllm|torch|transformers) '")
 
