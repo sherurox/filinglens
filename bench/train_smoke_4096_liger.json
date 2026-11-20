@@ -1,0 +1,61 @@
+{
+  "command": "python -m filinglens.train.smoke_qlora --batch-size 1 --seq-len 4096 --liger --note AC power, Best performance, VRAM capped to free --out bench/train_smoke_4096_liger.json",
+  "utc": "2026-11-20T17:30:10+00:00",
+  "note": "AC power, Best performance, VRAM capped to free",
+  "model": "Qwen/Qwen3-1.7B",
+  "quant": "nf4 + double quant, bf16 compute",
+  "lora": {
+    "rank": 16,
+    "alpha": 32,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "liger_fused_linear_cross_entropy": true,
+  "liger_version": "unknown",
+  "trainable_params": 17432576,
+  "total_params": 1738007552,
+  "batch_size": 1,
+  "seq_len": 4096,
+  "gradient_checkpointing": true,
+  "steps_requested": 10,
+  "steps_done": 10,
+  "oom": null,
+  "gpu_total_mib": 8124,
+  "gpu_free_at_start_mib": 6999,
+  "used_by_others_at_start_mib": 1125,
+  "vram_cap_mib": 6699,
+  "load_s": 1.5,
+  "weights_after_load_mib": 1950,
+  "peak_allocated_mib": 4065,
+  "peak_reserved_mib": 4330,
+  "sec_per_step": 6.068,
+  "tokens_per_s": 675,
+  "losses": [
+    13.1006,
+    12.7527,
+    12.4978,
+    12.3472,
+    12.226,
+    12.17,
+    12.1095,
+    12.0565,
+    12.0322,
+    12.0162
+  ],
+  "env": {
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "python": "3.12.16",
+    "torch": "2.15.0+cu132",
+    "cuda": "13.2",
+    "transformers": "5.23.0",
+    "peft": "0.22.0",
+    "bitsandbytes": "0.50.2"
+  }
+}

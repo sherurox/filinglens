@@ -1,0 +1,55 @@
+{
+  "command": "python -m filinglens.train.smoke_qlora --batch-size 1 --seq-len 2048 --note AC power, Best performance, sysmem fallback off --out bench/train_smoke_2048.json",
+  "utc": "2026-11-20T17:25:35+00:00",
+  "note": "AC power, Best performance, sysmem fallback off",
+  "model": "Qwen/Qwen3-1.7B",
+  "quant": "nf4 + double quant, bf16 compute",
+  "lora": {
+    "rank": 16,
+    "alpha": 32,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "trainable_params": 17432576,
+  "total_params": 1738007552,
+  "batch_size": 1,
+  "seq_len": 2048,
+  "gradient_checkpointing": true,
+  "steps": 10,
+  "load_s": 4.0,
+  "weights_after_load_mib": 1950,
+  "peak_allocated_mib": 7301,
+  "peak_reserved_mib": 8186,
+  "gpu_total_mib": 8124,
+  "gpu_free_at_end_mib": 0,
+  "sec_per_step": 4.233,
+  "tokens_per_s": 484,
+  "losses": [
+    13.1793,
+    12.8087,
+    12.5357,
+    12.3847,
+    12.2507,
+    12.1882,
+    12.1051,
+    12.0617,
+    12.0199,
+    11.9929
+  ],
+  "env": {
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "python": "3.12.16",
+    "torch": "2.15.0+cu132",
+    "cuda": "13.2",
+    "transformers": "5.23.0",
+    "peft": "0.22.0",
+    "bitsandbytes": "0.50.2"
+  }
+}
