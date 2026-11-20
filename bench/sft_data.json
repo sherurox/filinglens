@@ -1,0 +1,45 @@
+{
+  "command": "uv run python -m filinglens.train.sft_data",
+  "finished_utc": "2026-11-20T17:22:32+00:00",
+  "prompt": "fields.conversations zero-shot (silver_prompt.md + user_message)",
+  "completion": "compact JSON, keys ['rationale', 'category', 'severity', 'first_seen_year', 'unsure']",
+  "drop_not_a_risk": true,
+  "teacher": {
+    "file": null
+  },
+  "examples_from_non_train_companies": {
+    "silver": 0
+  },
+  "arms": {
+    "silver": {
+      "examples": 191,
+      "by_source": {
+        "silver": 191
+      },
+      "categories": {
+        "regulatory_legal": 41,
+        "macro_market": 29,
+        "operations_supply": 27,
+        "competition_demand": 26,
+        "financial_capital": 20,
+        "people": 11,
+        "health_pandemic": 10,
+        "geopolitical_international": 9,
+        "strategy_corporate": 7,
+        "technology_cyber": 6,
+        "climate_environment": 5
+      },
+      "completion_chars_median": 251,
+      "completion_chars_max": 581
+    }
+  },
+  "inputs": {
+    "gold/MANIFEST.json": "23543565165b4e50078e994f6ac69765e492ee58f643d13ecbaf39927492acce",
+    "docs/labeling/silver_prompt.md": "522c963b11da07c881f8988f55edda4084d652f095e9a63bb7835abae56d77ad",
+    "gold/silver_raw/ibm-granite-granite-4-1-3b.jsonl": "45648c51a6dd43abb0104773966065ddf2709851964fc6d565ddba48ba81870c"
+  },
+  "files": {
+    "silver.jsonl": "275561d1b33701fd48af3f46bc9c709e5940ecb1248b14c70165e2655fe6cfee"
+  },
+  "data_version": "5951779f56c9c090ab330289fa44a15ba384811d3de2d1c8088345d426c3b586"
+}
