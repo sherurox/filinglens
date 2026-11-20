@@ -1,12 +1,15 @@
 # Local services (all bound to 127.0.0.1):
 # - postgres: the hand-written SQL in sql/ (FL-M1 T11–T12)
 # - labelstudio: labeling the gold set (FL-M2 T4–T16)
-# Start one: docker compose up -d --wait postgres   (or labelstudio)    Stop: docker compose stop
+# - mlflow: experiment tracking + model registry (FL-M4)
+# Start one: docker compose up -d --wait postgres   (or labelstudio, mlflow)    Stop: docker compose stop
 # Teardown, one service at a time. Never `docker compose down -v`: it would also delete the labels.
 # - postgres (rebuild with filinglens.sql.load_postgres):
 #     docker compose rm -sf postgres && docker volume rm filinglens_pgdata
 # - labelstudio (only after the labels are exported and committed under gold/):
 #     docker compose rm -sf labelstudio && docker volume rm filinglens_lsdata
+# - mlflow (only after the M4 results are exported to bench/ and docs/):
+#     docker compose rm -sf mlflow && docker volume rm filinglens_mlflowdata
 name: filinglens
 
 services:
@@ -63,6 +66,36 @@ services:
       timeout: 5s
       retries: 60
 
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.18.0  # Apache-2.0; same version as the mlflow client in both venvs
+    container_name: filinglens-mlflow
+    command:
+      - mlflow
+      - server
+      - --host
+      - 0.0.0.0  # inside the container; the port below is published on localhost only
+      - --port
+      - "5000"
+      - --workers
+      - "1"  # one user; also keeps memory well under the limit
+      - --workers
+      - "1"  # one user; also keeps memory well under the limit
+      - --backend-store-uri
+      - sqlite:////mlflow/mlflow.db  # runs, params, metrics and the model registry
+      - --artifacts-destination
+      - /mlflow/artifacts  # adapters, plots; clients upload over HTTP, no shared mount needed
+    ports:
+      - "127.0.0.1:55000:5000"  # localhost only; MLFLOW_TRACKING_URI=http://127.0.0.1:55000
+    volumes:
+      - mlflowdata:/mlflow
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
 volumes:
   pgdata:
   lsdata:
+  mlflowdata:
