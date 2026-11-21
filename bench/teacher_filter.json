@@ -1,0 +1,112 @@
+{
+  "command": "uv run python -m filinglens.train.filter_teacher",
+  "finished_utc": "2026-11-21T20:01:13+00:00",
+  "rule": "valid, not not_a_risk, first token consistent, confidence >= tau, heuristic ok",
+  "tau": 0.9,
+  "tau_chosen": "fixed in advance (20 Nov 2026), not tuned on dev",
+  "heuristics": {
+    "health_pandemic": "covid|coronavirus|pandemic|epidemic",
+    "climate_environment": "climate change|climate-related|greenhouse|carbon emission",
+    "geopolitical_international": "tariff|sanction|\\bwars?\\b|export control",
+    "technology_cyber": "cyber|data breach|security breach|ransomware|hack"
+  },
+  "pool_rows": 7200,
+  "kept": 6259,
+  "dropped": {
+    "heuristic_disagrees": 86,
+    "inconsistent_first_token": 11,
+    "low_confidence": 515,
+    "not_a_risk": 166,
+    "rule_invalid": 163
+  },
+  "kept_categories": {
+    "regulatory_legal": 1599,
+    "financial_capital": 882,
+    "operations_supply": 797,
+    "competition_demand": 603,
+    "technology_cyber": 560,
+    "strategy_corporate": 493,
+    "macro_market": 408,
+    "climate_environment": 309,
+    "geopolitical_international": 253,
+    "people": 189,
+    "health_pandemic": 166
+  },
+  "pool_confidence_bands_valid_risks": {
+    "[0.0, 0.5)": 26,
+    "[0.5, 0.9)": 499,
+    "[0.9, 0.99)": 444,
+    "[0.99, 0.999)": 483,
+    "[0.999, 0.9999)": 425,
+    "[0.9999, 1.0]": 4994
+  },
+  "pool_heuristic_fires_on_valid_risks": 673,
+  "leakage": {
+    "kept_rows_not_from_train_company": 0,
+    "kept_rows_in_gold_sample": 0
+  },
+  "dev": {
+    "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+    "teacher_vs_silver_all_rows": {
+      "rows": 71,
+      "rule_valid": 67,
+      "category_macro_f1": 0.663,
+      "category_macro_f1_ci95": [
+        0.46,
+        0.737
+      ],
+      "category_accuracy": 0.7042,
+      "severity_macro_f1": 0.3286,
+      "first_seen_exact": 0.7465,
+      "first_seen_within_1y": 0.8169
+    },
+    "teacher_vs_silver_rows_where_silver_labelers_agree": {
+      "rows": 52,
+      "rule_valid": 50,
+      "category_macro_f1": 0.7655,
+      "category_macro_f1_ci95": [
+        0.53,
+        0.844
+      ],
+      "category_accuracy": 0.8654,
+      "severity_macro_f1": 0.3359,
+      "first_seen_exact": 0.75,
+      "first_seen_within_1y": 0.8462
+    },
+    "kept_by_threshold": {
+      "0.0": {
+        "kept": 67,
+        "category_agreement_with_silver": 0.7463
+      },
+      "0.5": {
+        "kept": 66,
+        "category_agreement_with_silver": 0.7576
+      },
+      "0.9": {
+        "kept": 62,
+        "category_agreement_with_silver": 0.7903
+      },
+      "0.99": {
+        "kept": 58,
+        "category_agreement_with_silver": 0.7931
+      }
+    },
+    "confidence_bands": {
+      "[0.0, 0.5)": 1,
+      "[0.5, 0.9)": 4,
+      "[0.9, 0.99)": 4,
+      "[0.99, 0.999)": 4,
+      "[0.999, 0.9999)": 5,
+      "[0.9999, 1.0]": 49
+    },
+    "heuristic_fires_on_silver_rows": 11,
+    "heuristic_agrees_with_silver": 9
+  },
+  "inputs": {
+    "pool_first7200_shard0of2.jsonl": "8f68866178cde9550da15fb84102d8feed667faac054d042d2d4a687addcc2bb",
+    "pool_first7200_shard1of2.jsonl": "c481df25e9e291d4477ea647cf286acd4a90a469c5ec2e10316b9dc073cafe06",
+    "dev_shard0of1.jsonl": "c231e8d3532239fcc4a9e4b798da6c98e68bc16263b73df78e3175d9f0a5fcad"
+  },
+  "output": "data/interim/teacher/filtered.jsonl",
+  "output_sha256": "99fce7966ee0afbd15d827b0cc1dff1455f100eec8b657140a4fd2a0177aabd3"
+}

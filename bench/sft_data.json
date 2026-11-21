@@ -1,14 +1,19 @@
 {
-  "command": "uv run python -m filinglens.train.sft_data",
-  "finished_utc": "2026-11-20T17:22:32+00:00",
+  "command": "uv run python -m filinglens.train.sft_data --teacher data/interim/teacher/filtered.jsonl",
+  "finished_utc": "2026-11-21T20:01:15+00:00",
   "prompt": "fields.conversations zero-shot (silver_prompt.md + user_message)",
   "completion": "compact JSON, keys ['rationale', 'category', 'severity', 'first_seen_year', 'unsure']",
   "drop_not_a_risk": true,
   "teacher": {
-    "file": null
+    "file": "data/interim/teacher/filtered.jsonl",
+    "sha256": "99fce7966ee0afbd15d827b0cc1dff1455f100eec8b657140a4fd2a0177aabd3",
+    "dropped": {},
+    "overlap_with_silver_dropped": 0
   },
   "examples_from_non_train_companies": {
-    "silver": 0
+    "silver": 0,
+    "teacher": 0,
+    "both": 0
   },
   "arms": {
     "silver": {
@@ -31,6 +36,49 @@
       },
       "completion_chars_median": 251,
       "completion_chars_max": 581
+    },
+    "teacher": {
+      "examples": 6259,
+      "by_source": {
+        "teacher": 6259
+      },
+      "categories": {
+        "regulatory_legal": 1599,
+        "financial_capital": 882,
+        "operations_supply": 797,
+        "competition_demand": 603,
+        "technology_cyber": 560,
+        "strategy_corporate": 493,
+        "macro_market": 408,
+        "climate_environment": 309,
+        "geopolitical_international": 253,
+        "people": 189,
+        "health_pandemic": 166
+      },
+      "completion_chars_median": 206,
+      "completion_chars_max": 372
+    },
+    "both": {
+      "examples": 6450,
+      "by_source": {
+        "silver": 191,
+        "teacher": 6259
+      },
+      "categories": {
+        "regulatory_legal": 1640,
+        "financial_capital": 902,
+        "operations_supply": 824,
+        "competition_demand": 629,
+        "technology_cyber": 566,
+        "strategy_corporate": 500,
+        "macro_market": 437,
+        "climate_environment": 314,
+        "geopolitical_international": 262,
+        "people": 200,
+        "health_pandemic": 176
+      },
+      "completion_chars_median": 206,
+      "completion_chars_max": 581
     }
   },
   "inputs": {
@@ -39,7 +87,9 @@
     "gold/silver_raw/ibm-granite-granite-4-1-3b.jsonl": "45648c51a6dd43abb0104773966065ddf2709851964fc6d565ddba48ba81870c"
   },
   "files": {
-    "silver.jsonl": "275561d1b33701fd48af3f46bc9c709e5940ecb1248b14c70165e2655fe6cfee"
+    "silver.jsonl": "275561d1b33701fd48af3f46bc9c709e5940ecb1248b14c70165e2655fe6cfee",
+    "teacher.jsonl": "6ba7f373571b0927dd7f77004bcffa67e25e622daad51ebc5a01f7d7ecafe859",
+    "both.jsonl": "59cacd160ecc3ed16fa95b4241d7e91fdbdbb8de882f65d40f257832b40a22ad"
   },
-  "data_version": "5951779f56c9c090ab330289fa44a15ba384811d3de2d1c8088345d426c3b586"
+  "data_version": "c22a17424ded116a0a1c18cd6d40a71a8ec921d191878571358efcaa970de1d4"
 }
