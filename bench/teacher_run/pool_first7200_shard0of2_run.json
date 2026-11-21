@@ -1,0 +1,43 @@
+{
+  "command": "python -m filinglens.train.kaggle_teacher --inputs /kaggle/input --out-dir /kaggle/working/teacher --split pool --limit 7200 --shard 0 --num-shards 2",
+  "finished_utc": "2026-11-21T01:00:24+00:00",
+  "model": "Qwen/Qwen3-8B-AWQ",
+  "vllm": "0.34.0",
+  "torch": "2.14.0+cu132",
+  "gpu": "Tesla T4",
+  "inputs_manifest": "2026-11-20T16:59:34+00:00",
+  "split": "pool",
+  "limit": 7200,
+  "shard": 0,
+  "num_shards": 2,
+  "max_model_len": 6144,
+  "gpu_memory_utilization": 0.9,
+  "elapsed_s_incl_model_load": 6396.4,
+  "rows_per_s_incl_load": 0.563,
+  "output": "pool_first7200_shard0of2.jsonl",
+  "rows": 3600,
+  "rule_valid": 3525,
+  "invalid_problems": {
+    "not_a_risk with severity or year": 17,
+    "risk without first_seen_year": 58
+  },
+  "categories": {
+    "regulatory_legal": 881,
+    "financial_capital": 502,
+    "operations_supply": 463,
+    "competition_demand": 316,
+    "technology_cyber": 302,
+    "strategy_corporate": 266,
+    "macro_market": 238,
+    "climate_environment": 160,
+    "geopolitical_international": 139,
+    "people": 99,
+    "health_pandemic": 86,
+    "not_a_risk": 73
+  },
+  "first_token_consistent": 3596,
+  "first_token_inconsistent": 4,
+  "confidence_errors": {},
+  "chosen_category_confidence_median": 0.9999999695653838,
+  "unsure": 0
+}

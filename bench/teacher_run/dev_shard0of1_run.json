@@ -1,0 +1,40 @@
+{
+  "command": "python -m filinglens.train.kaggle_teacher --inputs /kaggle/input --out-dir /kaggle/working/teacher --split dev",
+  "finished_utc": "2026-11-20T23:09:45+00:00",
+  "model": "Qwen/Qwen3-8B-AWQ",
+  "vllm": "0.34.0",
+  "torch": "2.14.0+cu132",
+  "gpu": "Tesla T4",
+  "inputs_manifest": "2026-11-20T16:59:34+00:00",
+  "split": "dev",
+  "limit": null,
+  "shard": 0,
+  "num_shards": 1,
+  "max_model_len": 6144,
+  "gpu_memory_utilization": 0.9,
+  "elapsed_s_incl_model_load": 352.6,
+  "rows_per_s_incl_load": 0.201,
+  "output": "dev_shard0of1.jsonl",
+  "rows": 71,
+  "rule_valid": 67,
+  "invalid_problems": {
+    "risk without first_seen_year": 4
+  },
+  "categories": {
+    "regulatory_legal": 20,
+    "health_pandemic": 10,
+    "competition_demand": 9,
+    "financial_capital": 9,
+    "operations_supply": 6,
+    "strategy_corporate": 4,
+    "climate_environment": 3,
+    "people": 3,
+    "geopolitical_international": 2,
+    "technology_cyber": 1
+  },
+  "first_token_consistent": 71,
+  "first_token_inconsistent": 0,
+  "confidence_errors": {},
+  "chosen_category_confidence_median": 0.9999999879279929,
+  "unsure": 1
+}

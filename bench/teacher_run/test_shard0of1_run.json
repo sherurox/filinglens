@@ -1,0 +1,41 @@
+{
+  "command": "python -m filinglens.train.kaggle_teacher --inputs /kaggle/input --out-dir /kaggle/working/teacher --split test --allow-test",
+  "finished_utc": "2026-11-20T23:13:37+00:00",
+  "model": "Qwen/Qwen3-8B-AWQ",
+  "vllm": "0.34.0",
+  "torch": "2.14.0+cu132",
+  "gpu": "Tesla T4",
+  "inputs_manifest": "2026-11-20T16:59:34+00:00",
+  "split": "test",
+  "limit": null,
+  "shard": 0,
+  "num_shards": 1,
+  "max_model_len": 6144,
+  "gpu_memory_utilization": 0.9,
+  "elapsed_s_incl_model_load": 228.2,
+  "rows_per_s_incl_load": 0.285,
+  "output": "test_shard0of1.jsonl",
+  "rows": 65,
+  "rule_valid": 64,
+  "invalid_problems": {
+    "risk without first_seen_year": 1
+  },
+  "categories": {
+    "operations_supply": 11,
+    "regulatory_legal": 11,
+    "geopolitical_international": 7,
+    "technology_cyber": 6,
+    "people": 6,
+    "macro_market": 5,
+    "financial_capital": 5,
+    "strategy_corporate": 4,
+    "health_pandemic": 4,
+    "competition_demand": 3,
+    "climate_environment": 2
+  },
+  "first_token_consistent": 65,
+  "first_token_inconsistent": 0,
+  "confidence_errors": {},
+  "chosen_category_confidence_median": 0.999999994035158,
+  "unsure": 0
+}

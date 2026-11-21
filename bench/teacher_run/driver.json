@@ -1,0 +1,16 @@
+{
+  "commit": "73dbfb5",
+  "mode": "full",
+  "n": 7200,
+  "model": "Qwen/Qwen3-8B-AWQ",
+  "gpus": [
+    "0, Tesla T4, 15360 MiB, 580.178.04",
+    "1, Tesla T4, 15360 MiB, 580.178.04"
+  ],
+  "versions": [
+    "torch                                    2.14.0+cu132",
+    "transformers                             5.20.2",
+    "vllm                                     0.34.0"
+  ],
+  "wall_s_incl_install": 7098.4
+}
