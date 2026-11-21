@@ -98,3 +98,17 @@ def test_config_names_and_params() -> None:
     assert sft.TrainConfig(epochs=2).run_name() == "silver-r16-lr0.0002-e2"
     params = cfg.params()
     assert params["lora_alpha"] == 16 and params["batch_size"] == 1 and params["liger"] is True
+
+
+def test_limit_teacher_keeps_silver_and_a_teacher_prefix() -> None:
+    examples = [{"id": f"s{i}", "source": "silver"} for i in range(2)]
+    examples += [{"id": f"t{i}", "source": "teacher"} for i in range(5)]
+    assert [e["id"] for e in sft.limit_teacher(examples, 3)] == ["s0", "s1", "t0", "t1", "t2"]
+    assert sft.limit_teacher(examples, -1) == examples
+
+
+def test_run_name_with_teacher_limit() -> None:
+    assert sft.TrainConfig(arm="teacher", teacher_limit=1500).run_name() == (
+        "teacher-n1500-r16-lr0.0002-e2"
+    )
+    assert sft.TrainConfig(arm="silver", teacher_limit=1500).run_name() == "silver-r16-lr0.0002-e2"

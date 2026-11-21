@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --tag base-s1b --gpu-memory-utilization 0.84 --max-model-len 4608 --max-num-seqs 1",
+  "finished_utc": "2026-11-21T20:34:53+00:00",
+  "split": "dev",
+  "model": "Qwen/Qwen3-1.7B",
+  "lora": null,
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 69,
+  "elapsed_s_incl_model_load": 157.6,
+  "peak_gpu_memory_mib": 7338,
+  "predictions": "data/interim/fields/fields_zero_dev_base-s1b.jsonl"
+}

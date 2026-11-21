@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --gpu-memory-utilization 0.84 --max-model-len 4608 --max-num-seqs 1 --lora data/interim/adapters/silver-r16-lr0.0002-e2/adapter",
+  "finished_utc": "2026-11-21T20:38:07+00:00",
+  "split": "dev",
+  "model": "Qwen/Qwen3-1.7B",
+  "lora": "data/interim/adapters/silver-r16-lr0.0002-e2/adapter",
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 71,
+  "elapsed_s_incl_model_load": 186.3,
+  "peak_gpu_memory_mib": 7316,
+  "predictions": "data/interim/fields/fields_zero_dev_silver-r16-lr0.0002-e2.jsonl"
+}

@@ -1,0 +1,48 @@
+{
+  "command": "python -m filinglens.train.sft --arm silver --epochs 2 --note AC power, Best performance, VRAM capped to free",
+  "finished_utc": "2026-11-21T20:19:57+00:00",
+  "note": "AC power, Best performance, VRAM capped to free",
+  "config": {
+    "arm": "silver",
+    "model": "Qwen/Qwen3-1.7B",
+    "rank": 16,
+    "lora_dropout": 0.05,
+    "learning_rate": 0.0002,
+    "epochs": 2.0,
+    "max_steps": -1,
+    "grad_accum": 8,
+    "max_length": 4096,
+    "warmup_frac": 0.05,
+    "seed": 0,
+    "liger": true,
+    "lora_alpha": 32,
+    "batch_size": 1
+  },
+  "vram": {
+    "gpu_total_mib": 8124,
+    "gpu_free_at_start_mib": 6999,
+    "used_by_others_at_start_mib": 1125,
+    "vram_cap_mib": 6699
+  },
+  "lengths": {
+    "examples_in": 191,
+    "examples_kept": 191,
+    "dropped_too_long": 0,
+    "dropped_ids": [],
+    "tokens_total": 346748,
+    "tokens_median": 1758,
+    "tokens_max": 4039,
+    "completion_tokens_median": 56
+  },
+  "run_id": "69352ce72ba347d688f06f72932a8791",
+  "run_name": "silver-r16-lr0.0002-e2",
+  "train_runtime_s": 986.1,
+  "optimizer_steps": 48,
+  "final_train_loss": 0.7057,
+  "peak_allocated_mib": 3995,
+  "peak_reserved_mib": 4204,
+  "gpu_temp_max_c": 63.6,
+  "sec_per_optimizer_step": 20.54,
+  "train_samples_per_s": 0.388,
+  "adapter_dir": "data/interim/adapters/silver-r16-lr0.0002-e2/adapter"
+}

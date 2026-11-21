@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.extract.fields score --variant zero --split dev --tag base-s1b",
+  "finished_utc": "2026-11-21T20:35:01+00:00",
+  "split": "dev",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "predictions": "data/interim/fields/fields_zero_dev_base-s1b.jsonl",
+  "all_rows": {
+    "rows": 71,
+    "rule_valid": 69,
+    "category_macro_f1": 0.6437,
+    "category_macro_f1_ci95": [
+      0.45,
+      0.745
+    ],
+    "category_accuracy": 0.7324,
+    "severity_macro_f1": 0.368,
+    "first_seen_exact": 0.493,
+    "first_seen_within_1y": 0.6056
+  },
+  "rows_where_silver_labelers_agree": {
+    "rows": 52,
+    "rule_valid": 50,
+    "category_macro_f1": 0.6962,
+    "category_macro_f1_ci95": [
+      0.478,
+      0.789
+    ],
+    "category_accuracy": 0.8269,
+    "severity_macro_f1": 0.3724,
+    "first_seen_exact": 0.4808,
+    "first_seen_within_1y": 0.5962
+  }
+}

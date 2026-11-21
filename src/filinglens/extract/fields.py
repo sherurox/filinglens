@@ -14,6 +14,16 @@ Generation runs in the GPU venv; scoring runs in the main environment (scikit-le
     ~/venvs/fl-gpu/bin/python -m filinglens.extract.fields generate --variant fewshot --split dev
     uv run python -m filinglens.extract.fields score --variant fewshot --split dev
 The test split needs --allow-test in both.
+
+FL-M4 (T9): `generate --lora data/interim/adapters/<run>/adapter` serves the same base model with a
+LoRA adapter (vLLM enable_lora) on exactly the same prompts; outputs get a suffix (the run name,
+or --tag), so the FL-M2 baseline files are never overwritten. Without --lora and --tag, names and
+behavior are unchanged.
+
+Batch-dependent numerics (found 21 Nov): the same base model on the same 71 dev prompts gave
+category macro-F1 0.5792 (19 Nov) and 0.6255 (21 Nov), with 33/71 identical raw outputs. vLLM sizes
+its KV cache from the GPU memory free at start, so batching (and bf16 rounding at near-ties)
+varied between runs. FL-M4 comparisons therefore run with --max-num-seqs 1.
 """
 
 import argparse
@@ -108,19 +118,31 @@ def generate(convs: list[list[dict]], args: argparse.Namespace) -> list[str]:
     from vllm import LLM, SamplingParams
     from vllm.sampling_params import StructuredOutputsParams
 
+    lora = getattr(args, "lora", None)
+    extra = (
+        {"enable_lora": True, "max_lora_rank": args.max_lora_rank, "max_loras": 1} if lora else {}
+    )
+    if getattr(args, "max_num_seqs", None):  # 1 = no batching: outputs can't depend on the batch
+        extra["max_num_seqs"] = args.max_num_seqs
     llm = LLM(
         model=args.model,
         max_model_len=args.max_model_len,
         gpu_memory_utilization=args.gpu_memory_utilization,
         enforce_eager=True,
         seed=0,
+        **extra,
     )
     params = SamplingParams(
         temperature=0.0,
         max_tokens=400,
         structured_outputs=StructuredOutputsParams(json=schema()),
     )
-    outputs = llm.chat(convs, params, chat_template_kwargs={"enable_thinking": False})
+    request = {}
+    if lora:
+        from vllm.lora.request import LoRARequest
+
+        request = {"lora_request": LoRARequest(output_suffix(args).lstrip("_"), 1, str(lora))}
+    outputs = llm.chat(convs, params, chat_template_kwargs={"enable_thinking": False}, **request)
     return [o.outputs[0].text for o in outputs]
 
 
@@ -145,10 +167,12 @@ def run_generate(args: argparse.Namespace) -> dict:
     elapsed = time.perf_counter() - started
     records = [parse(raw, task_view(row, tasks)) for raw, row in zip(raws, rows, strict=True)]
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out = OUT_DIR / f"fields_{args.variant}_{args.split}.jsonl"
+    out = OUT_DIR / f"fields_{args.variant}_{args.split}{output_suffix(args)}.jsonl"
     out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records))
     return {
         "model": args.model,
+        "lora": str(args.lora) if getattr(args, "lora", None) else None,
+        "max_num_seqs": getattr(args, "max_num_seqs", None),
         "variant": args.variant,
         "examples": example_ids,
         "rows": len(rows),
@@ -205,7 +229,7 @@ def scores(rows: list[dict], preds: dict[str, dict]) -> dict:
 
 def run_score(args: argparse.Namespace) -> dict:
     rows = load_rows(args.split, args.allow_test)
-    path = OUT_DIR / f"fields_{args.variant}_{args.split}.jsonl"
+    path = OUT_DIR / f"fields_{args.variant}_{args.split}{output_suffix(args)}.jsonl"
     preds = {r["para_id"]: r for r in map(json.loads, path.read_text().splitlines())}
     agreed = [r for r in rows if r["models_agree_category"]]
     return {
@@ -214,6 +238,15 @@ def run_score(args: argparse.Namespace) -> dict:
         "all_rows": scores(rows, preds),
         "rows_where_silver_labelers_agree": scores(agreed, preds),
     }
+
+
+def output_suffix(args: argparse.Namespace) -> str:
+    """'' for the FL-M2 baseline; '_<tag>' or '_<run name>' (the adapter's parent folder)."""
+    tag = getattr(args, "tag", None)
+    lora = getattr(args, "lora", None)
+    if tag:
+        return f"_{tag}"
+    return f"_{Path(lora).parent.name}" if lora else ""
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -226,6 +259,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--max-model-len", type=int, default=8192)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.80)
     parser.add_argument("--bench", type=Path, default=Path("bench"))
+    parser.add_argument("--lora", type=Path, default=None, help="LoRA adapter folder (FL-M4)")
+    parser.add_argument("--max-lora-rank", type=int, default=16)
+    parser.add_argument("--tag", default=None, help="output suffix (default: the run name)")
+    parser.add_argument(
+        "--max-num-seqs", type=int, default=None, help="1 = one request at a time (FL-M4 evals)"
+    )
     argv = sys.argv[1:] if argv is None else argv
     args = parser.parse_args(argv)
 
@@ -237,7 +276,7 @@ def main(argv: list[str] | None = None) -> None:
         "split": args.split,
         **body,
     }
-    out = args.bench / f"fields_{args.variant}_{args.split}{suffix}.json"
+    out = args.bench / f"fields_{args.variant}_{args.split}{output_suffix(args)}{suffix}.json"
     out.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 

@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import shlex
 import statistics
 import sys
 import time
@@ -54,6 +55,7 @@ class TrainConfig:
     warmup_frac: float = 0.05
     seed: int = 0
     liger: bool = True
+    teacher_limit: int = -1  # > 0: only the first N teacher examples (a balanced prefix)
 
     @property
     def alpha(self) -> int:
@@ -61,7 +63,10 @@ class TrainConfig:
 
     def run_name(self) -> str:
         length = f"s{self.max_steps}" if self.max_steps > 0 else f"e{self.epochs:g}"
-        return f"{self.arm}-r{self.rank}-lr{self.learning_rate:g}-{length}"
+        subset = (
+            f"-n{self.teacher_limit}" if self.teacher_limit > 0 and self.arm != "silver" else ""
+        )
+        return f"{self.arm}{subset}-r{self.rank}-lr{self.learning_rate:g}-{length}"
 
     def params(self) -> dict[str, Any]:
         return asdict(self) | {"lora_alpha": self.alpha, "batch_size": 1}
@@ -138,6 +143,16 @@ def optimizer_steps(n_examples: int, grad_accum: int, epochs: float, max_steps: 
 
 def warmup_steps(total_steps: int, frac: float) -> int:
     return max(1, round(frac * total_steps))
+
+
+def limit_teacher(examples: list[dict], limit: int) -> list[dict]:
+    """All silver examples plus the first `limit` teacher examples (file order is the teacher
+    pool's round-robin order, so the prefix stays balanced across sectors and years)."""
+    if limit <= 0:
+        return examples
+    silver = [e for e in examples if e["source"] == "silver"]
+    teacher = [e for e in examples if e["source"] == "teacher"][:limit]
+    return silver + teacher
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -325,6 +340,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--grad-accum", type=int, default=8)
     parser.add_argument("--max-length", type=int, default=4096)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--teacher-limit", type=int, default=-1, help="first N teacher examples")
     parser.add_argument("--no-liger", action="store_true")
     parser.add_argument("--headroom-mib", type=int, default=300)
     parser.add_argument("--run-name", default=None)
@@ -344,14 +360,15 @@ def main(argv: list[str] | None = None) -> None:
         max_length=args.max_length,
         seed=args.seed,
         liger=not args.no_liger,
+        teacher_limit=args.teacher_limit,
     )
-    examples = read_jsonl(args.data / f"{args.arm}.jsonl")
+    examples = limit_teacher(read_jsonl(args.data / f"{args.arm}.jsonl"), cfg.teacher_limit)
     if args.dry_run:
         print(json.dumps(dry_run(cfg, examples), indent=2))
         return
     body = train(cfg, examples, args)
     record = {
-        "command": " ".join(["python -m filinglens.train.sft", *argv]),
+        "command": "python -m filinglens.train.sft " + shlex.join(argv),
         "finished_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "note": args.note,
         **body,
