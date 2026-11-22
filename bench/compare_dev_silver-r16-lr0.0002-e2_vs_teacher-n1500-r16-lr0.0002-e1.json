@@ -1,0 +1,32 @@
+{
+  "command": "python -m filinglens.train.compare --a silver-r16-lr0.0002-e2 --b teacher-n1500-r16-lr0.0002-e1",
+  "finished_utc": "2026-11-22T03:15:52+00:00",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "split": "dev",
+  "a": "silver-r16-lr0.0002-e2",
+  "b": "teacher-n1500-r16-lr0.0002-e1",
+  "bootstrap_resamples": 2000,
+  "category_macro_f1": {
+    "a": 0.6404,
+    "b": 0.7414,
+    "diff_b_minus_a": 0.101,
+    "diff_ci95": [
+      -0.0561,
+      0.1767
+    ],
+    "share_b_not_better": 0.182
+  },
+  "category_accuracy": {
+    "a": 0.7465,
+    "b": 0.7606,
+    "diff_b_minus_a": 0.0141,
+    "diff_ci95": [
+      -0.0704,
+      0.0986
+    ],
+    "share_b_not_better": 0.4375
+  },
+  "rows": 71,
+  "rows_where_only_a_right": 4,
+  "rows_where_only_b_right": 5
+}
