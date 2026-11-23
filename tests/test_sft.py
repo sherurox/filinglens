@@ -107,6 +107,29 @@ def test_limit_teacher_keeps_silver_and_a_teacher_prefix() -> None:
     assert sft.limit_teacher(examples, -1) == examples
 
 
+def test_heldout_teacher_is_a_teacher_slice_after_the_training_prefix() -> None:
+    examples = [{"id": f"s{i}", "source": "silver"} for i in range(2)]
+    examples += [{"id": f"t{i}", "source": "teacher"} for i in range(6)]
+    heldout = sft.heldout_teacher(examples, 3, 2)
+    assert [e["id"] for e in heldout] == ["t3", "t4"]  # silver never counts as held out
+    trained = {e["id"] for e in sft.limit_teacher(examples, 3)}
+    assert trained.isdisjoint(e["id"] for e in heldout)
+    assert sft.heldout_teacher(examples, 5, 10) == [examples[-1]]  # short file: fewer rows
+
+
+def test_token_weighted_mean() -> None:
+    # 2 tokens at loss 1.0 and 6 tokens at loss 3.0: per token 2.5, per example would be 2.0
+    assert sft.token_weighted_mean([1.0, 3.0], [2, 6]) == pytest.approx(2.5)
+    with pytest.raises(ValueError, match="no completion tokens"):
+        sft.token_weighted_mean([], [])
+
+
+@pytest.mark.parametrize("limit", ["-1", "1600"])
+def test_cli_refuses_heldout_overlapping_training(limit: str) -> None:
+    with pytest.raises(SystemExit):  # parser.error, before any file is read
+        sft.main(["--arm", "teacher", "--teacher-limit", limit, "--heldout-n", "300"])
+
+
 def test_run_name_with_teacher_limit() -> None:
     assert sft.TrainConfig(arm="teacher", teacher_limit=1500).run_name() == (
         "teacher-n1500-r16-lr0.0002-e2"

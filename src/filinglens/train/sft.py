@@ -158,6 +158,20 @@ def limit_teacher(examples: list[dict], limit: int) -> list[dict]:
     return silver + teacher
 
 
+def heldout_teacher(examples: list[dict], start: int, n: int) -> list[dict]:
+    """Teacher examples start..start+n-1 in file order (a balanced slice, like the training
+    prefix). Training never sees them as long as 0 < --teacher-limit <= start."""
+    return [e for e in examples if e["source"] == "teacher"][start : start + n]
+
+
+def token_weighted_mean(losses: list[float], counts: list[int]) -> float:
+    """Loss per completion token over examples whose own loss is already a per-token mean."""
+    total = sum(counts)
+    if total == 0:
+        raise ValueError("no completion tokens to average over")
+    return sum(loss * n for loss, n in zip(losses, counts, strict=True)) / total
+
+
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
@@ -165,7 +179,12 @@ def read_jsonl(path: Path) -> list[dict]:
 # ---------- training (fl-train environment only) ----------
 
 
-def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> dict:
+def train(
+    cfg: TrainConfig,
+    examples: list[dict],
+    args: argparse.Namespace,
+    heldout: list[dict] | None = None,
+) -> dict:
     import mlflow
     import torch
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
@@ -195,6 +214,7 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
 
     tokenizer = AutoTokenizer.from_pretrained(cfg.model)
     encoded, length_stats = prepare(examples, tokenizer, cfg.max_length)
+    heldout_encoded, heldout_lengths = prepare(heldout or [], tokenizer, cfg.max_length)
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
 
     class Examples(torch.utils.data.Dataset):
@@ -273,6 +293,20 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
             metrics["vram_reserved_mib"] = torch.cuda.memory_reserved() / MIB
             step_log.log(metrics, state.global_step)
 
+    def heldout_loss(items: list[dict]) -> float:
+        """Mean completion-token loss on rows training never saw (bf16 autocast, as in training;
+        batch 1, so there's no padding to mask)."""
+        model.eval()
+        losses, counts = [], []
+        with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
+            for item in items:
+                ids = torch.tensor([item["input_ids"]], device=model.device)
+                labels = torch.tensor([item["labels"]], device=model.device)
+                losses.append(float(model(input_ids=ids, labels=labels, use_cache=False).loss))
+                counts.append(item["completion_tokens"])
+        model.train()
+        return token_weighted_mean(losses, counts)
+
     def finish_mlflow(summary: dict, adapter_dir: Path) -> bool:
         """Missed steps, summary metrics, the step log and the adapter; False if MLflow is still
         unreachable (everything is in bench/ and steps.jsonl, so nothing is lost)."""
@@ -312,6 +346,8 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
             adapter_dir = out_dir / "adapter"
             model.save_pretrained(adapter_dir)
             tokenizer.save_pretrained(adapter_dir)
+            heldout_started = time.perf_counter()
+            loss_heldout = heldout_loss(heldout_encoded) if heldout_encoded else None
             summary = {
                 "run_id": run.info.run_id,
                 "run_name": run_name,
@@ -325,6 +361,11 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
                 "train_samples_per_s": result.metrics.get("train_samples_per_second"),
                 "adapter_dir": adapter_dir.as_posix(),
                 "steps_log": step_log.path.as_posix(),
+                "heldout_from": args.heldout_from if heldout_encoded else None,
+                "heldout_examples": len(heldout_encoded),
+                "heldout_dropped_too_long": heldout_lengths["dropped_too_long"],
+                "heldout_loss": None if loss_heldout is None else round(loss_heldout, 5),
+                "heldout_eval_s": round(time.perf_counter() - heldout_started, 1),
             }
             summary["mlflow_synced"] = finish_mlflow(summary, adapter_dir)
     except Exception as e:
@@ -371,6 +412,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--max-length", type=int, default=4096)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--teacher-limit", type=int, default=-1, help="first N teacher examples")
+    parser.add_argument(
+        "--heldout-from", type=int, default=1500, help="first teacher row of the held-out slice"
+    )
+    parser.add_argument(
+        "--heldout-n", type=int, default=0, help="held-out teacher rows for heldout_loss (0: off)"
+    )
     parser.add_argument("--no-liger", action="store_true")
     parser.add_argument("--headroom-mib", type=int, default=300)
     parser.add_argument("--run-name", default=None)
@@ -379,6 +426,11 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--bench", type=Path, default=Path("bench"))
     argv = sys.argv[1:] if argv is None else argv
     args = parser.parse_args(argv)
+    if args.heldout_n > 0 and not 0 < args.teacher_limit <= args.heldout_from:
+        parser.error(
+            "held-out rows would overlap the training rows: "
+            "need 0 < --teacher-limit <= --heldout-from"
+        )
 
     cfg = TrainConfig(
         arm=args.arm,
@@ -392,11 +444,15 @@ def main(argv: list[str] | None = None) -> None:
         liger=not args.no_liger,
         teacher_limit=args.teacher_limit,
     )
-    examples = limit_teacher(read_jsonl(args.data / f"{args.arm}.jsonl"), cfg.teacher_limit)
+    every = read_jsonl(args.data / f"{args.arm}.jsonl")
+    examples = limit_teacher(every, cfg.teacher_limit)
+    heldout = heldout_teacher(every, args.heldout_from, args.heldout_n) if args.heldout_n else []
+    if len(heldout) < args.heldout_n:
+        parser.error(f"only {len(heldout)} teacher rows from row {args.heldout_from}")
     if args.dry_run:
         print(json.dumps(dry_run(cfg, examples), indent=2))
         return
-    body = train(cfg, examples, args)
+    body = train(cfg, examples, args, heldout)
     record = {
         "command": "python -m filinglens.train.sft " + shlex.join(argv),
         "finished_utc": datetime.now(UTC).isoformat(timespec="seconds"),

@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --gpu-memory-utilization 0.84 --max-model-len 4608 --max-num-seqs 1 --max-lora-rank 16 --lora data/interim/adapters/teacher-n1500-r8-lr0.0002-e1/adapter",
+  "finished_utc": "2026-11-23T19:54:59+00:00",
+  "split": "dev",
+  "model": "Qwen/Qwen3-1.7B",
+  "lora": "data/interim/adapters/teacher-n1500-r8-lr0.0002-e1/adapter",
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 71,
+  "elapsed_s_incl_model_load": 155.5,
+  "peak_gpu_memory_mib": 7850,
+  "predictions": "data/interim/fields/fields_zero_dev_teacher-n1500-r8-lr0.0002-e1.jsonl"
+}

@@ -1,0 +1,53 @@
+{
+  "command": "python -m filinglens.train.sft --arm teacher --teacher-limit 1500 --epochs 1 --rank 16 --lr 1e-4 --note 'AC power, Best performance, VRAM capped to free'",
+  "finished_utc": "2026-11-23T20:53:40+00:00",
+  "note": "AC power, Best performance, VRAM capped to free",
+  "config": {
+    "arm": "teacher",
+    "model": "Qwen/Qwen3-1.7B",
+    "rank": 16,
+    "lora_dropout": 0.05,
+    "learning_rate": 0.0001,
+    "epochs": 1.0,
+    "max_steps": -1,
+    "grad_accum": 8,
+    "max_length": 4096,
+    "warmup_frac": 0.05,
+    "seed": 0,
+    "liger": true,
+    "teacher_limit": 1500,
+    "lora_alpha": 32,
+    "batch_size": 1
+  },
+  "vram": {
+    "gpu_total_mib": 8124,
+    "gpu_free_at_start_mib": 6999,
+    "used_by_others_at_start_mib": 1125,
+    "vram_cap_mib": 6699
+  },
+  "lengths": {
+    "examples_in": 1500,
+    "examples_kept": 1500,
+    "dropped_too_long": 0,
+    "dropped_ids": [],
+    "tokens_total": 2732920,
+    "tokens_median": 1790.5,
+    "tokens_max": 2974,
+    "completion_tokens_median": 47.0
+  },
+  "run_id": "f14c38966e464974801d8406e38c6173",
+  "run_name": "teacher-n1500-r16-lr0.0001-e1",
+  "train_runtime_s": 3497.3,
+  "optimizer_steps": 188,
+  "final_train_loss": 0.3833,
+  "peak_allocated_mib": 3551,
+  "peak_reserved_mib": 4180,
+  "gpu_temp_max_c": 67.1,
+  "sec_per_optimizer_step": 18.6,
+  "train_samples_per_s": 0.429,
+  "adapter_dir": "data/interim/adapters/teacher-n1500-r16-lr0.0001-e1/adapter",
+  "steps_log": "data/interim/adapters/teacher-n1500-r16-lr0.0001-e1/steps.jsonl",
+  "mlflow_synced": true,
+  "mlflow_offline_at_step": null,
+  "mlflow_errors": []
+}
