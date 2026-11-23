@@ -117,6 +117,20 @@ def test_heldout_teacher_is_a_teacher_slice_after_the_training_prefix() -> None:
     assert sft.heldout_teacher(examples, 5, 10) == [examples[-1]]  # short file: fewer rows
 
 
+def test_completion_positions_predict_exactly_the_completion_tokens() -> None:
+    tok = FakeTokenizer()
+    item = sft.encode("abc", "de|", tok, max_length=10)  # prompt 3 tokens, completion 3
+    start, end = sft.completion_positions(item["prompt_tokens"], len(item["input_ids"]))
+    assert (start, end) == (2, 5)
+    targets = item["input_ids"][start + 1 : end + 1]  # what positions start..end-1 predict
+    assert targets == [t for t in item["labels"] if t != -100]  # = the training loss tokens
+    assert end - start == item["completion_tokens"]
+    with pytest.raises(ValueError):
+        sft.completion_positions(0, 5)  # no position predicts the first token
+    with pytest.raises(ValueError):
+        sft.completion_positions(5, 5)  # no completion
+
+
 def test_token_weighted_mean() -> None:
     # 2 tokens at loss 1.0 and 6 tokens at loss 3.0: per token 2.5, per example would be 2.0
     assert sft.token_weighted_mean([1.0, 3.0], [2, 6]) == pytest.approx(2.5)

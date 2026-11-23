@@ -164,6 +164,17 @@ def heldout_teacher(examples: list[dict], start: int, n: int) -> list[dict]:
     return [e for e in examples if e["source"] == "teacher"][start : start + n]
 
 
+def completion_positions(prompt_tokens: int, total_tokens: int) -> tuple[int, int]:
+    """Hidden-state positions [start, end) whose next token is a completion token: position t
+    predicts token t + 1, so the completion tokens prompt_tokens..total-1 come from
+    positions prompt_tokens-1..total-2 (the same tokens the training loss is on)."""
+    if not 0 < prompt_tokens < total_tokens:
+        raise ValueError(
+            f"need 0 < prompt_tokens < total_tokens, got {prompt_tokens}, {total_tokens}"
+        )
+    return prompt_tokens - 1, total_tokens - 1
+
+
 def token_weighted_mean(losses: list[float], counts: list[int]) -> float:
     """Loss per completion token over examples whose own loss is already a per-token mean."""
     total = sum(counts)
@@ -293,17 +304,30 @@ def train(
             metrics["vram_reserved_mib"] = torch.cuda.memory_reserved() / MIB
             step_log.log(metrics, state.global_step)
 
-    def heldout_loss(items: list[dict]) -> float:
-        """Mean completion-token loss on rows training never saw (bf16 autocast, as in training;
-        batch 1, so there's no padding to mask)."""
+    causal = model.get_base_model()  # the Qwen3ForCausalLM, with the LoRA layers injected
+
+    def heldout_loss(items: list[dict], every: int = 50) -> float:
+        """Mean completion-token loss on rows training never saw (bf16 autocast, as in training).
+
+        Hidden states once, then lm_head only at the completion positions, so the full logits
+        (tokens x 151,936 vocabulary, upcast to fp32) never exist. Calling the model with labels
+        in eval mode would build them: Liger's fused loss is only used in training mode, and that
+        path crashed Optuna trial 0 (23 Nov)."""
         model.eval()
         losses, counts = [], []
+        started = time.perf_counter()
         with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
-            for item in items:
+            for i, item in enumerate(items, 1):
                 ids = torch.tensor([item["input_ids"]], device=model.device)
-                labels = torch.tensor([item["labels"]], device=model.device)
-                losses.append(float(model(input_ids=ids, labels=labels, use_cache=False).loss))
-                counts.append(item["completion_tokens"])
+                start, end = completion_positions(item["prompt_tokens"], len(item["input_ids"]))
+                out = causal.model(input_ids=ids, use_cache=False)
+                logits = causal.lm_head(out.last_hidden_state[0, start:end]).float()
+                targets = ids[0, start + 1 : end + 1]
+                losses.append(float(torch.nn.functional.cross_entropy(logits, targets)))
+                counts.append(end - start)
+                if i % every == 0 or i == len(items):
+                    elapsed = time.perf_counter() - started
+                    print(f"[heldout] {i}/{len(items)} rows, {elapsed:.0f} s", flush=True)
         model.train()
         return token_weighted_mean(losses, counts)
 
@@ -322,6 +346,10 @@ def train(
             step_log.record_error("finish", e)
             return False
         return True
+
+    preflight = None
+    if heldout_encoded:  # fail in seconds, not after a whole training run
+        preflight = round(heldout_loss(heldout_encoded[:2]), 5)
 
     manifest = args.data / "MANIFEST.json"
     tags = run_tags(data_manifest=manifest, note=args.note) | {"arm": cfg.arm}
@@ -366,6 +394,7 @@ def train(
                 "heldout_dropped_too_long": heldout_lengths["dropped_too_long"],
                 "heldout_loss": None if loss_heldout is None else round(loss_heldout, 5),
                 "heldout_eval_s": round(time.perf_counter() - heldout_started, 1),
+                "heldout_preflight_loss_2_rows_before_training": preflight,
             }
             summary["mlflow_synced"] = finish_mlflow(summary, adapter_dir)
     except Exception as e:
