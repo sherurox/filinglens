@@ -17,6 +17,18 @@ LOGS=data/interim/logs
 mkdir -p "$LOGS"
 set -a; source .env; set +a
 
+mlflow_up() {  # MLflow answers, or is started once; otherwise stop the batch with a clear message
+  local url="${MLFLOW_TRACKING_URI:-http://127.0.0.1:55000}/health"
+  curl -fsS --max-time 5 "$url" > /dev/null 2>&1 && return 0
+  echo "    $(date -u +%FT%TZ) MLflow not answering at $url; trying docker compose up" >&2
+  if docker compose up -d --wait mlflow > /dev/null 2>&1 \
+      && curl -fsS --max-time 5 "$url" > /dev/null 2>&1; then
+    return 0
+  fi
+  echo "    MLflow still down: batch stopped (start Docker Desktop, then rerun this script)" >&2
+  return 1
+}
+
 name_of() {  # name_of <arm> <rank> <lr>
   $TRAIN -c "from filinglens.train.sft import TrainConfig as C
 print(C(arm='$1', rank=$2, learning_rate=$3, epochs=1.0, teacher_limit=1500).run_name())"
@@ -28,11 +40,13 @@ run() {  # run <arm> <rank> <lr>
   log="$LOGS/$name.log"
   echo "=== $(date -u +%FT%TZ) $name (log: $log)"
   if [[ ! -f "bench/sft_$name.json" ]]; then
+    mlflow_up || exit 1
     $TRAIN -m filinglens.train.sft --arm "$1" --teacher-limit 1500 --epochs 1 \
       --rank "$2" --lr "$3" --note "$NOTE" >> "$log" 2>&1
   fi
   $GPU -m filinglens.extract.fields generate --variant zero --split dev "${EVAL[@]}" \
     --max-lora-rank 16 --lora "data/interim/adapters/$name/adapter" >> "$log" 2>&1
+  mlflow_up || exit 1
   uv run python -m filinglens.train.evaluate --run-name "$name" --split dev >> "$log" 2>&1
   uv run python -m filinglens.train.compare --a base-s1a --b "$name" >> "$log" 2>&1
   python3 - "$name" <<'EOF'
@@ -40,10 +54,14 @@ import json, sys
 name = sys.argv[1]
 s = json.load(open(f"bench/fields_zero_dev_{name}.json"))["all_rows"]
 c = json.load(open(f"bench/compare_dev_base-s1a_vs_{name}.json"))["category_macro_f1"]
+t = json.load(open(f"bench/sft_{name}.json"))
 print(f"    dev macro-F1 {s['category_macro_f1']}  acc {s['category_accuracy']}  "
-      f"vs base {c['diff_b_minus_a']:+} (95% CI {c['diff_ci95']}, P(not better) {c['share_b_not_better']})")
+      f"vs base {c['diff_b_minus_a']:+} (95% CI {c['diff_ci95']}, P(not better) {c['share_b_not_better']})"
+      f"  mlflow_synced {t.get('mlflow_synced', 'n/a')}")
 EOF
 }
+
+mlflow_up || exit 1
 
 f1() { python3 -c "import json; print(json.load(open('bench/fields_zero_dev_$1.json'))['all_rows']['category_macro_f1'])"; }
 

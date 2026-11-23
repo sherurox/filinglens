@@ -14,7 +14,10 @@ and Liger fused linear cross-entropy (bench/train_smoke_4096_liger.json: 4,096 t
 
 Every run logs to MLflow (experiment fl-m4-sft): config, data version (sha256 of the SFT
 manifest), git state, per-step loss / learning rate / grad norm / GPU temperature, peak VRAM,
-and the adapter as an artifact. A JSON summary goes to bench/.
+and the adapter as an artifact. A JSON summary goes to bench/. MLflow must answer when the run
+starts; after that an outage doesn't stop training: per-step metrics also go to
+<adapters>/<run>/steps.jsonl, the missed steps are replayed at the end, and the bench summary
+says whether MLflow got everything (`mlflow_synced`).
 
     ~/venvs/fl-train/bin/python -m filinglens.train.sft --arm silver --dry-run
     ~/venvs/fl-train/bin/python -m filinglens.train.sft --arm silver --max-steps 30 --note "..."
@@ -176,7 +179,7 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
     )
 
     from filinglens.train.smoke_qlora import LORA_TARGETS, MIB, cap_to_free_vram
-    from filinglens.train.tracking import gpu_snapshot, run_tags, start_run
+    from filinglens.train.tracking import StepLog, gpu_snapshot, run_tags, start_run
 
     vram = cap_to_free_vram(args.headroom_mib)
     if cfg.liger:
@@ -255,9 +258,11 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
         dataloader_num_workers=0,
     )
     temps: list[float] = []
+    step_log = StepLog(out_dir / "steps.jsonl", lambda m, s: mlflow.log_metrics(m, step=s))
 
     class MlflowSteps(TrainerCallback):
-        """Per optimizer step: loss, learning rate, grad norm and GPU temperature."""
+        """Per optimizer step: loss, learning rate, grad norm and GPU temperature (to the local
+        steps.jsonl always, to MLflow while it answers)."""
 
         def on_log(self, _args, state, _control, logs=None, **_kwargs):
             metrics = {k: float(v) for k, v in (logs or {}).items() if isinstance(v, int | float)}
@@ -266,44 +271,69 @@ def train(cfg: TrainConfig, examples: list[dict], args: argparse.Namespace) -> d
                 temps.append(float(gpu["gpu.temperature.gpu"]))
                 metrics["gpu_temp_c"] = temps[-1]
             metrics["vram_reserved_mib"] = torch.cuda.memory_reserved() / MIB
-            mlflow.log_metrics(metrics, step=state.global_step)
+            step_log.log(metrics, state.global_step)
+
+    def finish_mlflow(summary: dict, adapter_dir: Path) -> bool:
+        """Missed steps, summary metrics, the step log and the adapter; False if MLflow is still
+        unreachable (everything is in bench/ and steps.jsonl, so nothing is lost)."""
+        if not step_log.sync():
+            return False
+        try:
+            mlflow.log_metrics(
+                {k: v for k, v in summary.items() if isinstance(v, int | float) and k != "run_id"}
+            )
+            mlflow.log_artifact(str(step_log.path))
+            mlflow.log_artifacts(str(adapter_dir), artifact_path="adapter")
+        except Exception as e:
+            step_log.record_error("finish", e)
+            return False
+        return True
 
     manifest = args.data / "MANIFEST.json"
     tags = run_tags(data_manifest=manifest, note=args.note) | {"arm": cfg.arm}
-    with start_run("sft", run_name, tags=tags) as run:
-        mlflow.log_params(cfg.params() | {"optimizer_steps": total})
-        mlflow.log_params({f"len.{k}": v for k, v in length_stats.items() if k != "dropped_ids"})
-        torch.cuda.reset_peak_memory_stats()
-        started = time.perf_counter()
-        trainer = Trainer(
-            model=model,
-            args=targs,
-            train_dataset=Examples(),
-            data_collator=collate,
-            callbacks=[MlflowSteps()],
-        )
-        result = trainer.train()
-        elapsed = time.perf_counter() - started
-        adapter_dir = out_dir / "adapter"
-        model.save_pretrained(adapter_dir)
-        tokenizer.save_pretrained(adapter_dir)
-        summary = {
-            "run_id": run.info.run_id,
-            "run_name": run_name,
-            "train_runtime_s": round(elapsed, 1),
-            "optimizer_steps": result.global_step,
-            "final_train_loss": round(float(result.training_loss), 4),
-            "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / MIB),
-            "peak_reserved_mib": round(torch.cuda.max_memory_reserved() / MIB),
-            "gpu_temp_max_c": max(temps) if temps else None,
-            "sec_per_optimizer_step": round(elapsed / max(result.global_step, 1), 2),
-            "train_samples_per_s": result.metrics.get("train_samples_per_second"),
-            "adapter_dir": adapter_dir.as_posix(),
-        }
-        mlflow.log_metrics(
-            {k: v for k, v in summary.items() if isinstance(v, int | float) and k != "run_id"}
-        )
-        mlflow.log_artifacts(str(adapter_dir), artifact_path="adapter")
+    summary: dict[str, Any] | None = None
+    try:
+        with start_run("sft", run_name, tags=tags) as run:
+            mlflow.log_params(cfg.params() | {"optimizer_steps": total})
+            mlflow.log_params(
+                {f"len.{k}": v for k, v in length_stats.items() if k != "dropped_ids"}
+            )
+            torch.cuda.reset_peak_memory_stats()
+            started = time.perf_counter()
+            trainer = Trainer(
+                model=model,
+                args=targs,
+                train_dataset=Examples(),
+                data_collator=collate,
+                callbacks=[MlflowSteps()],
+            )
+            result = trainer.train()
+            elapsed = time.perf_counter() - started
+            adapter_dir = out_dir / "adapter"
+            model.save_pretrained(adapter_dir)
+            tokenizer.save_pretrained(adapter_dir)
+            summary = {
+                "run_id": run.info.run_id,
+                "run_name": run_name,
+                "train_runtime_s": round(elapsed, 1),
+                "optimizer_steps": result.global_step,
+                "final_train_loss": round(float(result.training_loss), 4),
+                "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / MIB),
+                "peak_reserved_mib": round(torch.cuda.max_memory_reserved() / MIB),
+                "gpu_temp_max_c": max(temps) if temps else None,
+                "sec_per_optimizer_step": round(elapsed / max(result.global_step, 1), 2),
+                "train_samples_per_s": result.metrics.get("train_samples_per_second"),
+                "adapter_dir": adapter_dir.as_posix(),
+                "steps_log": step_log.path.as_posix(),
+            }
+            summary["mlflow_synced"] = finish_mlflow(summary, adapter_dir)
+    except Exception as e:
+        if summary is None:
+            raise  # training itself failed, or MLflow was down before training began
+        summary["mlflow_synced"] = False  # only closing the run failed (end_run)
+        step_log.record_error("end_run", e)
+    summary["mlflow_offline_at_step"] = step_log.offline_at_step
+    summary["mlflow_errors"] = step_log.errors
     return {"config": cfg.params(), "vram": vram, "lengths": length_stats, **summary}
 
 

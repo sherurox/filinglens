@@ -69,6 +69,9 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.18.0  # Apache-2.0; same version as the mlflow client in both venvs
     container_name: filinglens-mlflow
+    # Comes back when the Docker engine restarts (22 Nov: it stopped mid-training). Doesn't help
+    # while Docker Desktop itself is down; the training runs tolerate that (train/tracking.py).
+    restart: unless-stopped
     environment:
       # No background job runner: we don't use server jobs (GenAI features); it costs ~GBs of RAM
       # and its endpoints were unauthenticated (CVE-2026-0545).

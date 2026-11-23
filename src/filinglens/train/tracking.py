@@ -5,15 +5,19 @@ Every training, evaluation and filter run carries the same provenance tags: the 
 manifest), a free-text power note, and a GPU snapshot from nvidia-smi.
 
 mlflow is imported inside `start_run` only, so the pure helpers stay cheap to import.
+`StepLog` keeps per-step training metrics on local disk so a tracking-server outage can't
+kill a training run.
 """
 
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import subprocess
-from collections.abc import Iterator
+import sys
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -112,3 +116,58 @@ def start_run(
     mlflow.set_experiment(EXPERIMENTS[kind])
     with mlflow.start_run(run_name=run_name, tags=tags or {}, nested=nested) as run:
         yield run
+
+
+class StepLog:
+    """Per-step metrics: always appended to a local JSONL, sent to MLflow while it answers.
+
+    Why (FL-M4, 22 Nov): the MLflow container stopped at step 8 of 212 and the Trainer died in
+    its metrics callback after 8 min of HTTP retries. Now the first failed send switches to
+    offline mode: no more sends during training (each failed call can spend minutes retrying),
+    and `sync()` replays the rows MLflow missed, in order, from the JSONL. Rows are counted by
+    position, not by step, because the Trainer logs its final summary at the last step again.
+    """
+
+    def __init__(self, path: Path, send: Callable[[dict[str, float], int], None]) -> None:
+        self.path = path
+        self.send = send
+        self.rows = 0  # rows written to the JSONL
+        self.pending_from: int | None = None  # first row MLflow hasn't got; None = in sync
+        self.offline_at_step: int | None = None  # for the bench summary
+        self.errors: list[str] = []
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("")  # a rerun starts a fresh log
+
+    def log(self, metrics: dict[str, float], step: int) -> None:
+        with self.path.open("a") as f:
+            f.write(json.dumps({"step": step, **metrics}) + "\n")
+        row, self.rows = self.rows, self.rows + 1
+        if self.pending_from is not None:
+            return
+        try:
+            self.send(metrics, step)
+        except Exception as e:  # any transport error: keep training, catch up later
+            self.pending_from, self.offline_at_step = row, step
+            self.record_error("log", e)
+
+    def sync(self) -> bool:
+        """Replay the rows MLflow missed; True when MLflow has every row. Resumable."""
+        if self.pending_from is None:
+            return True
+        lines = [line for line in self.path.read_text().splitlines() if line.strip()]
+        for i in range(self.pending_from, len(lines)):
+            row = json.loads(lines[i])
+            step = row.pop("step")
+            try:
+                self.send(row, step)
+            except Exception as e:
+                self.record_error("sync", e)
+                return False
+            self.pending_from = i + 1
+        self.pending_from = None
+        return True
+
+    def record_error(self, where: str, error: BaseException) -> None:
+        message = f"{where}: {type(error).__name__}: {error}"[:500]
+        self.errors.append(message)
+        print(f"[StepLog] MLflow {message} (metrics continue in {self.path})", file=sys.stderr)
