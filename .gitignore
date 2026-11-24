@@ -47,3 +47,4 @@ override.tf.json
 
 # Dagster (DAGSTER_HOME lives in data/dagster; dev may create temp homes)
 .tmp_dagster_home_*/
+logs/
