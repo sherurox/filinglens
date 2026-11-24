@@ -1,0 +1,29 @@
+{
+  "command": "python -m filinglens.retrieval.chunks ",
+  "finished_utc": "2026-11-24T19:11:18+00:00",
+  "tokenizer": "BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a",
+  "item": "1A",
+  "heading_words": 40,
+  "corpus": "data/interim/risk_paragraphs.parquet",
+  "corpus_sha256": "e7fb93143faaaa419075f6e6a889baa168d119be8e62c1fc22f211dce3b7b64b",
+  "out": "data/interim/retrieval/chunks.parquet",
+  "out_sha256": "ecc1e6fcba04aed186477b799856c62000e1bb4c789c611cb337fa502975ae86",
+  "paragraphs": 201516,
+  "chunks": 203200,
+  "paragraphs_split": 1656,
+  "parts_per_split_paragraph": {
+    "2": 1628,
+    "3": 28
+  },
+  "heading_prefixed": 199183,
+  "companies": 294,
+  "filings": 2198,
+  "tokens": {
+    "p50": 157.0,
+    "p95": 354.0,
+    "p99": 446.0,
+    "max": 510,
+    "budget": 510
+  },
+  "seconds": 22.3
+}
