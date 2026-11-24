@@ -1,0 +1,123 @@
+{
+  "command": "python -m filinglens.retrieval.ab test --allow-test --note 'FL-M3 T10: pre-registered A/B on 1,137 ret-test queries'",
+  "finished_utc": "2026-11-24T23:07:55+00:00",
+  "split": "test",
+  "labels": "synthetic queries, automatic grades (no human judgment)",
+  "rule_file": "bench/ab_rule.json",
+  "rule": {
+    "fixed_utc": "2026-11-24T23:00:19+00:00",
+    "command": "python -m filinglens.retrieval.ab pilot --mde 0.03 --latency-budget-ms 500",
+    "primary_metric": "ndcg_at_10",
+    "mde": 0.03,
+    "alpha_two_sided": 0.05,
+    "power": 0.8,
+    "icc_company_dev": 0.1434,
+    "icc_bootstrap_implied_dev": 0.0297,
+    "n_test_required": 1137,
+    "n_test_basis": "all ret-test",
+    "expected_power_at_n_test": {
+      "icc_anova": 0.5602,
+      "icc_bootstrap_implied": 0.8694
+    },
+    "test_companies": 75,
+    "latency_budget_p95_ms": 500.0,
+    "bootstrap": {
+      "resamples": 10000,
+      "seed": 0,
+      "ci": "95% percentile",
+      "unit": "company"
+    },
+    "rule": "use every ret-test query (at least n_test_required); ship the rerank stage iff the 95% company-cluster bootstrap CI of the per-query NDCG@10 difference (reranked - dense) lies above 0 AND the reranker's p95 latency on ret-test <= latency_budget_p95_ms; otherwise keep dense-only"
+  },
+  "arms": {
+    "A": "dense top-10 (FAISS Flat, CIK filter)",
+    "B": "dense top-50 + bge-reranker-base"
+  },
+  "means": {
+    "recall_before": 0.6904,
+    "recall_after": 0.7872,
+    "mrr_before": 0.4792,
+    "mrr_after": 0.5919,
+    "ndcg_before": 0.4238,
+    "ndcg_after": 0.5125,
+    "recall_at_depth": 0.8725
+  },
+  "primary": {
+    "ndcg_at_10": {
+      "n": 1137,
+      "clusters": 75,
+      "mean_diff": 0.0888,
+      "ci95": [
+        0.0669,
+        0.1099
+      ],
+      "share_not_better": 0.0,
+      "sd_diff": 0.3111,
+      "effect_size_dz": 0.2854,
+      "queries_better": 553,
+      "queries_worse": 289,
+      "queries_tied": 295
+    }
+  },
+  "primary_query_bootstrap_for_reference": {
+    "n": 1137,
+    "clusters": null,
+    "mean_diff": 0.0888,
+    "ci95": [
+      0.0703,
+      0.1065
+    ],
+    "share_not_better": 0.0,
+    "sd_diff": 0.3111,
+    "effect_size_dz": 0.2854,
+    "queries_better": 553,
+    "queries_worse": 289,
+    "queries_tied": 295
+  },
+  "icc_company_test": 0.0323,
+  "secondary": {
+    "recall_at_10": {
+      "n": 1137,
+      "clusters": 75,
+      "mean_diff": 0.0967,
+      "ci95": [
+        0.0728,
+        0.1207
+      ],
+      "share_not_better": 0.0,
+      "sd_diff": 0.3884,
+      "effect_size_dz": 0.2491,
+      "queries_better": 146,
+      "queries_worse": 36,
+      "queries_tied": 955
+    },
+    "mrr_at_10": {
+      "n": 1137,
+      "clusters": 75,
+      "mean_diff": 0.1128,
+      "ci95": [
+        0.0833,
+        0.1407
+      ],
+      "share_not_better": 0.0,
+      "sd_diff": 0.4273,
+      "effect_size_dz": 0.2639,
+      "queries_better": 379,
+      "queries_worse": 173,
+      "queries_tied": 585
+    }
+  },
+  "rerank_latency_test": {
+    "p50_ms": 229.39,
+    "p95_ms": 246.63,
+    "p99_ms": 276.21,
+    "mean_ms": 214.58,
+    "samples": 1137
+  },
+  "decision": {
+    "ci_lower_above_zero": true,
+    "p95_within_budget": true,
+    "ship_rerank": true
+  },
+  "mlflow_run_id": "c891ce0b874c47bd9cbbad239fd22375"
+}

@@ -1,0 +1,61 @@
+{
+  "command": "python -m filinglens.retrieval.rerank score --split test --allow-test --note 'FL-M3 T10: bge-reranker-base on ret-test, scored once under rule 15b4381'",
+  "split": "test",
+  "model": "BAAI/bge-reranker-base@2cfc18c9415c912f9d8155881c133215df768a70",
+  "model_files": {
+    "architectures": [
+      "XLMRobertaForSequenceClassification"
+    ],
+    "num_labels": 1
+  },
+  "depth": 50,
+  "k": 10,
+  "dtype": "float16 weights, fp32 logits",
+  "max_pair_tokens": 512,
+  "power_note": "FL-M3 T10: bge-reranker-base on ret-test, scored once under rule 15b4381",
+  "labels": "synthetic queries, automatic grades (no human judgment)",
+  "fp16_vs_fp32_max_logit_diff": 0.00792,
+  "gpu_before": {
+    "gpu.name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu.temperature.gpu": "48.80",
+    "gpu.memory.used": "2940",
+    "gpu.memory.total": "8151",
+    "gpu.power.draw": "42.13",
+    "gpu.clocks.sm": "1050"
+  },
+  "gpu_after": {
+    "gpu.name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu.temperature.gpu": "54.40",
+    "gpu.memory.used": "3782",
+    "gpu.memory.total": "8151",
+    "gpu.power.draw": "64.29",
+    "gpu.clocks.sm": "1605"
+  },
+  "queries": 1137,
+  "pairs": 56850,
+  "pairs_truncated": 1241,
+  "metrics": {
+    "recall_before": 0.6904,
+    "recall_after": 0.7872,
+    "mrr_before": 0.4792,
+    "mrr_after": 0.5919,
+    "ndcg_before": 0.4238,
+    "ndcg_after": 0.5125,
+    "recall_at_depth": 0.8725
+  },
+  "rerank_latency": {
+    "p50_ms": 229.39,
+    "p95_ms": 246.63,
+    "p99_ms": 276.21,
+    "mean_ms": 214.58,
+    "samples": 1137
+  },
+  "peak_vram_allocated_mib": 963,
+  "peak_vram_reserved_mib": 2082,
+  "inputs_sha256": {
+    "candidates": "7565ceade50c4095d8d8337a8f7a03df7bc0cebe5207aabe2b56a23ebd7684b2",
+    "queries.test.jsonl": "d99ab1921951792194dfe56cda39caf8743a084432713af7e9b915831db1da82"
+  },
+  "finished_utc": "2026-11-24T23:07:52+00:00",
+  "mlflow_run_id": "203a3e4667f0473296640d29c0c2219a"
+}

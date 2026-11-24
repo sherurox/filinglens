@@ -269,3 +269,54 @@ The first run of the ablation batch died at step 8 of 212: the MLflow container 
 - Optional spec item not done: DPO (LATER).
 - The teacher's dev and test predictions came from batched decoding on a T4; base and student were scored deterministically.
 - The shipped student was chosen on dev from several adapters; one Optuna search, ending at the edge of its range.
+
+## FL-M3: retrieval, ranking and offline A/B
+
+Retrieval runs over Item 1A risk-factor chunks of the latest 10-K per company, embedded with `BAAI/bge-base-en-v1.5` (MIT, revision `a5beb1e3`) and filtered to the company the question names (CIK filter). Queries are synthetic: one question per paragraph, written by `Qwen/Qwen3-4B-AWQ` with the FL-M2 prompt and checks, graded automatically (grade 2 = the source chunk, grade 1 = a chunk that covers most of the evidence). No human judged relevance. Companies are split by hash into ret-dev (182 queries, 77 companies) and ret-test (1,137 queries, 75 companies).
+
+### Offline A/B: does the reranker ship? (D2)
+
+**Arms.** A: dense top-10 (FAISS Flat, exact inner product, CIK filter). B: dense top-50, rescored by `BAAI/bge-reranker-base` (MIT, revision `2cfc18c9`), keep the top 10.
+
+**Pre-registration.** The decision rule was written by `ab pilot` from ret-dev only and committed in `15b4381` (`bench/ab_rule.json`, fixed 2026-11-24 23:00:19 UTC) before any ret-test query was embedded. `ab test` refuses to run unless that file is committed and unchanged. The rule: use every ret-test query; ship the reranker if and only if the 95% company-cluster bootstrap CI of the per-query NDCG@10 difference (B − A) lies above 0 **and** the reranker's p95 latency on ret-test is at most 500 ms; otherwise keep dense-only.
+
+**Power analysis** (`bench/ab_power.json`, ret-dev pilot, 182 queries). The per-query NDCG@10 difference has sd 0.2752. Detecting a 0.03 gain at two-sided α 0.05 with 80% power needs 663 independent queries (paired t-test, noncentral t). Queries are not independent: questions about the same company move together. Two estimates of the company ICC disagree: 0.1434 (one-way ANOVA) and 0.0297 (implied by the ratio of the cluster to the query bootstrap CI widths). With a design effect of 1 + (m − 1)·ICC, the required n has no solution once ICC ≥ companies / n_independent = 75 / 663; at 0.1434 it has none, so adding questions per company cannot reach 80% power on 75 companies. Instead ret-test was grown from 175 to 1,137 queries (about 15 per company, T10a) and the rule uses all of them. Expected power at that size: 0.5602 at the ANOVA ICC, 0.8694 at the implied ICC (normal approximation); a simulation of the full rule at 75 × 16 gave 0.586 at the ANOVA ICC.
+
+**Result on ret-test** (`bench/ab_test.json`, 1,137 queries, 75 companies, 10,000 company-cluster resamples, seed 0):
+
+| Metric @10 | Dense (A) | Reranked (B) | Mean difference | 95% CI (company cluster) | Effect size d_z | Better / worse / tied |
+|---|---|---|---|---|---|---|
+| **NDCG (primary)** | 0.4238 | 0.5125 | +0.0888 | 0.0669 – 0.1099 | 0.2854 | 553 / 289 / 295 |
+| Recall | 0.6904 | 0.7872 | +0.0967 | 0.0728 – 0.1207 | 0.2491 | 146 / 36 / 955 |
+| MRR | 0.4792 | 0.5919 | +0.1128 | 0.0833 – 0.1407 | 0.2639 | 379 / 173 / 585 |
+
+For reference, the query-level bootstrap gives an NDCG@10 CI of 0.0703 – 0.1065; the cluster CI is wider, as it should be. Recall@50 of the dense candidates, the ceiling the reranker can reach, is 0.8725.
+
+Reranker latency on ret-test (`bench/reranker_test.json`; reranking step only, 50 pairs per query, fp16 on the RTX 5070 Laptop GPU, one query at a time, 1,137 samples): p50 229.39 ms, **p95 246.63 ms**, p99 276.21 ms. Peak VRAM allocated 963 MiB.
+
+**Decision: ship the reranker.** Both conditions hold: the CI's lower bound (0.0669) is above 0, and p95 (246.63 ms) is under the 500 ms budget. Why this is a sound call and not a lucky one:
+
+- The CI was computed at the company level, the unit the queries cluster on, so it is not overstated by treating 15 questions about one company as 15 independent pieces of evidence.
+- The rule, the metric, the budget and the test size were fixed and committed before the test split was scored, and the test split was scored once.
+- The secondary metrics move the same way. They are descriptive only; the rule does not use them.
+- Latency leaves about half the budget unused.
+
+**Reading the result with care.**
+
+- The test gain (+0.0888) is larger than the dev pilot's (+0.0512, cluster CI 0.0114 – 0.0927), though inside that CI. 962 of the 1,137 test queries come from the T10a batch, drawn from paragraphs the first batch had not used. A breakdown by batch was not pre-registered, so it is not reported here (`docs/LATER.md`).
+- The test ICC is 0.0323, close to the implied dev estimate, so the ANOVA estimate overstated the clustering. No post-hoc power is reported: given the observed effect it is a restatement of the CI.
+- Relevance is automatic. Each question is written from its source paragraph, so the labels measure finding that paragraph, not usefulness to an analyst; a human-judged set is needed to rule out a bias toward models that reward word overlap.
+- 1,241 of 56,850 query–chunk pairs exceed 512 tokens and are truncated. fp16 vs fp32 logits differ by at most 0.00792 on the checked pairs.
+- Latency is the reranking step alone on one laptop GPU with no concurrent load; it excludes the dense search and model loading.
+
+MLflow (experiment `fl-m3-retrieval`): query embedding `284008b6c39b4e5789d113c22b0f0995`, reranking `203a3e4667f0473296640d29c0c2219a`, A/B test `c891ce0b874c47bd9cbbad239fd22375`.
+
+Reproduce (the test steps need `--allow-test`; the last one also needs the committed rule):
+
+```bash
+uv run python -m filinglens.retrieval.ab pilot --mde 0.03 --latency-budget-ms 500
+~/venvs/fl-train/bin/python -m filinglens.retrieval.embed queries --split test --allow-test --note "..."
+uv run python -m filinglens.retrieval.rerank candidates --split test --allow-test
+~/venvs/fl-train/bin/python -m filinglens.retrieval.rerank score --split test --allow-test --note "..."
+uv run python -m filinglens.retrieval.ab test --allow-test --note "..."
+```
