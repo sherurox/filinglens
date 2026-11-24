@@ -2,7 +2,7 @@
 
 Reads US public-company filings from SEC EDGAR and answers analyst questions about them with cited numbers. Full specification: [docs/SPEC.md](docs/SPEC.md).
 
-**Status:** milestones **FL-M1 (data foundation)** and **FL-M2 (labels, OCR and extraction)** are complete. The later milestones (retrieval, fine-tuning, serving, agents, evaluation) are not built yet.
+**Status:** milestones **FL-M1 (data foundation)**, **FL-M2 (labels, OCR and extraction)** and **FL-M4 (fine-tune and distill)** are complete. The other milestones (retrieval, serving, agents, evaluation) are not built yet.
 
 ## FL-M1 results
 
@@ -47,6 +47,24 @@ Labels in FL-M2 are **silver**: written by local open-weight models following th
 - [x] **D3:** table-extraction accuracy and baseline extraction F1 are in [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md).
 - [x] **D4:** entity-resolution precision on 100 pairs, checked against SEC CIKs rather than by hand (deviation).
 
+## FL-M4 results
+
+A 1.7B student (Qwen3-1.7B, QLoRA on the 8 GB laptop GPU) distilled from an 8B teacher (Qwen3-8B-AWQ, run on Kaggle's free 2× T4). Labels are still silver, so scores are agreement with the silver labeler. Every FL-M4 comparison uses deterministic decoding (`--max-num-seqs 1`); see [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) for why.
+
+| Part | Result | Evidence |
+|---|---|---|
+| Teacher labels (Kaggle, 2× T4) | 7,200 pool rows labeled in 7,098.4 s; 6,871 valid risks; **6,259 kept** by a filter fixed in advance (rule checks, first-token consistency, confidence ≥ 0.9, keyword heuristic) | `bench/teacher_run/`, `bench/teacher_filter.json` |
+| Training memory (D2) | QLoRA NF4 + Liger fused cross-entropy: 4,096-token examples train in ≤ 4,180 MiB reserved on the 8 GB card (all 6,259 rows: 783 steps, 3.7 h, 4,118 MiB); VRAM capped so WSL can't spill silently | `bench/sft_*.json`, MLflow `fl-m4-sft` |
+| Dev ablations (71 rows) | Base 0.6437, silver arm 0.6404, teacher arm (1,500 rows) **0.7414** category macro-F1; both arms, rank 8 and lr 1e-4 all tie; training on all 6,259 teacher rows dropped to 0.6411 (the student copies the teacher more closely: teacher agreement 0.859 → 0.901), so the 1,500-row adapter ships | `bench/fields_zero_dev_*.json`, `bench/compare_dev_*.json` |
+| Optuna (8 trials, held-out teacher loss) | Best: r16, lr 4.86e-4 (loss 0.32874 vs 0.33982 for the default); on dev a tie (+0.0109, CI −0.0476 to 0.0763), so the default r16 / lr 2e-4 is kept | `bench/optuna.csv`, `bench/optuna.json` |
+| **Test comparison (D1)** | Category macro-F1 on 65 test rows: base 0.6525, teacher 0.783, fine-tuned student **0.7948**; JSON-valid 65 / 65 / 65 (rule-valid 64 / 64 / 65). Student vs base +0.1423 (95% CI 0.0276–0.2621); student vs teacher a tie | `bench/m4_test_comparison.json`, MLflow `fl-m4-compare` |
+| Registry (D3) | `filinglens-risk-student` v1 (LoRA adapter for Qwen3-1.7B) with config, data version, git SHA and scores; registry copy verified by SHA-256 | MLflow registry |
+
+**"Done when" (spec §4 M4):**
+- [x] **D1:** one MLflow comparison of base prompted vs teacher vs fine-tuned student on the test split (macro-F1, JSON-valid rate).
+- [x] **D2:** training curves and peak VRAM recorded.
+- [x] **D3:** model and adapter in the registry; `docs/EXPERIMENTS.md` updated.
+
 ## Layout
 
 ```
@@ -58,6 +76,8 @@ src/filinglens/
   extract/    Item 1A splitter, sampling, silver labels, kappa, table pages, OCR and VLM table
               extraction, prompted baseline, entity resolution, synthetic Q&A
   kg/         Exhibit 21 download, EX-21 and signature parsers, graph build (NetworkX, Postgres)
+  train/      teacher inputs and Kaggle driver helpers, confidence, filter, SFT data, QLoRA trainer,
+              MLflow helpers, dev evaluation, paired bootstrap, Optuna search
   bench/      dbt run_results summary
 dagster_project/  Dagster assets and the backfill report
 dbt/              staging -> intermediate -> marts (DuckDB and BigQuery targets), tests, docs
@@ -65,7 +85,8 @@ gold/             silver risk-paragraph splits, table pages with truth, master c
                   synthetic Q&A (all committed; "gold" is the spec's directory name)
 sql/              8 hand-written queries, their index changes, plans, RESULTS.md
 infra/terraform/gcp/  BigQuery datasets (state in HCP Terraform)
-notebooks/        data profiling; the Databricks notebook
+notebooks/        data profiling; the Databricks notebook; the Kaggle teacher driver
+scripts/          FL-M4 ablation runner
 bench/            committed benchmark outputs (each records the command that made it)
 docs/             SPEC, DATA, EXPERIMENTS, LABELING_GUIDE, LATER, labeling prompts, dbt docs site
 data/             git-ignored: downloads, Iceberg warehouse, DuckDB file
@@ -141,6 +162,32 @@ uv run python -m filinglens.kg.build graph
 docker compose up -d --wait postgres && uv run python -m filinglens.kg.build load
 ```
 
+## Running FL-M4
+
+Three environments: `uv run` (main), `~/venvs/fl-train` (training: PyTorch, PEFT, bitsandbytes, Liger, MLflow, Optuna; versions in `bench/train_env.txt`), `~/venvs/fl-gpu` (vLLM). MLflow runs in Docker. The teacher step needs a Kaggle account (phone-verified for GPU) and its API token in `~/.kaggle/access_token`.
+
+```bash
+TRAIN=~/venvs/fl-train/bin/python; GPU=~/venvs/fl-gpu/bin/python
+EVAL="--gpu-memory-utilization 0.84 --max-model-len 4608 --max-num-seqs 1"
+docker compose up -d --wait mlflow                                # http://127.0.0.1:55000
+uv run python -m filinglens.train.teacher_inputs                  # balanced pool, leakage 0/0/0
+# Kaggle: upload the inputs as a private dataset, run notebooks/kaggle_teacher_driver.py on 2x T4,
+# download the notebook output to data/interim/teacher/kaggle_out/ (also saved as the private
+# Kaggle dataset filinglens-teacher-labels)
+uv run python -m filinglens.train.filter_teacher
+uv run python -m filinglens.train.sft_data --teacher data/interim/teacher/filtered.jsonl
+bash scripts/fl_m4_ablate.sh "AC power"                           # dev ablations
+$TRAIN -m filinglens.train.optuna_search --arm teacher --baseline-rank 16 --baseline-lr 2e-4
+bash scripts/fl_m4_final.sh "AC power"                            # dev check + all-rows retrain (a finding, not shipped)
+# shipped student (already trained by the ablations): teacher arm, 1,500 rows, r16, lr 2e-4, 1 epoch
+$TRAIN -m filinglens.train.sft --arm teacher --teacher-limit 1500 --epochs 1 --rank 16 --lr 2e-4
+# test, once: base and student predictions, then comparison + registry
+$GPU -m filinglens.extract.fields generate --variant zero --split test --allow-test $EVAL --tag base-det
+$GPU -m filinglens.extract.fields generate --variant zero --split test --allow-test $EVAL --max-lora-rank 16 \
+  --lora data/interim/adapters/teacher-n1500-r16-lr0.0002-e1/adapter
+uv run python -m filinglens.train.final_comparison --allow-test
+```
+
 ## Resources and teardown ($0)
 
 | Resource | Created by | Free because | Teardown |
@@ -152,6 +199,8 @@ docker compose up -d --wait postgres && uv run python -m filinglens.kg.build loa
 | Local Postgres (`compose.yaml`: schemas `marts` and `kg`) and Dagster home (`data/dagster`) | `docker compose up`, `dagster dev` | Local | `docker compose rm -sf postgres && docker volume rm filinglens_pgdata`; `rm -rf data/dagster` |
 | Local Label Studio (`compose.yaml`) | `docker compose up -d labelstudio` (FL-M2 T4) | Local | `docker compose rm -sf labelstudio && docker volume rm filinglens_lsdata` (done 19 Nov 2026) |
 | Hugging Face model cache (4 models, FL-M2) | vLLM downloads | Local disk | Remove the four `models--*` folders under `~/.cache/huggingface/hub` |
+| Kaggle account `shreyask007`: private datasets `filinglens-teacher-inputs` and `filinglens-teacher-labels`, notebook `filinglens-teacher`, API token | Kaggle website + Kaggle CLI (FL-M4 T4) | Kaggle free tier: no card, about 30 GPU hours a week | Expire the API token (Kaggle → Settings → API) [done: date]; optionally delete both datasets and the notebook |
+| Local MLflow server (`compose.yaml`, volume `filinglens_mlflowdata`: runs, registry, adapters) | `docker compose up -d mlflow` (FL-M4 T2) | Local | After exporting what the docs need: `docker compose rm -sf mlflow && docker volume rm filinglens_mlflowdata` |
 
 ## Provenance and license
 

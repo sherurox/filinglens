@@ -349,3 +349,46 @@ The spec asks for a hand-labeled gold set, a re-label a week later (kappa) and 1
 | scikit-learn | 1.9.1 | BSD-3-Clause | macro-F1, kappa cross-check |
 | NetworkX | 3.7 | BSD-3-Clause | graph analysis |
 | Label Studio | 1.23.2 (Docker) | Apache-2.0 | set up in T4; unused after the silver-label decision; torn down |
+
+## FL-M4: teacher labels and SFT data
+
+Results are in [EXPERIMENTS.md](EXPERIMENTS.md). Labels are still silver (see FL-M2 above); the teacher labels are model output too.
+
+### Teacher inputs: `data/interim/teacher/` (git-ignored)
+
+- Command: `uv run python -m filinglens.train.teacher_inputs` (`bench/teacher_inputs.json`, manifest `82ab17e6…`).
+- Pool: train-split companies only; 65,996 eligible paragraphs → 8,274 drawn round-robin over sector × year cells (smallest cell 240 rows), so every prefix up to 7,200 rows is exactly balanced. At most 10 paragraphs per filing, no repeated text.
+- Leakage guard (writes nothing unless all are 0): rows from dev/test companies 0; rows whose text also appears at a dev or test company 0; silver-sample rows 0.
+- Labeled by the teacher: the first 7,200 pool rows (240 per cell × 30), plus dev 71 and test 65 (the test predictions are scored only in the final comparison).
+
+### Teacher labels: `data/interim/teacher/kaggle_out/` (git-ignored), summary in `bench/teacher_run/`
+
+- Produced on Kaggle (2× T4) by `notebooks/kaggle_teacher_driver.py` with `train/kaggle_teacher.py`; inputs uploaded as the private Kaggle dataset `shreyask007/filinglens-teacher-inputs`; outputs downloaded from the notebook's output and saved as the private Kaggle dataset `shreyask007/filinglens-teacher-labels` (23 Nov 2026; 12 files, 7,835,512 bytes as listed by Kaggle: the notebook log plus `teacher/` with the dev, test and two pool shards, their `_run.json` summaries, `driver.json` and both GPU logs).
+- Each row: the teacher's JSON answer, rule checks, and the category's first-token log-probabilities (top 20), from which `train/confidence.py` computes the chosen category's confidence.
+
+### Filtered teacher labels and SFT arms: `data/interim/teacher/filtered.jsonl`, `data/interim/sft/` (git-ignored)
+
+- Filter: `uv run python -m filinglens.train.filter_teacher` → 6,259 of 7,200 kept (`bench/teacher_filter.json`; rule and drop counts in EXPERIMENTS.md).
+- SFT examples: `uv run python -m filinglens.train.sft_data --teacher data/interim/teacher/filtered.jsonl` (`bench/sft_data.json`): silver 191, teacher 6,259, both 6,450; data version (SHA-256 of `data/interim/sft/MANIFEST.json`) `c22a1742…`, recorded on every MLflow run.
+- Format: the exact prompt the evaluation uses (`fields.conversations`), completion = the full answer JSON (rationale first), compact separators, ending in `<|im_end|>`. `not_a_risk` teacher rows are left out.
+- Teacher rows 1,500–1,799 are the held-out slice for the Optuna objective; no Optuna trial trains on them.
+
+### Models, libraries and services added in FL-M4
+
+| Name | Version | License / terms | Used for |
+|---|---|---|---|
+| Qwen/Qwen3-8B-AWQ | Hugging Face | Apache-2.0 | teacher (Kaggle) |
+| Qwen/Qwen3-1.7B | Hugging Face | Apache-2.0 | student base (already used in FL-M2) |
+| transformers | 5.23.0 | Apache-2.0 | `Trainer`, model loading |
+| PEFT | 0.22.0 | Apache-2.0 | LoRA |
+| accelerate, datasets | 1.16.0, 5.2.0 | Apache-2.0 | `Trainer` dependencies |
+| TRL | 1.18.2 | Apache-2.0 | installed, not used (see EXPERIMENTS.md) |
+| bitsandbytes | 0.50.2 | MIT | 4-bit NF4 base |
+| Liger-Kernel | 0.8.5 | BSD-2-Clause | fused linear cross-entropy |
+| PyTorch | 2.15.0+cu132 (training env; `bench/train_env.txt`) | BSD-3-Clause | training |
+| MLflow (server and client) | 3.18.0 | Apache-2.0 | tracking and model registry (Docker, `compose.yaml`) |
+| Optuna | 5.1.0 | MIT | hyperparameter search |
+| vLLM | 0.34.0 | Apache-2.0 | teacher (Kaggle) and evaluation (local GPU environment) |
+| Kaggle CLI | 2.2.5 | Apache-2.0 | dataset upload, notebook runs, output download |
+| six | not recorded | MIT | missing dependency of the Kaggle CLI |
+| Kaggle (notebooks, datasets) | – | Kaggle Terms of Use; $0, no card; account phone-verified for GPU | teacher run on 2× T4 |
