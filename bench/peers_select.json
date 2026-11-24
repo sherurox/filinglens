@@ -1,0 +1,86 @@
+{
+  "command": "python -m filinglens.retrieval.peers select --note 'FL-M3 T11: alpha on train+dev, train+dev candidates only'",
+  "finished_utc": "2026-11-24T23:25:29+00:00",
+  "step": "select",
+  "k": 5,
+  "sic_rule": "finest of [4, 3, 2] digits with coverage >= 0.8",
+  "sic_level": 4,
+  "sic_levels": {
+    "4": {
+      "groups": 104,
+      "companies_with_peer": 241,
+      "coverage": 0.8197,
+      "median_peers": 4.0,
+      "max_peers": 24
+    },
+    "3": {
+      "groups": 80,
+      "companies_with_peer": 264,
+      "coverage": 0.898,
+      "median_peers": 6.0,
+      "max_peers": 25
+    },
+    "2": {
+      "groups": 40,
+      "companies_with_peer": 292,
+      "coverage": 0.9932,
+      "median_peers": 10.0,
+      "max_peers": 39
+    }
+  },
+  "text": "mean bge-base chunk embedding of the latest 10-K (Item 1A), renormalized",
+  "ratios": "latest-year percentile ranks of ['net_margin', 'operating_margin', 'liabilities_to_equity', 'equity_multiplier', 'revenue_growth', 'assets_growth'], missing = 0.5",
+  "score": "alpha * z(text cosine) + (1 - alpha) * z(-euclidean on ratio ranks)",
+  "data": {
+    "companies": 294,
+    "latest_10k_chunks": 30220,
+    "latest_10k_period_year": {
+      "2018": 1,
+      "2019": 1,
+      "2024": 4,
+      "2025": 288
+    },
+    "ratios": {
+      "companies_without_ratios": 13,
+      "missing_share_per_feature": {
+        "net_margin": 0.1429,
+        "operating_margin": 0.2177,
+        "liabilities_to_equity": 0.4082,
+        "equity_multiplier": 0.1939,
+        "revenue_growth": 0.0476,
+        "assets_growth": 0.0476
+      },
+      "latest_ratio_year": {
+        "2018": 1,
+        "2019": 2,
+        "2023": 1,
+        "2024": 1,
+        "2025": 223,
+        "2026": 53
+      }
+    }
+  },
+  "selection_splits": [
+    "dev",
+    "train"
+  ],
+  "selection_candidates": "train + dev companies only (no test company's label used)",
+  "selection_pool": 235,
+  "selection_companies_scored": 183,
+  "selection_companies_without_peer": 52,
+  "hit_rate_by_alpha": {
+    "0.0": 0.3279,
+    "0.1": 0.3934,
+    "0.2": 0.4153,
+    "0.3": 0.5137,
+    "0.4": 0.5738,
+    "0.5": 0.6284,
+    "0.6": 0.7322,
+    "0.7": 0.7923,
+    "0.8": 0.8251,
+    "0.9": 0.8689,
+    "1.0": 0.8579
+  },
+  "alpha": 0.9,
+  "mlflow_run_id": "248005b76b034aa4abba69cf1c67052d"
+}
