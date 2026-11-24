@@ -183,6 +183,15 @@ def token_weighted_mean(losses: list[float], counts: list[int]) -> float:
     return sum(loss * n for loss, n in zip(losses, counts, strict=True)) / total
 
 
+def write_record(bench: Path, run_name: str, record: dict) -> Path:
+    """bench/sft_<run>.json, creating the folder: a missing --bench folder once threw away
+    finished Optuna trials at the last line (23 Nov)."""
+    bench.mkdir(parents=True, exist_ok=True)
+    out = bench / f"sft_{run_name}.json"
+    out.write_text(json.dumps(record, indent=2) + "\n")
+    return out
+
+
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
@@ -488,8 +497,7 @@ def main(argv: list[str] | None = None) -> None:
         "note": args.note,
         **body,
     }
-    out = args.bench / f"sft_{body['run_name']}.json"
-    out.write_text(json.dumps(record, indent=2) + "\n")
+    write_record(args.bench, body["run_name"], record)
     print(json.dumps({k: v for k, v in record.items() if k != "config"}, indent=2))
 
 

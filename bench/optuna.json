@@ -1,0 +1,61 @@
+{
+  "study": "fl-m4-teacher-n400",
+  "objective": "heldout_loss on teacher rows 1500..1799 (minimize)",
+  "space": {
+    "lr": [
+      5e-05,
+      0.0005,
+      "log"
+    ],
+    "rank": [
+      8,
+      16
+    ]
+  },
+  "sampler": {
+    "name": "TPE",
+    "seed": 0,
+    "n_startup_trials": 4
+  },
+  "teacher_limit": 400,
+  "baseline": {
+    "number": 0,
+    "state": "COMPLETE",
+    "rank": 16,
+    "lr": 0.0002,
+    "heldout_loss": 0.33982,
+    "run_name": "optuna-teacher-n400-t00-r16-lr0.0002",
+    "run_id": "447096c4bc12417eb26995467ea0ff83",
+    "optimizer_steps": 50,
+    "final_train_loss": 0.4835,
+    "sec_per_optimizer_step": 17.37,
+    "train_runtime_s": 868.5,
+    "heldout_examples": 300,
+    "heldout_eval_s": 104.3,
+    "peak_reserved_mib": 3598,
+    "mlflow_synced": true,
+    "wall_s": 985.6
+  },
+  "trials_complete": 8,
+  "trials_failed": 0,
+  "best": {
+    "number": 4,
+    "state": "COMPLETE",
+    "rank": 16,
+    "lr": 0.0004855614502686067,
+    "heldout_loss": 0.32874,
+    "run_name": "optuna-teacher-n400-t04-r16-lr0.000486",
+    "run_id": "a13d0545722c41f387b0cd6b63b7f654",
+    "optimizer_steps": 50,
+    "final_train_loss": 0.4589,
+    "sec_per_optimizer_step": 17.09,
+    "train_runtime_s": 854.7,
+    "heldout_examples": 300,
+    "heldout_eval_s": 104.9,
+    "peak_reserved_mib": 3598,
+    "mlflow_synced": true,
+    "wall_s": 971.8
+  },
+  "best_is_baseline": false,
+  "best_minus_baseline": -0.01108
+}

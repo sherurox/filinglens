@@ -172,7 +172,7 @@ def search(args: argparse.Namespace) -> dict:
 
     from filinglens.train.tracking import run_tags, start_run, tracking_uri
 
-    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "bench").mkdir(parents=True, exist_ok=True)  # sft also creates it
     study = optuna.create_study(
         study_name=args.study,
         storage=f"sqlite:///{(args.out / 'study.db').as_posix()}",

@@ -131,6 +131,12 @@ def test_completion_positions_predict_exactly_the_completion_tokens() -> None:
         sft.completion_positions(5, 5)  # no completion
 
 
+def test_write_record_creates_the_bench_folder(tmp_path) -> None:
+    out = sft.write_record(tmp_path / "optuna" / "bench", "run-a", {"heldout_loss": 0.5})
+    assert out == tmp_path / "optuna" / "bench" / "sft_run-a.json"
+    assert out.read_text() == '{\n  "heldout_loss": 0.5\n}\n'
+
+
 def test_token_weighted_mean() -> None:
     # 2 tokens at loss 1.0 and 6 tokens at loss 3.0: per token 2.5, per example would be 2.0
     assert sft.token_weighted_mean([1.0, 3.0], [2, 6]) == pytest.approx(2.5)
