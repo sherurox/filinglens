@@ -1,0 +1,25 @@
+{
+  "fixed_utc": "2026-11-24T23:00:19+00:00",
+  "command": "python -m filinglens.retrieval.ab pilot --mde 0.03 --latency-budget-ms 500",
+  "primary_metric": "ndcg_at_10",
+  "mde": 0.03,
+  "alpha_two_sided": 0.05,
+  "power": 0.8,
+  "icc_company_dev": 0.1434,
+  "icc_bootstrap_implied_dev": 0.0297,
+  "n_test_required": 1137,
+  "n_test_basis": "all ret-test",
+  "expected_power_at_n_test": {
+    "icc_anova": 0.5602,
+    "icc_bootstrap_implied": 0.8694
+  },
+  "test_companies": 75,
+  "latency_budget_p95_ms": 500.0,
+  "bootstrap": {
+    "resamples": 10000,
+    "seed": 0,
+    "ci": "95% percentile",
+    "unit": "company"
+  },
+  "rule": "use every ret-test query (at least n_test_required); ship the rerank stage iff the 95% company-cluster bootstrap CI of the per-query NDCG@10 difference (reranked - dense) lies above 0 AND the reranker's p95 latency on ret-test <= latency_budget_p95_ms; otherwise keep dense-only"
+}
