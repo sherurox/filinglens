@@ -1,0 +1,32 @@
+{
+  "command": "python -m filinglens.train.compare --a optuna-teacher-n400-t00-r16-lr0.0002 --b optuna-teacher-n400-t04-r16-lr0.000486",
+  "finished_utc": "2026-11-24T01:23:16+00:00",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "split": "dev",
+  "a": "optuna-teacher-n400-t00-r16-lr0.0002",
+  "b": "optuna-teacher-n400-t04-r16-lr0.000486",
+  "bootstrap_resamples": 2000,
+  "category_macro_f1": {
+    "a": 0.7002,
+    "b": 0.7111,
+    "diff_b_minus_a": 0.0109,
+    "diff_ci95": [
+      -0.0476,
+      0.0763
+    ],
+    "share_b_not_better": 0.3615
+  },
+  "category_accuracy": {
+    "a": 0.6901,
+    "b": 0.7042,
+    "diff_b_minus_a": 0.0141,
+    "diff_ci95": [
+      -0.0423,
+      0.0845
+    ],
+    "share_b_not_better": 0.425
+  },
+  "rows": 71,
+  "rows_where_only_a_right": 2,
+  "rows_where_only_b_right": 3
+}
