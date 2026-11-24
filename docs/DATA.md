@@ -392,3 +392,75 @@ Results are in [EXPERIMENTS.md](EXPERIMENTS.md). Labels are still silver (see FL
 | Kaggle CLI | 2.2.5 | Apache-2.0 | dataset upload, notebook runs, output download |
 | six | not recorded | MIT | missing dependency of the Kaggle CLI |
 | Kaggle (notebooks, datasets) | – | Kaggle Terms of Use; $0, no card; account phone-verified for GPU | teacher run on 2× T4 |
+
+## FL-M3: retrieval corpus, queries and indexes
+
+Results are in [EXPERIMENTS.md](EXPERIMENTS.md). Labels for retrieval are synthetic and graded automatically; no person judged relevance.
+
+### Chunks: `data/interim/retrieval/chunks.parquet` (git-ignored)
+
+- Command: `uv run python -m filinglens.retrieval.chunks` (2026-11-24, 22.3 s; `bench/chunks.json`). Tokenizer: `BAAI/bge-base-en-v1.5` at revision `a5beb1e3e68b9ab74eb54cfd186867f64f240e1a`.
+- Input: the FL-M2 risk-factor corpus `data/interim/risk_paragraphs.parquet` (sha256 `e7fb9314…`), Item 1A only.
+- 201,516 paragraphs → 203,200 chunks. A paragraph over the 510-token budget (512 minus `[CLS]` and `[SEP]`) is split at sentence boundaries into balanced parts: 1,656 paragraphs, 1,628 into 2 parts and 28 into 3. 199,183 chunks start with their heading (first 40 words). Tokens per chunk: p50 157, p95 354, p99 446, max 510.
+- Chunk ID: `<para_id>#<part>`; each row keeps CIK, ticker, sector, fiscal year and accession.
+
+### Reconciliation with FL-M2: 2,198 10-Ks and 294 companies, not 2,207 and 295
+
+- FL-M2's `bench/risk_corpus.json` counts 2,207 filings with status `ok` (Item 1A found) at 295 companies, and 201,516 paragraphs.
+- The paragraph file itself holds those same 201,516 paragraphs from **2,198 filings and 294 companies** (counted on 24 Nov 2026 from `risk_paragraphs.parquet`). So 9 filings were found but kept no paragraph of at least 30 words, and for one company that was every filing it had.
+- The 6 universe companies with no paragraph: WFC, BNY, USB (Item 1A incorporated by reference from Exhibit 13), BNS (40-F filer), NEM and GEV. `risk_corpus.json` keeps no per-filing status, so the 9 filings aren't named here (`docs/LATER.md`).
+- FL-M3 uses the paragraph file, so 2,198 / 294 is the retrieval corpus.
+
+### Retrieval queries: `gold/retrieval/queries.{dev,test}.jsonl`
+
+- Command: `uv run python -m filinglens.retrieval.queries` (`bench/ret_queries.json`). One query per source paragraph (2,037 Q&A pairs → 1,319 queries); companies split by hash (seed 3) into ret-dev and ret-test; `load_queries` refuses the test split without `allow_test`.
+- Grades: 2 = the source paragraph's chunk holding the evidence quote; 1 = a chunk of the same company's other filings whose content words overlap it by at least 0.8 and that is at least half its size.
+- Sources: 550 FL-M2 pairs (`gold/synthetic/risk_qa.train.jsonl`, batch `fl_m2_t14`) and 1,487 T10a pairs (`gold/synthetic/risk_qa.ret_test_extra.jsonl`, batch `ret_test_extra_v1`); every evidence quote matched its chunk verbatim.
+- ret-dev: 182 queries, 77 companies, 4.984 grade-1 chunks per query on average (12 queries with none); sha256 `1edc1608…`, unchanged by T10a.
+- ret-test: 1,137 queries, 75 companies (175 from the FL-M2 pairs, unchanged by T10a, plus 962 new), 4.694 grade-1 chunks per query (65 with none); sha256 `d99ab192…`.
+- No company is in both splits. All questions come from FL-M2 train-split companies.
+
+### Extra ret-test questions (T10a): `gold/synthetic/risk_qa.ret_test_extra.jsonl`
+
+- Commands: `retrieval.extra_queries prepare` → `generate` (vLLM, `Qwen/Qwen3-4B-AWQ`, FL-M2 prompt v2, greedy JSON-schema decoding) → `finalize` (`bench/synthetic_qa_ret_test_extra.json`, `..._run.json`). Seed 20261124.
+- Pool: 30,190 paragraphs of the 75 ret-test companies, minus text that also appears at an FL-M2 dev or test company (39), text of a paragraph that already has a Q&A pair (295) and duplicate text (6,414) → 23,442. 1,163 paragraphs drawn, spread across each company's years, for about 15 queries per company.
+- 2,326 pairs generated, 1,487 kept by the FL-M2 checks (0.6393): the main drops were evidence length (453) and evidence not verbatim (273). 962 of 1,163 paragraphs kept at least one pair (0.8272).
+- Leakage counts, all 0: rows from non-train companies, rows whose text appears at a dev or test company, rows not marked `synthetic` / train, rows from outside the ret-test companies, rows reusing an existing Q&A paragraph.
+
+### Embeddings: `data/interim/retrieval/bge-base/` (git-ignored)
+
+- `embed corpus` (`bench/embed_corpus.json`): 203,200 × 768 float32 (`chunks.npy`, sha256 `56465072…`; row order in `chunk_ids.txt`), CLS pooling as the model's pooling config says, L2-normalized; fp16 weights, minimum cosine to fp32 0.9999995 on the checked rows; 0 chunks truncated; 424.5 s (478.7 rows/s); peak VRAM allocated 1,306 MiB.
+- `embed queries`: questions get the model card's query instruction; passages get none. ret-dev 182 rows; ret-test 1,137 rows, embedded once, after the A/B rule was committed (`bench/embed_queries_test.json`).
+
+### Indexes (all local, rebuildable from the embeddings)
+
+- FAISS: `data/interim/retrieval/faiss/flat.index` and `hnsw.index` (git-ignored).
+- pgvector: table `retrieval.chunk_vectors` in the compose Postgres (HNSW index and a B-tree on `cik`).
+- Qdrant: one collection in the compose volume `qdrantdata` (payload index on `cik`).
+- Build settings and sizes: `bench/index_build.json`; teardown in the README.
+
+### Peer recommender inputs
+
+- Text: the chunks of each company's latest 10-K, 30,220 chunks; fiscal year 2025 for 288 companies, 2024 for 4, 2019 for 1, 2018 for 1.
+- Ratios: `data/features/annual_ratios.parquet` (FL-M1), latest fiscal year per company. 13 of 294 companies have none; missing share per ratio from 0.0476 (growth) to 0.4082 (liabilities / equity).
+- SIC codes: `dbt/seeds/universe.csv` (from SEC submissions). Splits: `gold/splits.csv` (FL-M2).
+
+### Models, libraries and services added in FL-M3
+
+| Name | Version | License | Used for |
+|---|---|---|---|
+| BAAI/bge-base-en-v1.5 | revision `a5beb1e3e68b9ab74eb54cfd186867f64f240e1a` | MIT | chunk and query embeddings |
+| BAAI/bge-reranker-base | revision `2cfc18c9415c912f9d8155881c133215df768a70` | MIT | cross-encoder reranking |
+| Qwen/Qwen3-4B-AWQ | Hugging Face | Apache-2.0 | extra ret-test questions (already used in FL-M2) |
+| faiss-cpu | 1.16.0 | MIT | exact and HNSW indexes |
+| pgvector (PostgreSQL extension) | 0.8.7, image `pgvector/pgvector:0.8.7-pg18-trixie` (PostgreSQL 18.7) | PostgreSQL License | HNSW in Postgres |
+| pgvector (Python) | 0.5.1 | MIT | psycopg vector adapter |
+| Qdrant | 1.20.2 (Docker image `qdrant/qdrant:v1.20.2`, telemetry off) | Apache-2.0 | vector database |
+| qdrant-client | 1.20.0 | Apache-2.0 | Qdrant gRPC client |
+| grpcio | 1.85.1 | Apache-2.0 | qdrant-client dependency |
+| protobuf | 6.33.6 | BSD-3-Clause | qdrant-client dependency |
+| h2, hpack, hyperframe | 4.4.1, 4.2.0, 6.1.0 | MIT | HTTP/2 for httpx (qdrant-client dependency) |
+| portalocker | 4.4.2 | BSD-3-Clause | qdrant-client dependency |
+| SciPy | 1.18.1 | BSD-3-Clause (classifier "BSD License") | noncentral-t power, root finding (already installed with scikit-learn) |
+
+Versions and licenses are from the installed package metadata (`importlib.metadata`, 24 Nov 2026) and `bench/retrieval_env.txt`; the model licenses are from the model cards at the pinned revisions.

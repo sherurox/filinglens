@@ -2,7 +2,7 @@
 
 Reads US public-company filings from SEC EDGAR and answers analyst questions about them with cited numbers. Full specification: [docs/SPEC.md](docs/SPEC.md).
 
-**Status:** milestones **FL-M1 (data foundation)**, **FL-M2 (labels, OCR and extraction)** and **FL-M4 (fine-tune and distill)** are complete. The other milestones (retrieval, serving, agents, evaluation) are not built yet.
+**Status:** milestones **FL-M1 (data foundation)**, **FL-M2 (labels, OCR and extraction)**, **FL-M3 (retrieval, ranking and offline A/B)** and **FL-M4 (fine-tune and distill)** are complete. The other milestones (serving, agents, evaluation) are not built yet.
 
 ## FL-M1 results
 
@@ -47,6 +47,24 @@ Labels in FL-M2 are **silver**: written by local open-weight models following th
 - [x] **D3:** table-extraction accuracy and baseline extraction F1 are in [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md).
 - [x] **D4:** entity-resolution precision on 100 pairs, checked against SEC CIKs rather than by hand (deviation).
 
+## FL-M3 results
+
+Retrieval over the Item 1A text of 2,198 10-Ks (294 companies; 203,200 chunks), with synthetic questions graded automatically: scores measure finding the paragraph a question was written from, not a human relevance judgment. Every search is filtered to the question's company. Details in [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) and [docs/DATA.md](docs/DATA.md).
+
+| Part | Result | Evidence |
+|---|---|---|
+| Embeddings | `bge-base-en-v1.5` (MIT), 203,200 × 768 in 424.5 s on the laptop GPU (fp16; min cosine to fp32 0.9999995) | `bench/embed_corpus.json` |
+| Why filter by company | Exact recall@10 on ret-dev: 0.2967 over all chunks, 0.6758 within the question's company | `bench/retrieval_dev_diagnostics.json` |
+| **Vector stores (D1)** | 100 ret-dev queries, filtered: FAISS Flat, pgvector 0.8.7 and Qdrant 1.20.2 all exact (tie-aware overlap 1.0; p95 0.488 / 3.44 / 1.154 ms); FAISS HNSW with a selector starves (47 of 100 searches < 10 results). Unfiltered HNSW tie-aware overlap: FAISS 0.875, pgvector 0.903, Qdrant 0.98 | `bench/vector_stores.csv`, `bench/index_build.json` |
+| **Reranker (D1)** | `bge-reranker-base` (MIT) over the filtered dense top 50, 182 ret-dev queries: NDCG@10 0.4368 → 0.488, MRR@10 0.5264 → 0.5708; rerank p95 279.26 ms | `bench/reranker.csv`, `bench/reranker_dev.json` |
+| Power analysis | Dev sd of the NDCG@10 difference 0.2752; 663 independent queries for a 0.03 gain at 80% power; company ICC 0.1434 (ANOVA) or 0.0297 (implied), so ret-test was grown to 1,137 queries over 75 companies | `bench/ab_power.json` |
+| **Offline A/B (D2)** | Rule committed before the test run (`15b4381`). ret-test, 1,137 queries: NDCG@10 0.4238 → 0.5125, +0.0888 (company-cluster 95% CI 0.0669–0.1099, d_z 0.2854); rerank p95 246.63 ms ≤ 500 ms budget → **ship the reranker** | `bench/ab_rule.json`, `bench/ab_test.json`, MLflow `fl-m3-retrieval` |
+| Peer recommender | Latest-10-K text + ratio ranks, α = 0.9 chosen on train + dev companies; 49 scored test companies, hit-rate@5 vs 4-digit SIC peers: combined 0.898 (0.8163–0.9796), text only 0.8571, ratios only 0.3061, random 0.1206 | `bench/peers_select.json`, `bench/peers.json` |
+
+**"Done when" (spec §4 M3):**
+- [x] **D1:** the vector-store comparison table and the reranker table are committed (`bench/vector_stores.csv`, `bench/reranker.csv`).
+- [x] **D2:** the A/B write-up states the decision and why ([docs/EXPERIMENTS.md](docs/EXPERIMENTS.md), FL-M3).
+
 ## FL-M4 results
 
 A 1.7B student (Qwen3-1.7B, QLoRA on the 8 GB laptop GPU) distilled from an 8B teacher (Qwen3-8B-AWQ, run on Kaggle's free 2× T4). Labels are still silver, so scores are agreement with the silver labeler. Every FL-M4 comparison uses deterministic decoding (`--max-num-seqs 1`); see [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) for why.
@@ -78,15 +96,17 @@ src/filinglens/
   kg/         Exhibit 21 download, EX-21 and signature parsers, graph build (NetworkX, Postgres)
   train/      teacher inputs and Kaggle driver helpers, confidence, filter, SFT data, QLoRA trainer,
               MLflow helpers, dev evaluation, paired bootstrap, Optuna search
+  retrieval/  chunks, graded queries, embeddings, FAISS / pgvector / Qdrant stores and benchmark,
+              ranking metrics, reranker, offline A/B (power analysis, cluster bootstrap), peers
   bench/      dbt run_results summary
 dagster_project/  Dagster assets and the backfill report
 dbt/              staging -> intermediate -> marts (DuckDB and BigQuery targets), tests, docs
 gold/             silver risk-paragraph splits, table pages with truth, master company table,
-                  synthetic Q&A (all committed; "gold" is the spec's directory name)
+                  synthetic Q&A, retrieval queries (all committed; "gold" is the spec's directory name)
 sql/              8 hand-written queries, their index changes, plans, RESULTS.md
 infra/terraform/gcp/  BigQuery datasets (state in HCP Terraform)
 notebooks/        data profiling; the Databricks notebook; the Kaggle teacher driver
-scripts/          FL-M4 ablation runner
+scripts/          FL-M4 ablation runner, FL-M3 environment record
 bench/            committed benchmark outputs (each records the command that made it)
 docs/             SPEC, DATA, EXPERIMENTS, LABELING_GUIDE, LATER, labeling prompts, dbt docs site
 data/             git-ignored: downloads, Iceberg warehouse, DuckDB file
@@ -162,6 +182,41 @@ uv run python -m filinglens.kg.build graph
 docker compose up -d --wait postgres && uv run python -m filinglens.kg.build load
 ```
 
+## Running FL-M3
+
+`uv run` for the stores, the A/B statistics and the peers; `~/venvs/fl-train` (PyTorch, transformers) for embedding and reranking; `~/venvs/fl-gpu` (vLLM) to generate the extra test questions. Postgres (pgvector image), Qdrant and MLflow run in Docker.
+
+```bash
+TRAIN=~/venvs/fl-train/bin/python; GPU=~/venvs/fl-gpu/bin/python
+docker compose up -d --wait mlflow postgres qdrant
+bash scripts/fl_m3_env.sh "AC power, Best performance"           # bench/retrieval_env.txt
+uv run python -m filinglens.retrieval.chunks                       # 203,200 chunks
+uv run python -m filinglens.retrieval.queries                      # ret-dev / ret-test queries
+$TRAIN -m filinglens.retrieval.embed corpus --note "..."
+$TRAIN -m filinglens.retrieval.embed queries --split dev --note "..."
+uv run python -m filinglens.retrieval.diagnose_dev                 # why the CIK filter
+uv run python -m filinglens.retrieval.build_indexes --note "..."    # FAISS, pgvector, Qdrant
+uv run python -m filinglens.retrieval.bench_stores --note "..."     # bench/vector_stores.csv (D1)
+uv run python -m filinglens.retrieval.rerank candidates --split dev
+$TRAIN -m filinglens.retrieval.rerank score --split dev --note "..." # bench/reranker.csv (D1)
+# extra ret-test questions (T10a), then rebuild the query files
+uv run python -m filinglens.retrieval.extra_queries prepare
+$GPU -m filinglens.retrieval.extra_queries generate --model Qwen/Qwen3-4B-AWQ --gpu-memory-utilization 0.80 --enforce-eager
+uv run python -m filinglens.retrieval.extra_queries finalize
+uv run python -m filinglens.retrieval.queries
+# A/B: rule from dev, commit it, then ret-test once
+uv run python -m filinglens.retrieval.ab pilot --mde 0.03 --latency-budget-ms 500
+git add bench/ab_rule.json bench/ab_power.json && git commit -m "pre-registered A/B rule"
+$TRAIN -m filinglens.retrieval.embed queries --split test --allow-test --note "..."
+uv run python -m filinglens.retrieval.rerank candidates --split test --allow-test
+$TRAIN -m filinglens.retrieval.rerank score --split test --allow-test --note "..."
+uv run python -m filinglens.retrieval.ab test --allow-test --note "..."
+# peers: choose on train + dev, commit, then test once
+uv run python -m filinglens.retrieval.peers select --note "..."
+git add bench/peers_select.json && git commit -m "peers selection"
+uv run python -m filinglens.retrieval.peers test --allow-test --note "..."
+```
+
 ## Running FL-M4
 
 Three environments: `uv run` (main), `~/venvs/fl-train` (training: PyTorch, PEFT, bitsandbytes, Liger, MLflow, Optuna; versions in `bench/train_env.txt`), `~/venvs/fl-gpu` (vLLM). MLflow runs in Docker. The teacher step needs a Kaggle account (phone-verified for GPU) and its API token in `~/.kaggle/access_token`.
@@ -201,6 +256,8 @@ uv run python -m filinglens.train.final_comparison --allow-test
 | Hugging Face model cache (4 models, FL-M2) | vLLM downloads | Local disk | Remove the four `models--*` folders under `~/.cache/huggingface/hub` |
 | Kaggle account `shreyask007`: private datasets `filinglens-teacher-inputs` and `filinglens-teacher-labels`, notebook `filinglens-teacher`, API token | Kaggle website + Kaggle CLI (FL-M4 T4) | Kaggle free tier: no card, about 30 GPU hours a week | Expire the API token (Kaggle → Settings → API) [done: date]; optionally delete both datasets and the notebook |
 | Local MLflow server (`compose.yaml`, volume `filinglens_mlflowdata`: runs, registry, adapters) | `docker compose up -d mlflow` (FL-M4 T2) | Local | After exporting what the docs need: `docker compose rm -sf mlflow && docker volume rm filinglens_mlflowdata` |
+| Local Qdrant (`compose.yaml`, volume `qdrantdata`) and the pgvector table `retrieval.chunk_vectors` in the local Postgres (FL-M3) | `docker compose up -d qdrant postgres`, `retrieval.build_indexes` | Local | `docker compose rm -sf qdrant && docker volume rm filinglens_qdrantdata`; `DROP SCHEMA retrieval CASCADE` in Postgres |
+| FL-M3 embeddings and FAISS indexes (`data/interim/retrieval/`, git-ignored) and the Hugging Face cache for `bge-base-en-v1.5` and `bge-reranker-base` | `retrieval.embed`, `retrieval.build_indexes` | Local disk | `rm -rf data/interim/retrieval`; remove the two `models--BAAI--*` folders under `~/.cache/huggingface/hub` |
 
 ## Provenance and license
 

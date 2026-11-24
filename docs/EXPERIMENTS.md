@@ -272,7 +272,57 @@ The first run of the ablation batch died at step 8 of 212: the MLflow container 
 
 ## FL-M3: retrieval, ranking and offline A/B
 
-Retrieval runs over Item 1A risk-factor chunks of the latest 10-K per company, embedded with `BAAI/bge-base-en-v1.5` (MIT, revision `a5beb1e3`) and filtered to the company the question names (CIK filter). Queries are synthetic: one question per paragraph, written by `Qwen/Qwen3-4B-AWQ` with the FL-M2 prompt and checks, graded automatically (grade 2 = the source chunk, grade 1 = a chunk that covers most of the evidence). No human judged relevance. Companies are split by hash into ret-dev (182 queries, 77 companies) and ret-test (1,137 queries, 75 companies).
+Retrieval runs over the Item 1A risk-factor text of 2,198 10-Ks from 294 companies (fiscal 2018–2025): 201,516 paragraphs split into 203,200 chunks of at most 510 bge tokens (`bench/chunks.json`), embedded with `BAAI/bge-base-en-v1.5` (MIT, revision `a5beb1e3`). Queries are synthetic: one question per source paragraph, written by `Qwen/Qwen3-4B-AWQ` with the FL-M2 prompt (v2) and checks, and graded automatically. Grade 2 is the source paragraph's chunk holding the evidence quote; grade 1 is a chunk from the same company's other filings whose content words overlap it by at least 0.8 and that is at least half its size (the same risk, repeated in another year). No human judged relevance. Questions come only from FL-M2 train-split companies, split again by company hash into ret-dev (182 queries, 77 companies) and ret-test (1,137 queries, 75 companies: 175 from FL-M2's Q&A plus 962 added in T10a; `bench/ret_queries.json`).
+
+*Correction (T12): the first version of this paragraph (`d94a40f`) said the corpus was the latest 10-K per company. Retrieval uses all 2,198 10-Ks; only the peer recommender uses the latest 10-K.*
+
+### Why every search is filtered to one company (T4b)
+
+Exact search over all 203,200 chunks put a relevant chunk in the top 10 for 0.2967 of ret-dev queries; restricted to the question's company, 0.6758; to its company and fiscal year, 0.8846 (`bench/retrieval_dev_diagnostics.json`). The questions name the company ("According to NDAQ's FY2019 10-K, …") while risk-factor text says "we", and boilerplate risks read almost the same at every company, so other companies' paragraphs crowd the top 10. The company is known at query time (the question checks require the ticker), so every store and both A/B arms filter by CIK. A year filter was not added: it needs the fiscal year parsed from the question, and grade-1 chunks from other years are relevant by definition (`docs/LATER.md`).
+
+### Vector-store comparison (D1)
+
+The same 203,200 vectors in four indexes, with the same HNSW settings where there is a graph (M 16, ef_construction 100, ef_search 100; inner product on normalized vectors): FAISS 1.16.0 `IndexFlatIP` (exact, the reference) and `IndexHNSWFlat` (company filter via `IDSelectorBatch`); pgvector 0.8.7 on PostgreSQL 18.7 (HNSW `vector_ip_ops`, B-tree on `cik`, `hnsw.iterative_scan = strict_order`); Qdrant 1.20.2 over gRPC (payload index on `cik`, `full_scan_threshold` 10,000 KB).
+
+Build (`bench/index_build.json`, 24 CPUs, AC power):
+
+| Store | Build | Size on disk / in the database |
+|---|---|---|
+| FAISS Flat | 0.2 s | 624,230,445 bytes |
+| FAISS HNSW | 11.1 s (24 threads) | 653,550,778 bytes |
+| pgvector | `COPY` 3.5 s, then HNSW 20.5 s (`maintenance_work_mem` 1 GB, 4 workers) | HNSW index 593,674,240 bytes; table + indexes 1,470,136,320 bytes |
+| Qdrant | upload 12.3 s, indexed and green at 13.3 s | 202,752 of 203,200 vectors in HNSW segments (8 segments; the rest searched exactly) |
+
+Search (`bench/vector_stores.csv`; 100 ret-dev queries, 500 timed searches per row after 2 warm-up passes, one query at a time, one search thread). "Filtered" is the production query (top 10 within the question's company); "unfiltered" searches all 203,200 vectors and is scored only against exact search. Tie-aware overlap counts a result as correct if its exact score is at least the exact 10th score − 1e-5 (as in ann-benchmarks), because repeated boilerplate gives tied scores.
+
+| Store | Mode | Recall@10 | MRR@10 | NDCG@10 | Overlap with exact | Tie-aware overlap | Searches with < 10 results | p50 ms | p95 ms | p99 ms |
+|---|---|---|---|---|---|---|---|---|---|---|
+| FAISS Flat | filtered | 0.66 | 0.5023 | 0.4104 | 1.0 | 1.0 | 0 | 0.356 | 0.488 | 0.649 |
+| FAISS HNSW | filtered | 0.54 | 0.441 | 0.33 | 0.54 | 0.55 | 47 | 0.237 | 0.369 | 0.415 |
+| pgvector | filtered | 0.66 | 0.5023 | 0.4116 | 0.982 | 1.0 | 0 | 1.797 | 3.44 | 6.351 |
+| Qdrant | filtered | 0.66 | 0.5023 | 0.4102 | 0.972 | 1.0 | 0 | 0.896 | 1.154 | 1.373 |
+| FAISS Flat | unfiltered | | | | 1.0 | 1.0 | 0 | 20.42 | 24.091 | 25.781 |
+| FAISS HNSW | unfiltered | | | | 0.851 | 0.875 | 0 | 0.231 | 0.352 | 0.391 |
+| pgvector | unfiltered | | | | 0.88 | 0.903 | 0 | 1.497 | 2.202 | 2.409 |
+| Qdrant | unfiltered | | | | 0.956 | 0.98 | 0 | 1.827 | 2.47 | 2.919 |
+
+Reading:
+- **Filtered, pgvector and Qdrant search exactly.** pgvector's planner used the `cik` B-tree (bitmap scan) and sorted that company's rows for all 100 queries (`bench/vector_stores.json`), and a company's ~700 points are below Qdrant's full-scan threshold. Their ID overlap below 1.0 is tie order: the tie-aware overlap is 1.0, and recall and MRR equal FAISS Flat's.
+- **FAISS HNSW with a filter starves.** The selector hides other companies' points but the graph walk is unchanged, so with ~0.3% of points allowed, 47 of 100 searches ended with fewer than 10 results (recall 0.54 vs 0.66). Unfiltered, the same index is fine (tie-aware 0.875).
+- **Unfiltered, the HNSW indexes trade overlap for speed** at the same M / ef: FAISS 0.875, pgvector 0.903, Qdrant 0.98 tie-aware overlap, all at 0.23–1.9 ms p50 against 20.42 ms for exact FAISS.
+- Latencies are client-observed: FAISS runs in process, while pgvector and Qdrant include their client library, serialization and a localhost round trip, so part of their gap is transport.
+- The A/B uses FAISS Flat, filtered: exact, and the fastest exact option here (p95 0.488 ms). The serving store is chosen in M6; for this filtered workload, every exact option costs under 4 ms at p95, against about 250 ms for the reranker.
+
+### Reranker on ret-dev (D1)
+
+`BAAI/bge-reranker-base` (MIT, revision `2cfc18c9`; XLM-RoBERTa cross-encoder, one logit) rescoring the filtered dense top 50, keeping the top 10 (`bench/reranker.csv`, `bench/reranker_dev.json`; 182 ret-dev queries; fp16 on the RTX 5070 Laptop GPU, one query's 50 pairs per batch):
+
+| Variant | Recall@10 | MRR@10 | NDCG@10 | Rerank p50 ms | p95 ms | p99 ms | Recall@50 |
+|---|---|---|---|---|---|---|---|
+| Dense (FAISS Flat, CIK filter) | 0.6758 | 0.5264 | 0.4368 | | | | 0.8626 |
+| Dense top-50 + bge-reranker-base | 0.7308 | 0.5708 | 0.488 | 240.37 | 279.26 | 291.26 | 0.8626 |
+
+The dense recall reproduces T4b's 0.6758 exactly. 152 of 9,100 pairs were longer than 512 tokens; the chunk is cut, never the question. fp16 and fp32 logits differ by at most 0.01154 on the checked pairs; peak VRAM allocated 965 MiB. The decision on test is the A/B below.
 
 ### Offline A/B: does the reranker ship? (D2)
 
@@ -320,3 +370,32 @@ uv run python -m filinglens.retrieval.rerank candidates --split test --allow-tes
 ~/venvs/fl-train/bin/python -m filinglens.retrieval.rerank score --split test --allow-test --note "..."
 uv run python -m filinglens.retrieval.ab test --allow-test --note "..."
 ```
+
+### Peer recommender (T11)
+
+For each company, rank the other companies by α · z(text cosine) + (1 − α) · z(ratio similarity) and count a hit if one of the top 5 has the same SIC code (hit-rate@5).
+- **Text:** the mean of the company's chunk embeddings from its latest 10-K, renormalized.
+- **Ratios:** the six FL-M1 ratios of the latest fiscal year as percentile ranks across companies (heavy tails can't set the scale); a missing ratio is the median rank 0.5. Similarity is minus the Euclidean distance.
+- Each similarity matrix is z-scored over its off-diagonal entries, so α weighs two signals on one scale.
+- **SIC level:** the finest of 4, 3 or 2 digits at which at least 80% of the 294 companies have a peer, fixed from label counts alone: 4 digits (241 companies, coverage 0.8197, median 4 peers); 3 digits would give 0.898, 2 digits 0.9932. Companies with no peer can't be hit and are left out.
+- **α** was chosen on the FL-M2 train + dev companies, ranking and counting peers among those 235 only, so no test company's label entered the choice (`bench/peers_select.json`, committed in `6e98035` before the test run). Hit-rate@5 on the 183 scorable selection companies rose from 0.3279 (ratios only) to 0.8689 at α = 0.9, then fell to 0.8579 (text only); ties would have gone to the α nearest 0.5.
+- **Test:** the 59 FL-M2 test companies, ranked against all 293 others, scored once (`bench/peers.json`). 10 have no 4-digit peer.
+
+| Variant | α | hit-rate@5 (49 companies) | 95% CI (bootstrap over companies) |
+|---|---|---|---|
+| Combined | 0.9 | 0.898 | 0.8163 – 0.9796 |
+| Text only | 1.0 | 0.8571 | 0.7551 – 0.9388 |
+| Ratios only | 0.0 | 0.3061 | 0.1837 – 0.4286 |
+| Random 5 (exact, hypergeometric) | – | 0.1206 | – |
+
+Reading: all three beat random; filing text carries almost all of the signal, because risk factors name products, inputs and regulators. Combined vs text only is 44 vs 42 hits of 49 with overlapping intervals: the data are consistent with a small gain from the ratios and with none. No paired test was registered, so none is reported (`docs/LATER.md`).
+
+### Limits
+
+- Labels are synthetic and automatic: each question is written from one paragraph and graded by text overlap, so the scores measure finding that paragraph, not usefulness to an analyst. No human checked relevance.
+- Item 1A only; questions only from FL-M2 train-split companies (FL-M2's dev and test companies were never shown to the generator).
+- The store comparison uses 100 ret-dev queries on one laptop, one query at a time: no concurrency, memory or update costs. With the company filter, three of the four stores do exact search, so the filtered rows compare exact-search speed more than index quality.
+- Reranker: 2.2% of ret-test pairs are truncated at 512 tokens. Latency is the reranking step alone on one GPU with no other load.
+- A/B: the test gain (+0.0888) is larger than dev's (+0.0512); 962 of the 1,137 test queries come from the second batch. A per-batch breakdown was not registered.
+- Peers: SIC codes are a noisy ground truth (one code per company, rarely updated). The 4-digit level passed the 80% rule by a small margin (0.8197). 41% of companies lack liabilities / equity and 13 have no ratios at all, so they sit at the median on those features. 2 companies' latest 10-K is from fiscal 2018 or 2019. The SIC level rule used all companies' label counts (never a score).
+- One run per setting; no seeds to vary except the bootstrap's (fixed at 0).
