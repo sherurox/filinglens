@@ -1,0 +1,3 @@
+variant,recall_at_10,mrr_at_10,ndcg_at_10,rerank_p50_ms,rerank_p95_ms,rerank_p99_ms,queries,recall_at_depth
+"dense (FAISS Flat, CIK filter)",0.6758,0.5264,0.4368,,,,182,0.8626
+dense top-50 + bge-reranker-base,0.7308,0.5708,0.488,240.37,279.26,291.26,182,0.8626
