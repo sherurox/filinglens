@@ -1,0 +1,111 @@
+{
+  "command": "python -m filinglens.retrieval.build_indexes --note 'AC power, Best performance'",
+  "power_note": "AC power, Best performance",
+  "cpu_count": 24,
+  "rows": 203200,
+  "dim": 768,
+  "shared_params": {
+    "M": 16,
+    "ef_construction": 100,
+    "ef_search": 100
+  },
+  "inputs_sha256": {
+    "chunks.npy": "56465072508501f2ea8924f73567187c07525158240af81cc8d73960da0c9247",
+    "chunk_ids.txt": "56d58cf172ed8f1a98104ab7bdbf7302f9e93d153a4955a4eb714f4f7994d309"
+  },
+  "stores": {
+    "faiss-flat": {
+      "store": "faiss-flat",
+      "rows": 203200,
+      "build_seconds": 0.2,
+      "build_threads": 24,
+      "params": {
+        "index": "IndexFlatIP"
+      },
+      "index_bytes": 624230445,
+      "path": "data/interim/retrieval/faiss/flat.index",
+      "search_threads": 1,
+      "self_check_top10": true
+    },
+    "faiss-hnsw": {
+      "store": "faiss-hnsw",
+      "rows": 203200,
+      "build_seconds": 11.1,
+      "build_threads": 24,
+      "params": {
+        "index": "IndexHNSWFlat",
+        "M": 16,
+        "ef_construction": 100,
+        "ef_search": 100
+      },
+      "index_bytes": 653550778,
+      "path": "data/interim/retrieval/faiss/hnsw.index",
+      "search_threads": 1,
+      "self_check_top10": true
+    },
+    "pgvector": {
+      "store": "pgvector",
+      "rows": 203200,
+      "load_seconds": 3.5,
+      "btree_seconds": 0.0,
+      "build_seconds": 20.5,
+      "maintenance_work_mem": "1GB",
+      "max_parallel_maintenance_workers": 4,
+      "notices": [
+        "schema \"retrieval\" already exists, skipping"
+      ],
+      "params": {
+        "index": "hnsw vector_ip_ops",
+        "M": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "iterative_scan": "strict_order",
+        "plan_cache_mode": "force_custom_plan",
+        "max_scan_tuples": 20000
+      },
+      "total_bytes": 1470136320,
+      "hnsw_index_bytes": 593674240,
+      "cik_index_bytes": 1482752,
+      "pgvector_version": "0.8.7",
+      "plan_filtered": [
+        "Limit",
+        "  ->  Sort",
+        "        Sort Key: ((embedding <#> <query vector>))",
+        "        ->  Bitmap Heap Scan on chunk_vectors",
+        "              Recheck Cond: (cik = 1001838)",
+        "              ->  Bitmap Index Scan on chunk_vectors_cik_idx",
+        "                    Index Cond: (cik = 1001838)"
+      ],
+      "plan_unfiltered": [
+        "Limit",
+        "  ->  Index Scan using chunk_vectors_embedding_hnsw_idx on chunk_vectors",
+        "        Order By: (embedding <#> <query vector>)"
+      ],
+      "self_check_top10": true
+    },
+    "qdrant": {
+      "store": "qdrant",
+      "rows": 203200,
+      "upload_seconds": 12.3,
+      "build_seconds": 13.3,
+      "index_wait_exit": "green_10_polls",
+      "params": {
+        "index": "hnsw, dot",
+        "M": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "full_scan_threshold_kb": 10000,
+        "indexing_threshold_kb": 10000,
+        "payload_index": "cik (integer)",
+        "transport": "gRPC"
+      },
+      "points": 203200,
+      "indexed_vectors": 202752,
+      "segments": 8,
+      "qdrant_version": "1.20.2",
+      "self_check_top10": true
+    }
+  },
+  "finished_utc": "2026-11-24T19:56:33+00:00",
+  "mlflow_run_id": "e660f79b5b5745fb8ab4fac21a47ef5f"
+}
