@@ -56,6 +56,23 @@ def test_quality_filtered_and_unfiltered():
     assert "recall_at_10" not in unfiltered and "ndcg_at_10" not in unfiltered
 
 
+def test_tie_aware_overlap_counts_equal_scores_as_matches():
+    exact = [0.9, 0.8, 0.7]  # the exact top 3; its 3rd score is 0.7
+    assert bs.tie_aware_overlap([0.9, 0.8, 0.7], exact, k=3) == 1.0
+    # another chunk with the same 0.7 score (a duplicate) counts: same quality, different ID
+    assert bs.tie_aware_overlap([0.9, 0.7, 0.8], exact, k=3) == 1.0
+    assert bs.tie_aware_overlap([0.9, 0.8, 0.6], exact, k=3) == pytest.approx(2 / 3)
+    assert bs.tie_aware_overlap([0.9], exact, k=3) == pytest.approx(1 / 3)  # short result
+    assert bs.tie_aware_overlap([0.5, 0.4], [0.5, 0.4], k=10) == 1.0  # fewer than k candidates
+    assert bs.tie_aware_overlap([], [], k=10) == 1.0
+
+
+def test_plan_kind():
+    exact = ["Limit", "  ->  Sort", "        ->  Bitmap Heap Scan on chunk_vectors"]
+    hnsw = ["Limit", "  ->  Index Scan using chunk_vectors_embedding_hnsw_idx on chunk_vectors"]
+    assert bs.plan_kind(exact) == "btree+sort" and bs.plan_kind(hnsw) == "hnsw"
+
+
 def test_csv_rows_has_every_column():
     rows = bs.csv_rows({"s": {"filtered": {"queries": 1, "p50_ms": 2.0}, "unfiltered": {}}})
     assert [r["mode"] for r in rows] == ["filtered", "unfiltered"]
@@ -120,6 +137,8 @@ def test_main_with_faiss_stores(tmp_path, monkeypatch):
     assert record["reproduce_t4b"]["match"] is True
     flat = record["table"]["faiss-flat"]
     assert flat["filtered"]["overlap_at_10_exact"] == 1.0 and flat["unfiltered"]["samples"] == 25
+    assert flat["filtered"]["overlap_at_10_tie_aware"] == 1.0  # the reference matches itself
+    assert record["pgvector_filtered_plans"] is None  # pgvector wasn't among the stores
     assert (tmp_path / "vector_stores.csv").read_text().count("\n") == 5  # header + 2 x 2 rows
     assert len((tmp_path / "results.jsonl").read_text().splitlines()) == 2 * 2 * 5
 

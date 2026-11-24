@@ -1,0 +1,9 @@
+store,mode,queries,recall_at_10,mrr_at_10,ndcg_at_10,overlap_at_10_exact,overlap_at_10_tie_aware,grade1_share_top10,short_results,p50_ms,p95_ms,p99_ms,mean_ms,samples
+faiss-flat,filtered,100,0.66,0.5023,0.4104,1.0,1.0,0.263,0,0.356,0.488,0.649,0.371,500
+faiss-flat,unfiltered,100,,,,1.0,1.0,,0,20.42,24.091,25.781,20.934,500
+faiss-hnsw,filtered,100,0.54,0.441,0.33,0.54,0.55,0.204,47,0.237,0.369,0.415,0.245,500
+faiss-hnsw,unfiltered,100,,,,0.851,0.875,,0,0.231,0.352,0.391,0.238,500
+pgvector,filtered,100,0.66,0.5023,0.4116,0.982,1.0,0.263,0,1.797,3.44,6.351,2.019,500
+pgvector,unfiltered,100,,,,0.88,0.903,,0,1.497,2.202,2.409,1.529,500
+qdrant,filtered,100,0.66,0.5023,0.4102,0.972,1.0,0.263,0,0.896,1.154,1.373,0.912,500
+qdrant,unfiltered,100,,,,0.956,0.98,,0,1.827,2.47,2.919,1.891,500

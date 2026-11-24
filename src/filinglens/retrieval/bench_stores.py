@@ -7,6 +7,12 @@ Two modes per store, same 100 queries (a seeded sample of the 182 ret-dev querie
 - unfiltered (index quality): search all 203,200 chunks; overlap@10 with FAISS Flat (exact).
   Not scored against the grades: T4b showed cross-company search isn't the task.
 
+Two overlaps: by ID, and tie-aware (as in ann-benchmarks): a returned chunk counts if its exact
+score is at least the exact k-th best score minus TIE_EPS. Repeated boilerplate gives identical
+vectors, so exact ties are common; stores break them differently, which lowers the ID overlap
+without changing the ranking's quality. For pgvector the plan of every filtered search is
+recorded too (B-tree + exact sort vs the HNSW index), since the planner may differ per company.
+
 Latency: per store and mode, 2 warm-up passes, then 5 timed passes over the 100 queries
 (500 samples) -> p50 / p95 / p99 / mean in ms, client-observed (FAISS in process; pgvector and
 Qdrant through their client libraries over localhost). Query embedding isn't included (T4).
@@ -54,6 +60,7 @@ MODES = ("filtered", "unfiltered")
 STORES = ("faiss-flat", "faiss-hnsw", "pgvector", "qdrant")
 REFERENCE = "faiss-flat"
 REPRODUCE_TOLERANCE = 1e-4
+TIE_EPS = 1e-5
 CSV_COLUMNS = [
     "store",
     "mode",
@@ -62,6 +69,7 @@ CSV_COLUMNS = [
     "mrr_at_10",
     "ndcg_at_10",
     "overlap_at_10_exact",
+    "overlap_at_10_tie_aware",
     "grade1_share_top10",
     "short_results",
     "p50_ms",
@@ -158,6 +166,46 @@ def quality(
     return out
 
 
+def tie_aware_overlap(
+    found_scores: Sequence[float], exact_scores: Sequence[float], k: int = K
+) -> float:
+    """Share of the exact top-k matched, counting any result scoring >= the exact k-th score.
+
+    `exact_scores` are the reference's top-k scores (fewer if the candidate set is smaller than
+    k); `found_scores` the exact scores of what a store returned.
+    """
+    reference = list(exact_scores)[:k]
+    if not reference:
+        return 1.0
+    kth = min(reference)
+    hits = sum(score >= kth - TIE_EPS for score in list(found_scores)[:k])
+    return min(hits, len(reference)) / len(reference)
+
+
+def plan_kind(plan: Sequence[str]) -> str:
+    """'hnsw' if pgvector's plan uses the HNSW index, else 'btree+sort' (exact over the rows)."""
+    return "hnsw" if any("hnsw_idx" in line for line in plan) else "btree+sort"
+
+
+def mean_tie_aware(results, reference, vecs, score) -> float:
+    pairs = zip(results, reference, vecs, strict=True)
+    return round(
+        float(np.mean([tie_aware_overlap(score(r, v), score(e, v)) for r, e, v in pairs])), 4
+    )
+
+
+def pg_plan_counts(store, vecs: np.ndarray, queries: Sequence[dict]) -> dict:
+    kinds = [
+        plan_kind(store.explain(v, K, cik=q["cik"])) for q, v in zip(queries, vecs, strict=True)
+    ]
+    return {
+        "counts": {kind: kinds.count(kind) for kind in sorted(set(kinds))},
+        "hnsw_ciks": sorted(
+            {q["cik"] for q, kind in zip(queries, kinds, strict=True) if kind == "hnsw"}
+        ),
+    }
+
+
 def csv_rows(table: dict) -> list[dict]:
     rows = []
     for store, modes in table.items():
@@ -222,6 +270,14 @@ def main(argv: list[str] | None = None) -> None:
     results = {
         name: {m: search_all(s, vecs, picked, m) for m in MODES} for name, s in stores.items()
     }
+    chunk_vecs = np.load(args.emb_dir / "chunks.npy", mmap_mode="r")
+    position = {cid: i for i, cid in enumerate(chunk_ids)}
+
+    def score(found: Sequence[str], vec: np.ndarray) -> list[float]:
+        rows = [position[c] for c in found]
+        return (np.asarray(chunk_vecs[rows]) @ vec).tolist() if rows else []
+
+    pg_plans = pg_plan_counts(stores["pgvector"], vecs, picked) if "pgvector" in stores else None
 
     # ties T7 to T4b: exact within-company recall@10 on all 182 dev queries
     full = search_all(stores[REFERENCE], all_vecs, all_dev, "filtered")
@@ -235,6 +291,9 @@ def main(argv: list[str] | None = None) -> None:
         table[name] = {}
         for mode in MODES:
             row = quality(results[name][mode], results[REFERENCE][mode], picked, mode)
+            row["overlap_at_10_tie_aware"] = mean_tie_aware(
+                results[name][mode], results[REFERENCE][mode], vecs, score
+            )
             row.update(latency_summary(time_searches(store, vecs, picked, mode)))
             table[name][mode] = row
             print(name, mode, json.dumps(row), flush=True)
@@ -255,6 +314,8 @@ def main(argv: list[str] | None = None) -> None:
         "latency": "client-observed; FAISS in process (1 thread), pgvector + Qdrant over localhost",
         "labels": "synthetic queries, automatic grades (no human judgment)",
         "reference": REFERENCE,
+        "tie_eps": TIE_EPS,
+        "pgvector_filtered_plans": pg_plans,
         "reproduce_t4b": {
             "queries": len(all_dev),
             "faiss_flat_filtered_recall_at_10": round(reproduced, 4),
@@ -284,7 +345,7 @@ def main(argv: list[str] | None = None) -> None:
         for name, modes in table.items()
         for mode, row in modes.items()
         for key, value in row.items()
-        if key in ("recall_at_10", "ndcg_at_10", "overlap_at_10_exact", "p95_ms")
+        if key in ("recall_at_10", "ndcg_at_10", "overlap_at_10_tie_aware", "p95_ms")
     }
     params = {"stores": ",".join(args.stores), "queries": len(picked), "k": K, "passes": PASSES}
     record["mlflow_run_id"] = log_run(

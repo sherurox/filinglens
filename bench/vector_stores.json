@@ -1,0 +1,147 @@
+{
+  "command": "python -m filinglens.retrieval.bench_stores --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-24T20:19:52+00:00",
+  "power_note": "AC power, Best performance",
+  "split": "dev",
+  "queries_sampled": 100,
+  "sample_seed": 0,
+  "k": 10,
+  "warmup_passes": 2,
+  "timed_passes": 5,
+  "latency": "client-observed; FAISS in process (1 thread), pgvector + Qdrant over localhost",
+  "labels": "synthetic queries, automatic grades (no human judgment)",
+  "reference": "faiss-flat",
+  "tie_eps": 1e-05,
+  "pgvector_filtered_plans": {
+    "counts": {
+      "btree+sort": 100
+    },
+    "hnsw_ciks": []
+  },
+  "reproduce_t4b": {
+    "queries": 182,
+    "faiss_flat_filtered_recall_at_10": 0.6758,
+    "diagnostics_company_recall_at_10": 0.6758,
+    "match": true
+  },
+  "inputs_sha256": {
+    "chunks.npy": "56465072508501f2ea8924f73567187c07525158240af81cc8d73960da0c9247",
+    "queries.dev.npy": "f141a68f9ae4496b2514fe8a81f5649a97ea202428df0f2999cfdf25a1bc1403",
+    "queries.dev.jsonl": "1edc160841848e8f55b6e9568ffe9e8f9fe3299c01f0ab690225c05408a5a27e"
+  },
+  "table": {
+    "faiss-flat": {
+      "filtered": {
+        "queries": 100,
+        "overlap_at_10_exact": 1.0,
+        "short_results": 0,
+        "recall_at_10": 0.66,
+        "mrr_at_10": 0.5023,
+        "ndcg_at_10": 0.4104,
+        "grade1_share_top10": 0.263,
+        "overlap_at_10_tie_aware": 1.0,
+        "p50_ms": 0.356,
+        "p95_ms": 0.488,
+        "p99_ms": 0.649,
+        "mean_ms": 0.371,
+        "samples": 500
+      },
+      "unfiltered": {
+        "queries": 100,
+        "overlap_at_10_exact": 1.0,
+        "short_results": 0,
+        "overlap_at_10_tie_aware": 1.0,
+        "p50_ms": 20.42,
+        "p95_ms": 24.091,
+        "p99_ms": 25.781,
+        "mean_ms": 20.934,
+        "samples": 500
+      }
+    },
+    "faiss-hnsw": {
+      "filtered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.54,
+        "short_results": 47,
+        "recall_at_10": 0.54,
+        "mrr_at_10": 0.441,
+        "ndcg_at_10": 0.33,
+        "grade1_share_top10": 0.204,
+        "overlap_at_10_tie_aware": 0.55,
+        "p50_ms": 0.237,
+        "p95_ms": 0.369,
+        "p99_ms": 0.415,
+        "mean_ms": 0.245,
+        "samples": 500
+      },
+      "unfiltered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.851,
+        "short_results": 0,
+        "overlap_at_10_tie_aware": 0.875,
+        "p50_ms": 0.231,
+        "p95_ms": 0.352,
+        "p99_ms": 0.391,
+        "mean_ms": 0.238,
+        "samples": 500
+      }
+    },
+    "pgvector": {
+      "filtered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.982,
+        "short_results": 0,
+        "recall_at_10": 0.66,
+        "mrr_at_10": 0.5023,
+        "ndcg_at_10": 0.4116,
+        "grade1_share_top10": 0.263,
+        "overlap_at_10_tie_aware": 1.0,
+        "p50_ms": 1.797,
+        "p95_ms": 3.44,
+        "p99_ms": 6.351,
+        "mean_ms": 2.019,
+        "samples": 500
+      },
+      "unfiltered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.88,
+        "short_results": 0,
+        "overlap_at_10_tie_aware": 0.903,
+        "p50_ms": 1.497,
+        "p95_ms": 2.202,
+        "p99_ms": 2.409,
+        "mean_ms": 1.529,
+        "samples": 500
+      }
+    },
+    "qdrant": {
+      "filtered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.972,
+        "short_results": 0,
+        "recall_at_10": 0.66,
+        "mrr_at_10": 0.5023,
+        "ndcg_at_10": 0.4102,
+        "grade1_share_top10": 0.263,
+        "overlap_at_10_tie_aware": 1.0,
+        "p50_ms": 0.896,
+        "p95_ms": 1.154,
+        "p99_ms": 1.373,
+        "mean_ms": 0.912,
+        "samples": 500
+      },
+      "unfiltered": {
+        "queries": 100,
+        "overlap_at_10_exact": 0.956,
+        "short_results": 0,
+        "overlap_at_10_tie_aware": 0.98,
+        "p50_ms": 1.827,
+        "p95_ms": 2.47,
+        "p99_ms": 2.919,
+        "mean_ms": 1.891,
+        "samples": 500
+      }
+    }
+  },
+  "mlflow_run_id": "c227c4e735c94ac49d21f9071a2a7500"
+}
