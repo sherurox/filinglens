@@ -1,0 +1,30 @@
+{
+  "command": "python -m filinglens.retrieval.embed queries --split dev --note AC power, Best performance",
+  "model": "BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a",
+  "what": "queries",
+  "dtype": "float16 weights, fp32 pooling + norm, float32 .npy",
+  "batch": 128,
+  "max_seq_tokens": 512,
+  "power_note": "AC power, Best performance",
+  "split": "dev",
+  "model_files": {
+    "pooling": {
+      "word_embedding_dimension": 768,
+      "pooling_mode_cls_token": true,
+      "pooling_mode_mean_tokens": false,
+      "pooling_mode_max_tokens": false,
+      "pooling_mode_mean_sqrt_len_tokens": false
+    },
+    "query_instruction_in_card": true
+  },
+  "norm_min": 0.9999998807907104,
+  "norm_max": 1.0000001192092896,
+  "rows": 182,
+  "dim": 768,
+  "truncated": 0,
+  "seconds": 0.75,
+  "rows_per_second": 242.2,
+  "exact_recall_at_10": 0.2967,
+  "finished_utc": "2026-11-24T19:30:18+00:00",
+  "mlflow_run_id": "0c4993dd920d43f5b6372b405fb0cf3c"
+}

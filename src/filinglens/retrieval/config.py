@@ -11,6 +11,9 @@ EMBED_REVISION = "a5beb1e3e68b9ab74eb54cfd186867f64f240e1a"
 RERANK_MODEL = "BAAI/bge-reranker-base"  # MIT
 RERANK_REVISION = "2cfc18c9415c912f9d8155881c133215df768a70"
 
+# The model card's instruction for short queries that retrieve passages; passages get none.
+QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
+EMBED_DIM = 768
 MAX_SEQ_TOKENS = 512  # bge-base input length, including [CLS] and [SEP]
 TEXT_TOKEN_BUDGET = MAX_SEQ_TOKENS - 2  # what a chunk's own text may use
 
@@ -19,3 +22,4 @@ ITEM = "1A"  # Risk Factors: the only 10-K item in the FL-M2 corpus (Item 7 is a
 CORPUS = Path("data/interim/risk_paragraphs.parquet")
 RET_DIR = Path("data/interim/retrieval")
 CHUNKS = RET_DIR / "chunks.parquet"
+EMB_DIR = RET_DIR / "bge-base"  # chunks.npy + chunk_ids.txt, queries.<split>.npy + query_ids

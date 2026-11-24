@@ -1,4 +1,4 @@
-"""MLflow helpers for FL-M4: one place for the tracking URI, experiment names and run tags.
+"""MLflow helpers (FL-M4, FL-M3): one place for the tracking URI, experiment names and run tags.
 
 Every training, evaluation and filter run carries the same provenance tags: the git commit
 (and whether tracked files had uncommitted changes), the data version (SHA-256 of the data
@@ -28,6 +28,7 @@ EXPERIMENTS = {
     "teacher": "fl-m4-teacher",
     "optuna": "fl-m4-optuna",
     "compare": "fl-m4-compare",
+    "retrieval": "fl-m3-retrieval",  # embeddings, vector stores, reranker, A/B, peers
 }
 GPU_FIELDS = ("name", "temperature.gpu", "memory.used", "memory.total", "power.draw", "clocks.sm")
 
