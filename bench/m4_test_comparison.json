@@ -1,0 +1,182 @@
+{
+  "command": "python -m filinglens.train.final_comparison --allow-test --note T12, run once",
+  "finished_utc": "2026-11-24T18:36:40+00:00",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "split": "test",
+  "rows": 65,
+  "eval_settings": "--gpu-memory-utilization 0.84 --max-model-len 4608 --max-num-seqs 1",
+  "student": "teacher-n1500-r16-lr0.0002-e1",
+  "student_selection": "dev-selected (highest dev category macro-F1 among FL-M4 adapters; chosen before test was scored)",
+  "teacher": {
+    "model": "Qwen/Qwen3-8B-AWQ",
+    "source": "data/interim/teacher/kaggle_out/teacher/test_shard0of1.jsonl",
+    "valid_flags_differ_from_kaggle": 0
+  },
+  "models": {
+    "base_fl_m2_batched": {
+      "category_macro_f1": 0.6295,
+      "category_macro_f1_ci95": [
+        0.474,
+        0.712
+      ],
+      "category_accuracy": 0.6615,
+      "severity_macro_f1": 0.2832,
+      "first_seen_exact": 0.4308,
+      "first_seen_within_1y": 0.5846,
+      "rows": 65,
+      "rule_valid": 64,
+      "rule_valid_rate": 0.9846,
+      "agreed_rows_category_macro_f1": 0.6001,
+      "decoding": "batched (FL-M2, 19 Nov)"
+    },
+    "base": {
+      "category_macro_f1": 0.6525,
+      "category_macro_f1_ci95": [
+        0.494,
+        0.734
+      ],
+      "category_accuracy": 0.6769,
+      "severity_macro_f1": 0.2832,
+      "first_seen_exact": 0.4,
+      "first_seen_within_1y": 0.5538,
+      "rows": 65,
+      "rule_valid": 64,
+      "rule_valid_rate": 0.9846,
+      "json_valid": 65,
+      "json_valid_rate": 1.0,
+      "agreed_rows_category_macro_f1": 0.6663,
+      "decoding": "max_num_seqs 1"
+    },
+    "teacher": {
+      "category_macro_f1": 0.783,
+      "category_macro_f1_ci95": [
+        0.624,
+        0.866
+      ],
+      "category_accuracy": 0.7692,
+      "severity_macro_f1": 0.337,
+      "first_seen_exact": 0.8,
+      "first_seen_within_1y": 0.8615,
+      "rows": 65,
+      "rule_valid": 64,
+      "rule_valid_rate": 0.9846,
+      "json_valid": 65,
+      "json_valid_rate": 1.0,
+      "agreed_rows_category_macro_f1": 0.9192,
+      "decoding": "batched fp16, Kaggle T4"
+    },
+    "student": {
+      "category_macro_f1": 0.7948,
+      "category_macro_f1_ci95": [
+        0.632,
+        0.869
+      ],
+      "category_accuracy": 0.7846,
+      "severity_macro_f1": 0.2931,
+      "first_seen_exact": 0.7846,
+      "first_seen_within_1y": 0.8769,
+      "rows": 65,
+      "rule_valid": 65,
+      "rule_valid_rate": 1.0,
+      "json_valid": 65,
+      "json_valid_rate": 1.0,
+      "agreed_rows_category_macro_f1": 0.9024,
+      "decoding": "max_num_seqs 1"
+    }
+  },
+  "paired_bootstrap": {
+    "student_vs_base": {
+      "a": "base-det",
+      "b": "teacher-n1500-r16-lr0.0002-e1",
+      "category_macro_f1": {
+        "a": 0.6525,
+        "b": 0.7948,
+        "diff_b_minus_a": 0.1423,
+        "diff_ci95": [
+          0.0276,
+          0.2621
+        ],
+        "share_b_not_better": 0.0065
+      },
+      "category_accuracy": {
+        "a": 0.6769,
+        "b": 0.7846,
+        "diff_b_minus_a": 0.1077,
+        "diff_ci95": [
+          0.0,
+          0.2154
+        ],
+        "share_b_not_better": 0.035
+      },
+      "rows_where_only_a_right": 3,
+      "rows_where_only_b_right": 10
+    },
+    "student_vs_teacher": {
+      "a": "teacher-qwen3-8b-awq",
+      "b": "teacher-n1500-r16-lr0.0002-e1",
+      "category_macro_f1": {
+        "a": 0.783,
+        "b": 0.7948,
+        "diff_b_minus_a": 0.0118,
+        "diff_ci95": [
+          -0.0513,
+          0.0876
+        ],
+        "share_b_not_better": 0.3625
+      },
+      "category_accuracy": {
+        "a": 0.7692,
+        "b": 0.7846,
+        "diff_b_minus_a": 0.0154,
+        "diff_ci95": [
+          -0.0462,
+          0.0923
+        ],
+        "share_b_not_better": 0.4135
+      },
+      "rows_where_only_a_right": 2,
+      "rows_where_only_b_right": 3
+    },
+    "teacher_vs_base": {
+      "a": "base-det",
+      "b": "teacher-qwen3-8b-awq",
+      "category_macro_f1": {
+        "a": 0.6525,
+        "b": 0.783,
+        "diff_b_minus_a": 0.1305,
+        "diff_ci95": [
+          0.0024,
+          0.2678
+        ],
+        "share_b_not_better": 0.0245
+      },
+      "category_accuracy": {
+        "a": 0.6769,
+        "b": 0.7692,
+        "diff_b_minus_a": 0.0923,
+        "diff_ci95": [
+          -0.0154,
+          0.2
+        ],
+        "share_b_not_better": 0.071
+      },
+      "rows_where_only_a_right": 4,
+      "rows_where_only_b_right": 10
+    }
+  },
+  "mlflow_run_id": "6ade9c36180e40a1abcc720260b68c9a",
+  "registry": {
+    "name": "filinglens-risk-student",
+    "version": 1,
+    "source": "mlflow-artifacts:/1/2b109c9f6f234d659bece77f590356f6/artifacts/adapter",
+    "files": [
+      "README.md",
+      "adapter_config.json",
+      "adapter_model.safetensors",
+      "chat_template.jinja",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "weights_match_local_adapter": true
+  }
+}
