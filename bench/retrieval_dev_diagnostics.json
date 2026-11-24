@@ -1,0 +1,27 @@
+{
+  "command": "python -m filinglens.retrieval.diagnose_dev ",
+  "finished_utc": "2026-11-24T19:33:57+00:00",
+  "split": "dev",
+  "search": "exact inner product over every candidate chunk",
+  "queries": 182,
+  "k": 10,
+  "recall_at_10": {
+    "all": 0.2967,
+    "company": 0.6758,
+    "company_year": 0.8846
+  },
+  "first_relevant_rank_all_chunks": {
+    "median": 66.0,
+    "share_le_10": 0.2967,
+    "share_le_50": 0.467,
+    "share_le_100": 0.544,
+    "share_le_1000": 0.7418
+  },
+  "top_10_share_same_company": 0.2731,
+  "top_10_share_grade1_copies": 0.0995,
+  "ticker_in_grade2_text": 0.0275,
+  "inputs_sha256": {
+    "chunks.npy": "56465072508501f2ea8924f73567187c07525158240af81cc8d73960da0c9247",
+    "queries.dev.npy": "f141a68f9ae4496b2514fe8a81f5649a97ea202428df0f2999cfdf25a1bc1403"
+  }
+}

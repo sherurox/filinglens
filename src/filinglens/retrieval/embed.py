@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 import time
 from collections.abc import Mapping, Sequence
@@ -210,7 +211,7 @@ METRIC_KEYS = (
 
 def base_record(what: str, note: str, argv: list[str]) -> dict:
     return {
-        "command": "python -m filinglens.retrieval.embed " + " ".join(argv),
+        "command": "python -m filinglens.retrieval.embed " + shlex.join(argv),
         "model": f"{EMBED_MODEL}@{EMBED_REVISION}",
         "what": what,
         "dtype": "float16 weights, fp32 pooling + norm, float32 .npy",
