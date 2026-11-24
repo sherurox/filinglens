@@ -93,6 +93,13 @@ def test_top_k_skips_self_and_breaks_ties_by_index():
     assert top[0].tolist() == [1, 2]  # never itself, even with the highest score
     assert top[1].tolist() == [3, 0]  # 0 and 2 tie at 5.0: the lower index wins
     assert top[2].tolist() == [0, 1]
+    only = pr.top_k(score, k=1, candidates=[2, 3])  # e.g. the selection pool
+    assert only[:, 0].tolist() == [2, 3, 3, 2]  # never a company outside the pool, nor itself
+
+
+def test_restrict_keeps_only_allowed_peers():
+    peers = {1: {2, 3}, 2: {1}, 3: {1}}
+    assert pr.restrict(peers, {1, 2}) == {1: {2}, 2: {1}, 3: {1}}
 
 
 def test_hits_and_scorable_companies():
@@ -198,6 +205,7 @@ def test_select_then_test(fake_inputs, monkeypatch, capsys):
     pr.main(["select", *common])
     chosen = json.loads((bench / "peers_select.json").read_text())
     assert chosen["sic_level"] == 4 and chosen["selection_companies_scored"] == 8
+    assert chosen["selection_pool"] == 8 and chosen["selection_companies_without_peer"] == 0
     assert chosen["data"]["latest_10k_chunks"] == 36  # 12 companies x 3 chunks of 2024
     assert chosen["data"]["latest_10k_period_year"] == {"2024": 12}
     assert chosen["hit_rate_by_alpha"]["1.0"] == 1.0  # text alone finds every group
@@ -226,3 +234,20 @@ def test_misaligned_embeddings_are_refused(fake_inputs):
     (emb / "chunk_ids.txt").write_text("".join(f"{i}\n" for i in reversed(ids)))
     with pytest.raises(ValueError, match="row for row"):
         pr.main(["select", *common])
+
+
+def test_select_never_sees_a_test_company(fake_inputs, monkeypatch):
+    common, _ = fake_inputs
+    seen = {}
+
+    def spy(z_text, z_ratio, order, peers, queries, candidates=None):
+        seen.update(order=order, peers=peers, queries=queries, candidates=candidates)
+        return 0.5, {"0.5": 1.0}
+
+    monkeypatch.setattr(pr, "choose_alpha", spy)
+    pr.main(["select", *common])
+    split = dict(zip(range(101, 113), ["train", "dev", "test"] * 4, strict=True))
+    order = seen["order"]
+    assert all(split[order[i]] != "test" for i in seen["candidates"])
+    assert all(split[order[i]] != "test" for i in seen["queries"])
+    assert all(split[p] != "test" for i in seen["queries"] for p in seen["peers"][order[i]])

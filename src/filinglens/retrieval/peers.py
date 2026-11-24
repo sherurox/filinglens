@@ -15,8 +15,9 @@ and count a hit if one of the top 5 shares the company's SIC code (hit-rate@5).
   peers, fixed from the label counts alone before any score is computed. A company with no peer
   at that level can't be scored and is left out (counted in the record).
 - Splits: the FL-M2 company splits (gold/splits.csv). alpha is chosen on train + dev (nothing is
-  trained, so the larger set gives a less noisy choice); test is scored once. Candidates are
-  always all other companies: a candidate's SIC code is only the label being scored.
+  trained, so the larger set gives a less noisy choice), ranking and counting peers among train +
+  dev companies only, so no test company's label enters the choice. Test is scored once, ranking
+  against all other companies (how the recommender would be used).
 - Baseline: the exact hit-rate of 5 random candidates, 1 - C(N - p, 5) / C(N, 5) for N
   candidates and p peers, averaged over the scored companies.
 
@@ -176,10 +177,17 @@ def zscore_offdiag(sim: np.ndarray) -> np.ndarray:
 # ---- ranking and scoring ----------------------------------------------------------------------
 
 
-def top_k(score: np.ndarray, k: int = K) -> np.ndarray:
-    """Indices of each row's k best other companies; ties keep index order (stable sort)."""
+def top_k(score: np.ndarray, k: int = K, candidates: Sequence[int] | None = None) -> np.ndarray:
+    """Indices of each row's k best other companies; ties keep index order (stable sort).
+
+    With `candidates` (column indices), only those companies can be recommended.
+    """
     s = score.astype(np.float64, copy=True)
     np.fill_diagonal(s, -np.inf)
+    if candidates is not None:
+        blocked = np.ones(s.shape[1], dtype=bool)
+        blocked[list(candidates)] = False
+        s[:, blocked] = -np.inf
     return np.argsort(-s, axis=1, kind="stable")[:, :k]
 
 
@@ -192,6 +200,11 @@ def hits_at_k(
         wanted = peers[order[q]]
         out.append(float(any(order[j] in wanted for j in top[q])))
     return np.array(out)
+
+
+def restrict(peers: dict[int, set[int]], allowed: set[int]) -> dict[int, set[int]]:
+    """Each company's peers among `allowed` companies only."""
+    return {cik: p & allowed for cik, p in peers.items()}
 
 
 def scorable(
@@ -223,12 +236,13 @@ def choose_alpha(
     peers: dict[int, set[int]],
     queries: Sequence[int],
     alphas: Sequence[float] = ALPHAS,
+    candidates: Sequence[int] | None = None,
 ) -> tuple[float, dict]:
     """The alpha with the best hit-rate@5 on `queries`; ties go to the alpha nearest 0.5, then
     the smaller one (a fixed rule, so the choice doesn't depend on the grid's order)."""
     rates = {}
     for a in alphas:
-        top = top_k(a * z_text + (1 - a) * z_ratio)
+        top = top_k(a * z_text + (1 - a) * z_ratio, candidates=candidates)
         rates[a] = float(hits_at_k(top, order, peers, queries).mean())
     best = max(rates.values())
     alpha = min((a for a in alphas if rates[a] == best), key=lambda a: (abs(a - 0.5), a))
@@ -298,20 +312,21 @@ def base_record(step: str, argv: list[str], data: dict) -> dict:
 
 def run_select(args: argparse.Namespace, argv: list[str]) -> dict:
     data = load_inputs(args)
-    queries = scorable(data["order"], data["peers"], data["split_of"], {"train", "dev"})
+    order, chosen_from = data["order"], {"train", "dev"}
+    pool = [i for i, c in enumerate(order) if data["split_of"][c] in chosen_from]
+    peers = restrict(data["peers"], {order[i] for i in pool})  # no test company counts
+    queries = scorable(order, peers, data["split_of"], chosen_from)
     alpha, grid = choose_alpha(
-        data["z_text"], data["z_ratio"], data["order"], data["peers"], queries
+        data["z_text"], data["z_ratio"], order, peers, queries, candidates=pool
     )
     record = base_record("select", argv, data)
     record.update(
         {
-            "selection_splits": ["train", "dev"],
+            "selection_splits": sorted(chosen_from),
+            "selection_candidates": "train + dev companies only (no test company's label used)",
+            "selection_pool": len(pool),
             "selection_companies_scored": len(queries),
-            "selection_companies_without_peer": sum(
-                1
-                for c in data["order"]
-                if data["split_of"][c] in {"train", "dev"} and not data["peers"][c]
-            ),
+            "selection_companies_without_peer": len(pool) - len(queries),
             "hit_rate_by_alpha": grid,
             "alpha": alpha,
         }
