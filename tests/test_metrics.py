@@ -2,7 +2,7 @@
 
 import pytest
 
-from filinglens.retrieval.metrics import ndcg_at_k
+from filinglens.retrieval.metrics import mrr_at_k, ndcg_at_k, recall_at_k
 
 
 def test_perfect_ranking_scores_one():
@@ -79,3 +79,29 @@ def test_duplicate_id_in_top_k_is_rejected():
 
     # a repeat after rank k is outside the scored window, so it's allowed
     assert ndcg_at_k(["a", "x", "a"], {"a": 2}, k=2) == 1.0
+
+
+# ---- below: AI-assisted tests for recall_at_k and mrr_at_k ------------------------------------
+
+
+def test_recall_at_k_any_graded_chunk_in_the_top_k():
+    grades = {"a": 2, "b": 1}
+    assert recall_at_k(["x", "b", "y"], grades, k=3) == 1.0  # grade 1 counts as found
+    assert recall_at_k(["x", "y", "a"], grades, k=2) == 0.0  # a is at rank 3, beyond k
+    assert recall_at_k(["x", "y", "a"], grades, k=3) == 1.0
+    assert recall_at_k([], grades, k=10) == 0.0
+    assert recall_at_k(["a"], {}, k=10) == 0.0
+
+
+def test_mrr_at_k_first_hit_only():
+    grades = {"a": 2, "b": 1}
+    assert mrr_at_k(["a", "b"], grades, k=10) == 1.0
+    assert mrr_at_k(["x", "y", "b", "a"], grades, k=10) == pytest.approx(1 / 3)  # b at rank 3
+    assert mrr_at_k(["x", "y", "b"], grades, k=2) == 0.0
+    assert mrr_at_k([], grades, k=10) == 0.0
+
+
+def test_recall_and_mrr_reject_k_below_one():
+    for metric in (recall_at_k, mrr_at_k):
+        with pytest.raises(ValueError, match="k=0"):
+            metric(["a"], {"a": 2}, k=0)

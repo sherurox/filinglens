@@ -54,3 +54,34 @@ def ndcg_at_k(ranked: Sequence[str], grades: Mapping[str, int], k: int = 10) -> 
     if idcg == 0:
         return 0.0
     return dcg / idcg
+
+
+# ---- below: AI-assisted (added after review of ndcg_at_k) -------------------------------------
+
+
+def _check_k(k: int) -> None:
+    if k < 1:
+        raise ValueError(f"k must be at least 1, got k={k}")
+
+
+def recall_at_k(ranked: Sequence[str], grades: Mapping[str, int], k: int = 10) -> float:
+    """1.0 if any chunk of grade >= 1 is in the top k of `ranked`, else 0.0 (known-item recall).
+
+    Averaged over queries this is the share of queries whose answer was found. Grade 1 (a near
+    copy in another filing) counts as found, like grade 2. Duplicates can't change it.
+    """
+    _check_k(k)
+    return 1.0 if any(grades.get(chunk_id, 0) >= 1 for chunk_id in ranked[:k]) else 0.0
+
+
+def mrr_at_k(ranked: Sequence[str], grades: Mapping[str, int], k: int = 10) -> float:
+    """Reciprocal rank of the first chunk of grade >= 1 in the top k (1/1, 1/2, ...), else 0.0.
+
+    Averaged over queries this is MRR@k. Only the first hit matters, so duplicates after it
+    can't change the score either.
+    """
+    _check_k(k)
+    for index, chunk_id in enumerate(ranked[:k]):
+        if grades.get(chunk_id, 0) >= 1:
+            return 1.0 / (index + 1)
+    return 0.0
