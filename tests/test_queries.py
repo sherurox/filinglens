@@ -214,3 +214,56 @@ def test_main_refuses_qa_from_non_train_companies(tmp_path):
     paths = _inputs(tmp_path, [qa("acc20:0:q1", "acc20:0")], splits)
     with pytest.raises(ValueError, match="non-train"):
         rq.main(_args(paths, tmp_path))
+
+
+def test_check_only_additions():
+    dev = [{"query_id": "d1", "split": "dev", "grades": {"a": 2}}]
+    test = [{"query_id": "t1", "split": "test", "grades": {"b": 2}}]
+    added = {"query_id": "t2", "split": "test", "grades": {"c": 2}}
+    assert rq.check_only_additions({}, dev + test) == {"previous_files": False}
+    ok = rq.check_only_additions({"dev": dev, "test": test}, dev + test + [added])
+    assert ok["added_test_queries"] == 1 and ok["existing_test_queries_identical"] == 1
+    with pytest.raises(ValueError, match="ret-dev"):
+        rq.check_only_additions({"dev": dev, "test": test}, test + [{**added, "split": "dev"}])
+    regraded = {**test[0], "grades": {"b": 1}}
+    with pytest.raises(ValueError, match="existing ret-test"):
+        rq.check_only_additions({"dev": dev, "test": test}, dev + [regraded])
+
+
+def test_main_rebuild_with_an_extra_file_only_adds_test_queries(tmp_path):
+    """In this tiny world company 1 is ret-dev and company 2 ret-test (seed 3, fixed)."""
+    pytest.importorskip("pyarrow")
+    qa_rows = [
+        qa("acc20:0:q1", "acc20:0"),
+        qa("bcc20:0:q1", "bcc20:0", cik=2, evidence="retain senior engineers"),
+    ]
+    splits = [
+        {"cik": 1, "ticker": "T1", "sector": "mining_energy", "split": "train"},
+        {"cik": 2, "ticker": "T2", "sector": "mining_energy", "split": "train"},
+    ]
+    paths = _inputs(tmp_path, qa_rows, splits)
+    chunks = pd.read_parquet(paths["chunks.parquet"])
+    more = chunk("bcc19:0#0", "bcc19:0", 2, "bcc19", 2019, "Tariffs on imported parts raise costs.")
+    pd.concat([chunks, pd.DataFrame([more])]).to_parquet(paths["chunks.parquet"])
+    rq.main(_args(paths, tmp_path))
+    out = tmp_path / "out"
+    dev_before = (out / "queries.dev.jsonl").read_text()
+    assert {r["cik"] for r in rq.read_jsonl(out / "queries.test.jsonl")} == {2}
+
+    def rebuild_with(extra_row):
+        extra = tmp_path / "extra.jsonl"
+        extra.write_text(json.dumps({**extra_row, "batch": "ret_test_extra_v1"}) + "\n")
+        args = _args(paths, tmp_path)
+        at = args.index("--qa") + 1
+        args[at : at + 1] = [str(paths["qa.jsonl"]), str(extra)]
+        rq.main(args)
+
+    rebuild_with(qa("bcc19:0:q1", "bcc19:0", cik=2, evidence="tariffs on imported parts"))
+    record = json.loads((tmp_path / "ret_queries.json").read_text())
+    assert record["rebuild"]["dev_identical"] is True
+    assert record["rebuild"]["added_test_queries"] == 1
+    assert record["qa_pairs_by_batch"] == {"fl_m2_t14": 2, "ret_test_extra_v1": 1}
+    assert (out / "queries.dev.jsonl").read_text() == dev_before
+
+    with pytest.raises(ValueError, match="ret-dev"):  # a question from a dev company is refused
+        rebuild_with(qa("acc19:0:q1", "acc19:0", cik=1, evidence="copper prices could reduce"))

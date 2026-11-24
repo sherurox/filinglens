@@ -16,6 +16,11 @@ person judged it:
   words all appear in the source doesn't count. Risk text repeats almost word for word from year
   to year; the questions name a fiscal year, so those copies are near misses, not equal answers.
 
+Q&A files: FL-M2's (gold/synthetic/risk_qa.train.jsonl) and, since FL-M3 T10a, extra questions
+for ret-test companies (gold/synthetic/risk_qa.ret_test_extra.jsonl, retrieval/extra_queries.py).
+A rebuild may only add ret-test queries: it reads the current query files first and stops if
+ret-dev or any existing ret-test query would change.
+
 Companies, not queries, are split (sha256 of seed:cik, alternating within each sector), so the
 boilerplate of one company never sits on both sides. Reading ret-test needs
 `load_queries("test", allow_test=True)`.
@@ -32,6 +37,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shlex
 import sys
 from collections import Counter
 from datetime import UTC, datetime
@@ -46,6 +52,8 @@ from filinglens.retrieval.chunks import sha256_file
 from filinglens.retrieval.config import CHUNKS
 
 QA = Path("gold/synthetic/risk_qa.train.jsonl")
+# FL-M3 T10a: more questions for ret-test companies only (retrieval/extra_queries.py)
+EXTRA_QA = Path("gold/synthetic/risk_qa.ret_test_extra.jsonl")
 SPLITS = Path("gold/splits.csv")
 OUT_DIR = Path("gold/retrieval")
 RET_SPLITS = ("dev", "test")
@@ -206,9 +214,30 @@ def load_queries(split: str, out_dir: Path = OUT_DIR, allow_test: bool = False) 
     return read_jsonl(out_dir / f"queries.{split}.jsonl")
 
 
+def check_only_additions(previous: dict[str, list[dict]], rows: list[dict]) -> dict:
+    """A rebuild with more Q&A files may only add ret-test queries: ret-dev must come out
+    identical, and every existing ret-test query identical too (question, grades, everything).
+    `previous` is {split: rows} as read from the current files ({} on the first build)."""
+    if not previous:
+        return {"previous_files": False}
+    new = {s: [r for r in rows if r["split"] == s] for s in RET_SPLITS}
+    if new["dev"] != previous.get("dev", []):
+        raise ValueError("ret-dev would change: a rebuild may only add ret-test queries")
+    now = {r["query_id"]: r for r in new["test"]}
+    changed = [r["query_id"] for r in previous.get("test", []) if now.get(r["query_id"]) != r]
+    if changed:
+        raise ValueError(f"{len(changed)} existing ret-test queries would change: {changed[:3]}")
+    return {
+        "previous_files": True,
+        "dev_identical": True,
+        "existing_test_queries_identical": len(previous.get("test", [])),
+        "added_test_queries": len(new["test"]) - len(previous.get("test", [])),
+    }
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--qa", type=Path, default=QA)
+    parser.add_argument("--qa", type=Path, nargs="+", default=[QA, EXTRA_QA])
     parser.add_argument("--chunks", type=Path, default=CHUNKS)
     parser.add_argument("--splits", type=Path, default=SPLITS)
     parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
@@ -216,7 +245,9 @@ def main(argv: list[str] | None = None) -> None:
     argv = sys.argv[1:] if argv is None else argv
     args = parser.parse_args(argv)
 
-    qa = read_jsonl(args.qa)
+    qa = [row for path in args.qa for row in read_jsonl(path)]
+    if len({r["qa_id"] for r in qa}) != len(qa):
+        raise ValueError("the same qa_id appears in more than one Q&A row")
     m2_splits = pd.read_csv(args.splits)
     train = set(m2_splits.loc[m2_splits["split"] == "train", "cik"].astype(int))
     outside = {int(r["cik"]) for r in qa} - train
@@ -227,9 +258,15 @@ def main(argv: list[str] | None = None) -> None:
     rows = build_queries(qa, chunks, assign_splits(companies))
     if leakage(rows):
         raise ValueError("a company has queries in both ret-dev and ret-test")
+    previous = {
+        s: read_jsonl(args.out_dir / f"queries.{s}.jsonl")
+        for s in RET_SPLITS
+        if (args.out_dir / f"queries.{s}.jsonl").exists()
+    }
+    additions = check_only_additions(previous, rows)
     paths = write_split_files(rows, args.out_dir)
     result = {
-        "command": "python -m filinglens.retrieval.queries " + " ".join(argv),
+        "command": "python -m filinglens.retrieval.queries " + shlex.join(argv),
         "finished_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "labels": "synthetic queries, relevance graded automatically (no human judgment)",
         "rule": {
@@ -239,7 +276,9 @@ def main(argv: list[str] | None = None) -> None:
             f"size >= {DUP_MIN_SIZE_RATIO} x grade-2 chunk (content words)",
         },
         "qa_pairs": len(qa),
-        "inputs_sha256": {str(p): sha256_file(p) for p in (args.qa, args.chunks, args.splits)},
+        "qa_pairs_by_batch": dict(sorted(Counter(r.get("batch", "fl_m2_t14") for r in qa).items())),
+        "rebuild": additions,
+        "inputs_sha256": {str(p): sha256_file(p) for p in (*args.qa, args.chunks, args.splits)},
         **summarize(rows),
         "outputs_sha256": {str(p): sha256_file(p) for p in paths.values()},
     }
