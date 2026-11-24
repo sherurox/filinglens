@@ -1,8 +1,10 @@
 # Local services (all bound to 127.0.0.1):
-# - postgres: the hand-written SQL in sql/ (FL-M1 T11–T12)
+# - postgres: the hand-written SQL in sql/ (FL-M1 T11–T12); pgvector index for retrieval (FL-M3)
 # - labelstudio: labeling the gold set (FL-M2 T4–T16)
 # - mlflow: experiment tracking + model registry (FL-M4)
-# Start one: docker compose up -d --wait postgres   (or labelstudio, mlflow)    Stop: docker compose stop
+# - qdrant: vector store compared with pgvector and FAISS (FL-M3)
+# Start one: docker compose up -d --wait postgres   (or labelstudio, mlflow, qdrant)
+# Stop: docker compose stop
 # Teardown, one service at a time. Never `docker compose down -v`: it would also delete the labels.
 # - postgres (rebuild with filinglens.sql.load_postgres):
 #     docker compose rm -sf postgres && docker volume rm filinglens_pgdata
@@ -10,11 +12,16 @@
 #     docker compose rm -sf labelstudio && docker volume rm filinglens_lsdata
 # - mlflow (only after the M4 results are exported to bench/ and docs/):
 #     docker compose rm -sf mlflow && docker volume rm filinglens_mlflowdata
+# - qdrant (rebuild with filinglens.retrieval.stores):
+#     docker compose rm -sf qdrant && docker volume rm filinglens_qdrantdata
 name: filinglens
 
 services:
   postgres:
-    image: postgres:18  # stable major; the exact version is recorded in bench/postgres_load.json
+    # The official postgres:18 image (trixie) plus the pgvector extension (PostgreSQL License).
+    # Same server build as before (18.7-1.pgdg13+2, checked in FL-M3 T1), so it reuses pgdata
+    # as is. Versions in use: bench/postgres_load.json (server), bench/retrieval_env.txt (both).
+    image: pgvector/pgvector:0.8.7-pg18-trixie
     container_name: filinglens-postgres
     environment:
       POSTGRES_DB: filinglens
@@ -37,8 +44,10 @@ services:
       - jit=off  # JIT compile time would add noise to every analytic query
       - -c
       - track_io_timing=on  # BUFFERS output shows I/O time
-    shm_size: 1gb  # parallel workers use shared memory; Docker's default is 64 MB
-    mem_limit: 4g
+    # Parallel workers use shared memory (Docker's default is 64 MB). A parallel HNSW build keeps
+    # its graph there too (up to maintenance_work_mem), so FL-M3 raised this from 1gb.
+    shm_size: 2gb
+    mem_limit: 5g  # was 4g: shared_buffers 1GB + a 1GB HNSW build graph + backends
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U filinglens -d filinglens"]
       interval: 2s
@@ -100,7 +109,30 @@ services:
       timeout: 5s
       retries: 30
 
+  qdrant:
+    image: qdrant/qdrant:v1.20.2  # Apache-2.0; version read from the image in FL-M3 T1
+    container_name: filinglens-qdrant
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"  # no anonymous usage reports leave the machine
+    ports:
+      - "127.0.0.1:56333:6333"  # REST, localhost only; QDRANT_URL=http://127.0.0.1:56333
+      - "127.0.0.1:56334:6334"  # gRPC, localhost only
+    volumes:
+      - qdrantdata:/qdrant/storage
+    mem_limit: 3g  # 201k x 768 float32 vectors are ~0.6 GB, plus the HNSW graph
+    healthcheck:
+      # The image has bash but no curl or wget: send the request through bash's /dev/tcp.
+      test:
+        - CMD
+        - bash
+        - -c
+        - "exec 3<>/dev/tcp/127.0.0.1/6333 && printf 'GET /readyz HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q ' 200 ' <&3"
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
 volumes:
   pgdata:
   lsdata:
   mlflowdata:
+  qdrantdata:

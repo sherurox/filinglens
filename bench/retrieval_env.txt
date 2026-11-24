@@ -1,0 +1,47 @@
+# FL-M3 retrieval environment
+recorded_utc: 2026-11-24T19:03:28Z
+command: bash scripts/fl_m3_env.sh "AC power, Best performance"
+git: 1d7ac43; uncommitted outside bench/: .env.example compose.yaml pyproject.toml uv.lock scripts/fl_m3_env.sh 
+power: AC power, Best performance
+
+## containers (image, image ID)
+filinglens-postgres pgvector/pgvector:0.8.7-pg18-trixie sha256:ab49524d18df7200b74ac9a475e1db6297fc1eb57da4c214c63d10ecc4b754fa
+filinglens-qdrant qdrant/qdrant:v1.20.2 sha256:d277592721d2e3b73f9b797b53cf05e6a5bb2134f6d13fdbda4ca51782afbcac
+filinglens-mlflow ghcr.io/mlflow/mlflow:v3.18.0 sha256:257204c77980b0f3450a26eb6089e487603fcdd4509529eadaf88f90669f5c13
+
+## postgres + pgvector
+PostgreSQL 18.7 (Debian 18.7-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+vector extension: 0.8.7
+kg.nodes: 47612
+kg.edges: 47757
+pgvector LICENSE: Portions Copyright (c) 1996-2026, PostgreSQL Global Development Group Portions Copyright (c) 1994, The Regents of the University of California 
+
+## qdrant
+GET /: {"title":"qdrant - vector search engine","version":"1.20.2","commit":"23065a0bf6857c3e5da45f6c8939cc746cc0580e"}
+GET /readyz: all shards are ready
+qdrant 1.20.2 | licenseDeclared: Apache-2.0
+
+## python packages: uv env
+faiss-cpu 1.16.0 | license: MIT | classifiers: -
+qdrant-client 1.20.0 | license: Apache-2.0 | classifiers: Apache Software License
+pgvector 0.5.1 | license: MIT | classifiers: -
+psycopg 3.3.9 | license: LGPL-3.0-only | classifiers: -
+numpy 2.5.5 | license: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | classifiers: -
+pandas 3.1.1 | license: BSD-3-Clause | classifiers: -
+scipy 1.18.1 | license: Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Develope | classifiers: BSD License
+mlflow 3.18.0 | license: Copyright 2018 Databricks, Inc.  All rights reserved. | classifiers: Apache Software License
+
+## python packages: fl-train venv (/home/shreyas/venvs/fl-train/bin/python)
+torch 2.15.0+cu132 | license: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clau | classifiers: -
+transformers 5.23.0 | license: Apache 2.0 License | classifiers: -
+huggingface-hub 2.4.0 | license: Apache-2.0 | classifiers: Apache Software License
+tokenizers 0.23.3 | license: - | classifiers: Apache Software License
+numpy 2.5.5 | license: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | classifiers: -
+mlflow 3.18.0 | license: Copyright 2018 Databricks, Inc.  All rights reserved. | classifiers: Apache Software License
+
+## models
+BAAI/bge-base-en-v1.5 revision a5beb1e3e68b9ab74eb54cfd186867f64f240e1a | card license: mit | tags: license:mit
+BAAI/bge-reranker-base revision 2cfc18c9415c912f9d8155881c133215df768a70 | card license: mit | tags: license:mit
+
+## gpu
+NVIDIA GeForce RTX 5070 Laptop GPU, 621.01, 2074 MiB, 8151 MiB, 48.20
