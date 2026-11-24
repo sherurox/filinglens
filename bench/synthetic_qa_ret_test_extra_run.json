@@ -1,0 +1,12 @@
+{
+  "command": "python -m filinglens.retrieval.extra_queries generate --model Qwen/Qwen3-4B-AWQ --gpu-memory-utilization 0.80 --enforce-eager",
+  "finished_utc": "2026-11-24T22:58:21+00:00",
+  "model": "Qwen/Qwen3-4B-AWQ",
+  "prompt_version": 2,
+  "quantization": null,
+  "gpu_memory_utilization": 0.8,
+  "enforce_eager": true,
+  "tasks": 1163,
+  "elapsed_s_incl_model_load": 418.6,
+  "peak_gpu_memory_mib": 7915
+}

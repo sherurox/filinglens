@@ -1,0 +1,70 @@
+{
+  "command": "python -m filinglens.retrieval.extra_queries finalize",
+  "finished_utc": "2026-11-24T22:58:25+00:00",
+  "generator": "Qwen/Qwen3-4B-AWQ",
+  "prompt": "docs/labeling/synthetic_qa_prompt.md",
+  "prompt_version": 2,
+  "batch": "ret_test_extra_v1",
+  "prepare": {
+    "command": "python -m filinglens.retrieval.extra_queries prepare",
+    "seed": 20261124,
+    "eligible_test_company_paragraphs": 30190,
+    "dropped_text_also_at_m2_dev_or_test_company": 39,
+    "dropped_text_of_an_existing_qa_paragraph": 295,
+    "dropped_duplicate_text_within_pool": 6414,
+    "pool_paragraphs": 23442,
+    "test_companies": 75,
+    "existing_test_queries": 175,
+    "target_per_company": 15,
+    "assumed_yield": 0.85,
+    "paragraphs_wanted": 1163,
+    "tasks": 1163,
+    "companies_short_of_paragraphs": 0,
+    "by_sector": {
+      "finance": 184,
+      "manufacturing": 189,
+      "mining_energy": 182,
+      "retail": 224,
+      "services": 178,
+      "transport_utilities": 206
+    },
+    "by_year": {
+      "2019": 213,
+      "2020": 221,
+      "2022": 234,
+      "2024": 251,
+      "2025": 244
+    }
+  },
+  "pairs_generated": 2326,
+  "pairs_kept": 1487,
+  "kept_rate": 0.6393,
+  "problems": {
+    "evidence_length": 453,
+    "evidence_not_verbatim": 273,
+    "answer_length": 138,
+    "question_copies_paragraph": 134,
+    "question_no_ticker": 99,
+    "answer_not_from_paragraph": 6,
+    "unparseable": 4,
+    "duplicate_question": 2
+  },
+  "kept_paragraphs": 962,
+  "paragraph_yield": 0.8272,
+  "kept_companies": 75,
+  "kept_by_type": {
+    "factual": 699,
+    "impact": 637,
+    "cause": 97,
+    "mitigation": 54
+  },
+  "leakage": {
+    "rows_from_non_train_companies": 0,
+    "rows_with_source_text_at_dev_or_test_company": 0,
+    "rows_not_marked_synthetic_train": 0,
+    "rows_from_non_ret_test_companies": 0,
+    "rows_reusing_an_existing_qa_paragraph": 0
+  },
+  "output": "gold/synthetic/risk_qa.ret_test_extra.jsonl",
+  "output_sha256": "4b75e4bfd309ab40a6b1742ccc20dc1f2f98a03323e83c1ce31d0de172a6307a"
+}

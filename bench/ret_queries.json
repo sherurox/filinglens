@@ -1,19 +1,30 @@
 {
   "command": "python -m filinglens.retrieval.queries ",
-  "finished_utc": "2026-11-24T19:17:57+00:00",
+  "finished_utc": "2026-11-24T22:58:45+00:00",
   "labels": "synthetic queries, relevance graded automatically (no human judgment)",
   "rule": {
     "seed": 3,
     "grade2": "source-paragraph chunks holding the evidence quote (synthetic_qa.squash)",
     "grade1": "same company, other filing, overlap >= 0.8, size >= 0.5 x grade-2 chunk (content words)"
   },
-  "qa_pairs": 550,
+  "qa_pairs": 2037,
+  "qa_pairs_by_batch": {
+    "fl_m2_t14": 550,
+    "ret_test_extra_v1": 1487
+  },
+  "rebuild": {
+    "previous_files": true,
+    "dev_identical": true,
+    "existing_test_queries_identical": 175,
+    "added_test_queries": 962
+  },
   "inputs_sha256": {
     "gold/synthetic/risk_qa.train.jsonl": "13122e1eb80678353847d0cc10473b5351e7225777932e63a63e48f8a879ec24",
+    "gold/synthetic/risk_qa.ret_test_extra.jsonl": "4b75e4bfd309ab40a6b1742ccc20dc1f2f98a03323e83c1ce31d0de172a6307a",
     "data/interim/retrieval/chunks.parquet": "ecc1e6fcba04aed186477b799856c62000e1bb4c789c611cb337fa502975ae86",
     "gold/splits.csv": "a526e57ee1860a0b10c5338a55148206df3e6c69cc6dfa04ac8a75f2dc3752d4"
   },
-  "queries": 357,
+  "queries": 1319,
   "leakage_companies_in_both_splits": 0,
   "dev": {
     "queries": 182,
@@ -43,33 +54,34 @@
     }
   },
   "test": {
-    "queries": 175,
+    "queries": 1137,
     "companies": 75,
     "by_sector": {
-      "finance": 30,
-      "manufacturing": 26,
-      "mining_energy": 30,
-      "retail": 28,
-      "services": 34,
-      "transport_utilities": 27
+      "finance": 188,
+      "manufacturing": 178,
+      "mining_energy": 184,
+      "retail": 224,
+      "services": 180,
+      "transport_utilities": 183
     },
     "by_type": {
-      "cause": 9,
-      "factual": 97,
-      "impact": 69
+      "cause": 54,
+      "factual": 650,
+      "impact": 419,
+      "mitigation": 14
     },
     "evidence_match": {
-      "verbatim": 175
+      "verbatim": 1137
     },
-    "grade2_chunks": 175,
+    "grade2_chunks": 1138,
     "grade1_per_query": {
-      "mean": 4.931,
+      "mean": 4.694,
       "max": 14,
-      "zero": 11
+      "zero": 65
     }
   },
   "outputs_sha256": {
     "gold/retrieval/queries.dev.jsonl": "1edc160841848e8f55b6e9568ffe9e8f9fe3299c01f0ab690225c05408a5a27e",
-    "gold/retrieval/queries.test.jsonl": "33d8fe99165f0e5c997202bc0190a3e111d635c01117ad27c72657d96dfb4dc4"
+    "gold/retrieval/queries.test.jsonl": "d99ab1921951792194dfe56cda39caf8743a084432713af7e9b915831db1da82"
   }
 }
