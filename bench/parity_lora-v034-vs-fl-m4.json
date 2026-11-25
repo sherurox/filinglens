@@ -1,0 +1,37 @@
+{
+  "command": "python -m filinglens.serve.parity --name lora-v034-vs-fl-m4 --a data/interim/fields/fields_zero_dev_teacher-n1500-r16-lr0.0002-e1.jsonl --b data/interim/fields/fields_zero_dev_lora-v034.jsonl --scores-a bench/fields_zero_dev_teacher-n1500-r16-lr0.0002-e1.json --scores-b bench/fields_zero_dev_lora-v034.json",
+  "finished_utc": "2026-11-25T17:05:41+00:00",
+  "a": "data/interim/fields/fields_zero_dev_teacher-n1500-r16-lr0.0002-e1.jsonl",
+  "b": "data/interim/fields/fields_zero_dev_lora-v034.jsonl",
+  "category_macro_f1_a": 0.7414,
+  "category_macro_f1_b": 0.7414,
+  "rows_a": 71,
+  "rows_b": 71,
+  "rows_compared": 71,
+  "only_a": [],
+  "only_b": [],
+  "raw_identical": 57,
+  "agree": {
+    "valid": 71,
+    "category": 71,
+    "severity": 71,
+    "first_seen_year": 70
+  },
+  "raw_differs": [
+    "0000703351-22-000036:37",
+    "0000745732-22-000014:5",
+    "0000840489-21-000028:3",
+    "0000895728-21-000010:16",
+    "0000950170-23-003797:6",
+    "0000950170-25-025210:13",
+    "0001451505-21-000020:19",
+    "0001531152-19-000010:62",
+    "0001539838-26-000010:82",
+    "0001558370-25-001869:134",
+    "0001559720-21-000010:98",
+    "0001628280-23-004087:48",
+    "0001658566-25-000014:16",
+    "0001730168-24-000139:19"
+  ],
+  "category_changes": []
+}

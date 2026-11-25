@@ -1,0 +1,73 @@
+{
+  "command": "python -m filinglens.serve.merge",
+  "finished_utc": "2026-11-25T17:01:17+00:00",
+  "base": "Qwen/Qwen3-1.7B",
+  "base_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "adapter": "data/interim/serve/student-v1/adapter",
+  "adapter_weights_sha256": "4315f7f644e647b9c863d3641be3cf81acf8da14cdd448c2263dbf0192d756c5",
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "target_modules": [
+    "v_proj",
+    "gate_proj",
+    "k_proj",
+    "up_proj",
+    "q_proj",
+    "down_proj",
+    "o_proj"
+  ],
+  "merge": "fp32 on CPU, safe_merge, cast to bfloat16 once",
+  "merge_and_save_s": 14.7,
+  "peak_rss_mib": 12392,
+  "out": "data/interim/serve/merged-bf16",
+  "out_files": {
+    "config.json": "3ee59ef9c4528d48c8d060a37a5e79cd83cb5ca1beaa0bf8f673b8be30f4f003",
+    "generation_config.json": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "model.safetensors": "089bb07072b111e738944d5091e2db60b3adc202660a7184fdd95a44dc5c02bd",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "out_weights_bytes": 3441185608,
+  "config_dtype": "bfloat16",
+  "tokenizer_files_copied_from_base": [
+    "generation_config.json",
+    "merges.txt",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "vocab.json"
+  ],
+  "adapter_tokenizer_files_bytes_equal_base": {
+    "chat_template.jinja": false,
+    "tokenizer.json": false,
+    "tokenizer_config.json": false
+  },
+  "tokenizer_note": "byte equality only; serve/template_check.py compares rendered token IDs",
+  "tie_word_embeddings": true,
+  "base_lm_head_equals_embed_tokens": true,
+  "only_base_ok": true,
+  "layers": 28,
+  "expected_changed": 196,
+  "tensors_base": 311,
+  "tensors_merged": 310,
+  "only_base": [
+    "lm_head.weight"
+  ],
+  "only_merged": [],
+  "lora_tensors_left": [],
+  "merged_dtypes": {
+    "torch.bfloat16": 310
+  },
+  "changed": 196,
+  "changed_by_module": {
+    "mlp.down_proj": 28,
+    "mlp.gate_proj": 28,
+    "mlp.up_proj": 28,
+    "self_attn.k_proj": 28,
+    "self_attn.o_proj": 28,
+    "self_attn.q_proj": 28,
+    "self_attn.v_proj": 28
+  },
+  "ok": true
+}

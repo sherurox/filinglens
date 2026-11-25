@@ -3,9 +3,10 @@
 Runs under any of the three Pythons (uv env, fl-train, fl-gpu) with the standard library only,
 so the same file reports every venv:
     <python> scripts/env_info.py packages vllm torch ...
-    <python> scripts/env_info.py models Qwen/Qwen3-1.7B BAAI/bge-reranker-base
-`models` reads the local Hugging Face cache only (no network): the snapshot revision that
-`main` points to and the `license:` line of the model card's front matter.
+    <python> scripts/env_info.py models Qwen/Qwen3-1.7B@<sha> BAAI/bge-reranker-base@<sha>
+`models` reads the local Hugging Face cache only (no network): the snapshot at the pinned
+revision (`repo@sha`; FL-M3 loads by revision, which stores no `refs/main`), or the one `main`
+points to when no revision is given, and the `license:` line of that model card's front matter.
 """
 
 from __future__ import annotations
@@ -50,12 +51,16 @@ def card_license(readme: Path) -> str:
     return "-"
 
 
-def model_line(repo_id: str, cache: Path | None = None) -> str:
+def model_line(spec: str, cache: Path | None = None) -> str:
+    repo_id, _, revision = spec.partition("@")
     folder = (cache or hub_cache()) / f"models--{repo_id.replace('/', '--')}"
-    ref = folder / "refs" / "main"
-    if not ref.is_file():
-        return f"{repo_id} | not in the local cache"
-    revision = ref.read_text().strip()
+    if not revision:
+        ref = folder / "refs" / "main"
+        if not ref.is_file():
+            return f"{repo_id} | not in the local cache (no refs/main)"
+        revision = ref.read_text().strip()
+    if not (folder / "snapshots" / revision).is_dir():
+        return f"{repo_id} revision {revision} | not in the local cache"
     readme = folder / "snapshots" / revision / "README.md"
     license_ = card_license(readme) if readme.is_file() else "- (no README in snapshot)"
     return f"{repo_id} revision {revision} | card license: {license_}"

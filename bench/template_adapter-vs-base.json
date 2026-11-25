@@ -1,0 +1,18 @@
+{
+  "command": "python -m filinglens.serve.template_check --name adapter-vs-base --a data/interim/serve/student-v1/adapter --b data/interim/serve/merged-bf16",
+  "finished_utc": "2026-11-25T17:01:18+00:00",
+  "a": "data/interim/serve/student-v1/adapter",
+  "b": "data/interim/serve/merged-bf16",
+  "split": "dev",
+  "render": "apply_chat_template(add_generation_prompt=True, enable_thinking=False)",
+  "conversations": 71,
+  "text_identical": 71,
+  "ids_identical": 71,
+  "ids_differ": [],
+  "first_difference": null,
+  "prompt_tokens_min_max": [
+    1324,
+    2335
+  ],
+  "ok": true
+}

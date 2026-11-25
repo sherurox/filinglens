@@ -29,7 +29,20 @@ def test_license_outside_front_matter_is_ignored(tmp_path):
 
 
 def test_model_not_cached(tmp_path):
-    assert env_info.model_line("Org/None", tmp_path) == "Org/None | not in the local cache"
+    assert env_info.model_line("Org/None", tmp_path) == (
+        "Org/None | not in the local cache (no refs/main)"
+    )
+
+
+def test_pinned_revision_without_refs_main(tmp_path):
+    fake_model(tmp_path, "Org/M", "abc123", "---\nlicense: mit\n---\n")
+    (tmp_path / "models--Org--M" / "refs" / "main").unlink()
+    assert env_info.model_line("Org/M@abc123", tmp_path) == (
+        "Org/M revision abc123 | card license: mit"
+    )
+    assert env_info.model_line("Org/M@other", tmp_path) == (
+        "Org/M revision other | not in the local cache"
+    )
 
 
 def test_missing_package_is_reported_not_raised():

@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --gpu-memory-utilization 0.83 --max-model-len 4608 --max-num-seqs 1 --model data/interim/serve/merged-bf16 --tag merged-bf16",
+  "finished_utc": "2026-11-25T17:05:34+00:00",
+  "split": "dev",
+  "model": "data/interim/serve/merged-bf16",
+  "lora": null,
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 71,
+  "elapsed_s_incl_model_load": 85.2,
+  "peak_gpu_memory_mib": 7840,
+  "predictions": "data/interim/fields/fields_zero_dev_merged-bf16.jsonl"
+}

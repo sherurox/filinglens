@@ -69,7 +69,10 @@ packages() {  # $1 = python, rest = distribution names
 
   echo; echo "## models (local Hugging Face cache)"
   if [[ -x "$TRAIN_PY" ]]; then
-    "$TRAIN_PY" scripts/env_info.py models Qwen/Qwen3-1.7B BAAI/bge-reranker-base BAAI/bge-base-en-v1.5
+    "$TRAIN_PY" scripts/env_info.py models \
+      Qwen/Qwen3-1.7B@70d244cc86ccca08cf5af4e1e306ecf908b1ad5e \
+      BAAI/bge-reranker-base@2cfc18c9415c912f9d8155881c133215df768a70 \
+      BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a
   fi
 } > "$OUT" 2>&1
 
