@@ -1,0 +1,72 @@
+# FL-M5 serving environment
+recorded_utc: 2026-11-25T16:51:12Z
+command: bash scripts/fl_m5_env.sh "AC power, Best performance"
+git: c0a1910; uncommitted outside bench/: scripts/env_info.py scripts/fl_m5_env.sh src/filinglens/serve/ tests/test_env_info.py tests/test_serve_student.py 
+power: AC power, Best performance
+
+## gpu (idle, before any model is loaded)
+name, compute_cap, driver_version, memory.used [MiB], memory.total [MiB], temperature.gpu, power.draw [W], power.limit [W], pstate
+NVIDIA GeForce RTX 5070 Laptop GPU, 12.0, 621.01, 2026 MiB, 8151 MiB, 45.30, 18.36 W, [N/A], P4
+note: WSL can't list Windows processes; memory.used includes the Windows desktop and apps
+Cuda compilation tools, release 13.2, V13.2.86
+Build cuda_13.2.r13.2/compiler.37953736_0
+
+## host
+CPU(s): 24
+Model name: AMD Ryzen 9 8940HX with Radeon Graphics
+Thread(s) per core: 2
+ram_mib total 19998, available 17855
+kernel: 6.18.58.1-microsoft-standard-WSL2
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  111G  846G  12% /
+D:\             932G  801G  131G  86% /mnt/d
+
+## containers (name, image, image ID)
+filinglens-postgres pgvector/pgvector:0.8.7-pg18-trixie sha256:ab49524d18df7200b74ac9a475e1db6297fc1eb57da4c214c63d10ecc4b754fa
+filinglens-qdrant qdrant/qdrant:v1.20.2 sha256:d277592721d2e3b73f9b797b53cf05e6a5bb2134f6d13fdbda4ca51782afbcac
+filinglens-mlflow ghcr.io/mlflow/mlflow:v3.18.0 sha256:257204c77980b0f3450a26eb6089e487603fcdd4509529eadaf88f90669f5c13
+
+## python packages: uv env
+mlflow 3.18.0 | license: Copyright 2018 Databricks, Inc. All rights reserved. Apache  | classifiers: Apache Software License
+numpy 2.5.5 | license: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | classifiers: -
+scipy 1.18.1 | license: Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Develope | classifiers: BSD License
+pandas 3.1.1 | license: BSD-3-Clause | classifiers: -
+psycopg 3.3.9 | license: LGPL-3.0-only | classifiers: -
+httpx 0.28.1 | license: BSD-3-Clause | classifiers: BSD License
+fastapi 0.165.0 | license: MIT | classifiers: -
+uvicorn 0.54.0 | license: BSD-3-Clause | classifiers: -
+opentelemetry-sdk 1.45.2 | license: Apache-2.0 | classifiers: -
+google-genai 2.34.0 | license: Apache-2.0 | classifiers: -
+
+## python packages: fl-train venv (/home/shreyas/venvs/fl-train/bin/python)
+torch 2.15.0+cu132 | license: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clau | classifiers: -
+transformers 5.23.0 | license: Apache 2.0 License | classifiers: -
+peft 0.22.0 | license: Apache | classifiers: Apache Software License
+accelerate 1.16.0 | license: Apache | classifiers: Apache Software License
+bitsandbytes 0.50.2 | license: MIT | classifiers: -
+safetensors 0.8.0 | license: - | classifiers: Apache Software License
+huggingface-hub 2.4.0 | license: Apache-2.0 | classifiers: Apache Software License
+onnx | not installed
+onnxruntime | not installed
+onnxruntime-gpu | not installed
+mlflow 3.18.0 | license: Copyright 2018 Databricks, Inc. All rights reserved. Apache  | classifiers: Apache Software License
+torch cuda 13.2 | capability (12, 0)
+
+## python packages: fl-gpu venv (/home/shreyas/venvs/fl-gpu/bin/python)
+vllm 0.34.0 | license: Apache-2.0 | classifiers: -
+torch 2.14.0+cu132 | license: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clau | classifiers: -
+transformers 5.22.2 | license: Apache 2.0 License | classifiers: -
+compressed-tensors 0.17.0 | license: Apache 2.0 | classifiers: -
+triton 3.8.0 | license: MIT | classifiers: -
+mlflow | not installed
+
+## python packages: fl-quant venv (/home/shreyas/venvs/fl-quant/bin/python)
+(/home/shreyas/venvs/fl-quant/bin/python not found)
+
+## llama.cpp (/home/shreyas/src/llama.cpp)
+not built yet (T4)
+
+## models (local Hugging Face cache)
+Qwen/Qwen3-1.7B revision 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e | card license: apache-2.0
+BAAI/bge-reranker-base | not in the local cache
+BAAI/bge-base-en-v1.5 | not in the local cache

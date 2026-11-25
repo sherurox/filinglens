@@ -1,0 +1,63 @@
+{
+  "command": "python -m filinglens.serve.student fetch",
+  "finished_utc": "2026-11-25T16:51:16+00:00",
+  "model": "filinglens-risk-student",
+  "version": "1",
+  "source": "mlflow-artifacts:/1/2b109c9f6f234d659bece77f590356f6/artifacts/adapter",
+  "run_id": "2b109c9f6f234d659bece77f590356f6",
+  "status": "READY",
+  "tags": {
+    "version.adapter": "LoRA (QLoRA training on an NF4 base; served on the bf16 base in vLLM)",
+    "version.base_model": "Qwen/Qwen3-1.7B",
+    "version.base_model_license": "Apache-2.0",
+    "version.config.arm": "teacher",
+    "version.config.batch_size": "1",
+    "version.config.epochs": "1.0",
+    "version.config.grad_accum": "8",
+    "version.config.learning_rate": "0.0002",
+    "version.config.liger": "True",
+    "version.config.lora_alpha": "32",
+    "version.config.lora_dropout": "0.05",
+    "version.config.max_length": "4096",
+    "version.config.max_steps": "-1",
+    "version.config.model": "Qwen/Qwen3-1.7B",
+    "version.config.optimizer_steps": "188",
+    "version.config.rank": "16",
+    "version.config.seed": "0",
+    "version.config.teacher_limit": "1500",
+    "version.config.warmup_frac": "0.05",
+    "version.data_version": "c22a17424ded116a0a1c18cd6d40a71a8ec921d191878571358efcaa970de1d4",
+    "version.dev.category_macro_f1": "0.7414",
+    "version.git_dirty": "false",
+    "version.git_sha": "edea65f9cf74ae5f3e7640b0cb0188eeb3a410ee",
+    "version.labels": "silver (Granite 4.1 3B); scores are agreement, not correctness",
+    "version.test.category_macro_f1": "0.7948",
+    "version.test.rule_valid_rate": "1.0",
+    "version.test_comparison_run_id": "6ade9c36180e40a1abcc720260b68c9a",
+    "version.train_run_id": "2b109c9f6f234d659bece77f590356f6"
+  },
+  "registry_copy": "/home/shreyas/code/filinglens/data/interim/serve/student-v1/adapter",
+  "local_adapter": "data/interim/adapters/teacher-n1500-r16-lr0.0002-e1/adapter",
+  "registry_files": {
+    "README.md": "9ee5f0e9779933c91cfa8b8d7602b5b6d2a171b81bf9933921f2ba52e0ff78d0",
+    "adapter_config.json": "c3a0a4a503bd6f102da51a1c3716fed727c63161232c6512439c1756069470b1",
+    "adapter_model.safetensors": "4315f7f644e647b9c863d3641be3cf81acf8da14cdd448c2263dbf0192d756c5",
+    "chat_template.jinja": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+    "tokenizer.json": "be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506",
+    "tokenizer_config.json": "04b1682c59acbd057f4c9072297faa73d56fc9de053094c659cdb4c464f58f86"
+  },
+  "comparison": {
+    "identical": true,
+    "files_same": 6,
+    "differ": [],
+    "only_registry": [],
+    "only_local": []
+  },
+  "weights_file": "adapter_model.safetensors",
+  "weights_sha256": "4315f7f644e647b9c863d3641be3cf81acf8da14cdd448c2263dbf0192d756c5",
+  "weights_sha256_in_tags": false,
+  "sha256_tags_match_a_file": {
+    "version.data_version": false
+  },
+  "ok": true
+}
