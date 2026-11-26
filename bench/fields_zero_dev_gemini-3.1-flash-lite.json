@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.extract.fields score --variant zero --split dev --tag gemini-3.1-flash-lite",
+  "finished_utc": "2026-11-26T22:20:22+00:00",
+  "split": "dev",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "predictions": "data/interim/fields/fields_zero_dev_gemini-3.1-flash-lite.jsonl",
+  "all_rows": {
+    "rows": 71,
+    "rule_valid": 71,
+    "category_macro_f1": 0.7175,
+    "category_macro_f1_ci95": [
+      0.523,
+      0.785
+    ],
+    "category_accuracy": 0.7606,
+    "severity_macro_f1": 0.249,
+    "first_seen_exact": 0.7746,
+    "first_seen_within_1y": 0.8732
+  },
+  "rows_where_silver_labelers_agree": {
+    "rows": 52,
+    "rule_valid": 52,
+    "category_macro_f1": 0.8447,
+    "category_macro_f1_ci95": [
+      0.626,
+      0.892
+    ],
+    "category_accuracy": 0.9231,
+    "severity_macro_f1": 0.2471,
+    "first_seen_exact": 0.75,
+    "first_seen_within_1y": 0.8846
+  }
+}
