@@ -1,0 +1,74 @@
+{
+  "command": "bash scripts/fl_m5_image.sh",
+  "finished_utc": "2026-11-26T23:56:00+00:00",
+  "image": "filinglens-api:local",
+  "image_id": "sha256:e4d41d7b6f1028b79ad240e8f00b320d2ca813d1a0ec99c127b0d0aaea988030",
+  "base": "\nunknown",
+  "build_s": 0.8,
+  "bytes": {
+    "docker_image_inspect_size": 181358157,
+    "docker_save_gzip": 180719407,
+    "unpacked_rootfs_du": 447713438
+  },
+  "registry_budget_bytes": 500000000,
+  "under_budget": true,
+  "layers": [
+    {
+      "size": "0B",
+      "created_by": "CMD [\"sh\" \"-c\" \"exec uvicorn filinglens.api.app:app --host 0.0.0.0 --port ${PORT}\"]"
+    },
+    {
+      "size": "0B",
+      "created_by": "EXPOSE [8080/tcp]"
+    },
+    {
+      "size": "0B",
+      "created_by": "USER app"
+    },
+    {
+      "size": "49.2kB",
+      "created_by": "RUN /bin/sh -c useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin app # buildkit"
+    },
+    {
+      "size": "0B",
+      "created_by": "ENV PYTHONPATH=/app/src EMBED_MODEL=/app/model/bge-base-int8.onnx EMBED_TOKENIZER=/app/model/bge-base.tokenizer.json ROUTER_INPUTS=/app/bench/router_inputs.json GEMINI_QUOTA_FILE=/tmp/gemini_quota.json PORT=8080"
+    },
+    {
+      "size": "725kB",
+      "created_by": "COPY data/interim/serve/onnx/bge-base.tokenizer.json /app/model/bge-base.tokenizer.json # buildkit"
+    },
+    {
+      "size": "109MB",
+      "created_by": "COPY data/interim/serve/onnx/bge-base.eager-opt-int8.onnx /app/model/bge-base-int8.onnx # buildkit"
+    },
+    {
+      "size": "20.5kB",
+      "created_by": "COPY bench/router_inputs.json /app/bench/router_inputs.json # buildkit"
+    },
+    {
+      "size": "1.02MB",
+      "created_by": "COPY src/filinglens /app/src/filinglens # buildkit"
+    },
+    {
+      "size": "237MB",
+      "created_by": "RUN /bin/sh -c pip install --require-hashes --no-deps -r requirements-api.txt # buildkit"
+    },
+    {
+      "size": "24.6kB",
+      "created_by": "COPY requirements-api.txt . # buildkit"
+    },
+    {
+      "size": "8.19kB",
+      "created_by": "WORKDIR /app"
+    }
+  ],
+  "startup": {
+    "seconds_to_healthy": 1.4,
+    "health": {
+      "status": "ok",
+      "database": true,
+      "spend_usd": 0
+    }
+  },
+  "runs_as_uid": 10001
+}

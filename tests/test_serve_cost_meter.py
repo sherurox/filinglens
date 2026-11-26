@@ -20,6 +20,7 @@ from filinglens.serve.cost_meter import (
     PostgresSink,
     Prices,
     error_type,
+    pg_conninfo,
     request_cost,
 )
 
@@ -164,3 +165,19 @@ def test_postgres_sink_creates_the_table_once_and_inserts_parameters():
     assert "%(route)s" in INSERT and "extraction" not in INSERT
     sink.close()
     assert con.closed
+
+
+def test_pg_conninfo_prefers_database_url_then_host_and_port(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@neon.example/db?sslmode=require")
+    assert pg_conninfo() == "postgresql://u:p@neon.example/db?sslmode=require"
+    monkeypatch.delenv("DATABASE_URL")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "pw")
+    monkeypatch.delenv("POSTGRES_HOST", raising=False)
+    monkeypatch.delenv("POSTGRES_PORT", raising=False)
+    assert pg_conninfo().startswith("host=127.0.0.1 port=55432 ")
+    monkeypatch.setenv("POSTGRES_HOST", "filinglens-postgres")
+    monkeypatch.setenv("POSTGRES_PORT", "5432")
+    assert pg_conninfo().startswith("host=filinglens-postgres port=5432 ")
+    monkeypatch.delenv("POSTGRES_PASSWORD")
+    with pytest.raises(SystemExit):
+        pg_conninfo()

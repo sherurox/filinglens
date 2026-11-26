@@ -1,0 +1,9 @@
+# Deny everything, then allow exactly what the Dockerfile copies (data/ is many GB).
+*
+!requirements-api.txt
+!src/filinglens/**
+!bench/router_inputs.json
+!data/interim/serve/onnx/bge-base.eager-opt-int8.onnx
+!data/interim/serve/onnx/bge-base.tokenizer.json
+**/__pycache__
+**/*.pyc

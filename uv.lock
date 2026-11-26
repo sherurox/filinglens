@@ -842,8 +842,15 @@ dependencies = [
 [package.dev-dependencies]
 api = [
     { name = "fastapi" },
+    { name = "httpx" },
+    { name = "numpy" },
     { name = "onnxruntime" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-sdk" },
+    { name = "pgvector" },
+    { name = "psycopg", extra = ["binary"] },
     { name = "tokenizers" },
+    { name = "tzdata" },
     { name = "uvicorn" },
 ]
 dev = [
@@ -885,8 +892,15 @@ requires-dist = [
 [package.metadata.requires-dev]
 api = [
     { name = "fastapi", specifier = ">=0.165.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "numpy", specifier = ">=2.5.5" },
     { name = "onnxruntime", specifier = ">=1.32.0" },
+    { name = "opentelemetry-api", specifier = ">=1.45.2" },
+    { name = "opentelemetry-sdk", specifier = ">=1.45.2" },
+    { name = "pgvector", specifier = ">=0.5.1" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.9" },
     { name = "tokenizers", specifier = ">=0.23.3" },
+    { name = "tzdata", specifier = ">=2026.6" },
     { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 dev = [

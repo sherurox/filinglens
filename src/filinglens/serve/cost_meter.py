@@ -133,14 +133,19 @@ INSERT = (
 
 
 def pg_conninfo() -> str:
-    """DATABASE_URL if set (Neon on Cloud Run, T13), else the local compose Postgres."""
+    """DATABASE_URL if set (Neon on Cloud Run, T13), else the local compose Postgres.
+
+    POSTGRES_HOST / POSTGRES_PORT override 127.0.0.1:55432, e.g. from a container on the compose
+    network (host filinglens-postgres, port 5432), where 127.0.0.1 is the container itself."""
     url = os.environ.get("DATABASE_URL")
     if url:
         return url
     password = os.environ.get("POSTGRES_PASSWORD")
     if not password:
         raise SystemExit("set POSTGRES_PASSWORD or DATABASE_URL (source .env)")
-    return f"host=127.0.0.1 port=55432 dbname=filinglens user=filinglens password={password}"
+    host = os.environ.get("POSTGRES_HOST", "127.0.0.1")
+    port = os.environ.get("POSTGRES_PORT", "55432")
+    return f"host={host} port={port} dbname=filinglens user=filinglens password={password}"
 
 
 class PostgresSink:
