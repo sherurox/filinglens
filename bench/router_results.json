@@ -1,0 +1,653 @@
+{
+  "command": "python -m filinglens.serve.router",
+  "finished_utc": "2026-11-26T23:05:37+00:00",
+  "rule": "bench/m5_router_rule.json",
+  "inputs": {
+    "file": "bench/router_inputs.json",
+    "sha256": "7e1dcf21501a1f7eda91005851494c62083aa2e897fd3e9998b8652c4a68295f"
+  },
+  "spend": {
+    "actual_usd": 0,
+    "why": "Gemini free tier (no billing linked); local backends on the author's laptop",
+    "modelled": "list prices (Gemini) and electricity at the EIA US average (local)"
+  },
+  "results": {
+    "S1_gpu_on/main": {
+      "traffic_per_day": {
+        "extraction": 500.0,
+        "short_qa": 200.0,
+        "long_synthesis": 50.0
+      },
+      "eligible": [
+        {
+          "cls": "extraction",
+          "backend": "vllm",
+          "accuracy": 0.7273,
+          "usd_per_request": 1.4134892202777776e-06,
+          "mean_latency_s": 0.4369,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gguf",
+          "accuracy": 0.6915,
+          "usd_per_request": 1.2677738958333334e-05,
+          "mean_latency_s": 3.3491,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gemini",
+          "accuracy": 0.7175,
+          "usd_per_request": 0.000554375,
+          "mean_latency_s": 6.2258,
+          "prompt_tokens": 1741.1
+        },
+        {
+          "cls": "short_qa",
+          "backend": "vllm",
+          "accuracy": 0.5481,
+          "usd_per_request": 6.654949247222221e-07,
+          "mean_latency_s": 0.2057,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "short_qa",
+          "backend": "gguf",
+          "accuracy": 0.5385,
+          "usd_per_request": 4.769246458333334e-06,
+          "mean_latency_s": 1.2599,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "long_synthesis",
+          "backend": "gemini",
+          "accuracy": null,
+          "usd_per_request": 0.004596,
+          "mean_latency_s": null,
+          "prompt_tokens": 15984
+        }
+      ],
+      "floors": {
+        "extraction": 0.7172999999999999,
+        "short_qa": 0.5381,
+        "long_synthesis": null
+      },
+      "lp": {
+        "status": "optimal",
+        "cost_usd_per_day": 0.23063984359508333,
+        "shares": {
+          "extraction/vllm": 1.0,
+          "extraction/gguf": 0.0,
+          "extraction/gemini": 0.0,
+          "short_qa/vllm": 1.0,
+          "short_qa/gguf": 0.0,
+          "long_synthesis/gemini": 1.0
+        },
+        "requests": {
+          "extraction/vllm": 500.0,
+          "extraction/gguf": 0.0,
+          "extraction/gemini": 0.0,
+          "short_qa/vllm": 200.0,
+          "short_qa/gguf": 0.0,
+          "long_synthesis/gemini": 50.0
+        },
+        "binding": [],
+        "slack": {
+          "floor:extraction": 0.010000000000000009,
+          "floor:short_qa": 0.010000000000000009,
+          "gemini_rpd": 450.0,
+          "gemini_rpm": 14.965277777777779,
+          "gemini_tpm": 249445.0,
+          "busy:vllm": 86140.41,
+          "busy:gguf": 86400.0
+        },
+        "duals_usd_per_unit": {
+          "floor:extraction": -0.0,
+          "floor:short_qa": -0.0,
+          "gemini_rpd": -0.0,
+          "gemini_rpm": -0.0,
+          "gemini_tpm": -0.0,
+          "busy:vllm": -0.0,
+          "busy:gguf": -0.0
+        }
+      },
+      "greedy": {
+        "status": "all routed",
+        "cost_usd_per_day": 0.23063984359508333,
+        "requests": {
+          "extraction/vllm": 500.0,
+          "short_qa/vllm": 200.0,
+          "long_synthesis/gemini": 50.0
+        },
+        "unrouted": {
+          "extraction": 0.0,
+          "short_qa": 0.0,
+          "long_synthesis": 0.0
+        },
+        "violates_lp_rows": []
+      },
+      "comparison": {
+        "savings_usd_per_day": 0.0,
+        "savings_pct": 0.0
+      },
+      "sweep": {
+        "extraction": [
+          {
+            "floor": 0.6915,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.694,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.6965,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.699,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7015,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.704,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7065,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.709,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7115,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.714,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7165,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.719,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7215,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.724,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.7265,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          }
+        ],
+        "short_qa": [
+          {
+            "floor": 0.5385,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.541,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.5435,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.546,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23063984359508333,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23063984359508333,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.5485,
+            "lp_status": "infeasible",
+            "lp_cost_usd_per_day": null,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2305067446101389,
+            "greedy_unrouted": 200.0
+          }
+        ]
+      }
+    },
+    "S1_gpu_on/infeasible_case": {
+      "traffic_per_day": {
+        "extraction": 500.0,
+        "short_qa": 200.0,
+        "long_synthesis": 600.0
+      },
+      "eligible": [
+        {
+          "cls": "extraction",
+          "backend": "vllm",
+          "accuracy": 0.7273,
+          "usd_per_request": 1.4134892202777776e-06,
+          "mean_latency_s": 0.4369,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gguf",
+          "accuracy": 0.6915,
+          "usd_per_request": 1.2677738958333334e-05,
+          "mean_latency_s": 3.3491,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gemini",
+          "accuracy": 0.7175,
+          "usd_per_request": 0.000554375,
+          "mean_latency_s": 6.2258,
+          "prompt_tokens": 1741.1
+        },
+        {
+          "cls": "short_qa",
+          "backend": "vllm",
+          "accuracy": 0.5481,
+          "usd_per_request": 6.654949247222221e-07,
+          "mean_latency_s": 0.2057,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "short_qa",
+          "backend": "gguf",
+          "accuracy": 0.5385,
+          "usd_per_request": 4.769246458333334e-06,
+          "mean_latency_s": 1.2599,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "long_synthesis",
+          "backend": "gemini",
+          "accuracy": null,
+          "usd_per_request": 0.004596,
+          "mean_latency_s": null,
+          "prompt_tokens": 15984
+        }
+      ],
+      "floors": {
+        "extraction": 0.7172999999999999,
+        "short_qa": 0.5381,
+        "long_synthesis": null
+      },
+      "lp": {
+        "status": "infeasible",
+        "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+      },
+      "greedy": {
+        "status": "unrouted",
+        "cost_usd_per_day": 2.298839843595083,
+        "requests": {
+          "extraction/vllm": 500.0,
+          "short_qa/vllm": 200.0,
+          "long_synthesis/gemini": 500.0
+        },
+        "unrouted": {
+          "extraction": 0.0,
+          "short_qa": 0.0,
+          "long_synthesis": 100.0
+        },
+        "violates_lp_rows": []
+      },
+      "comparison": {
+        "savings": null,
+        "note": "LP infeasible; greedy unrouted"
+      },
+      "infeasible_because": [
+        "gemini_rpd"
+      ]
+    },
+    "S2_gpu_off/main": {
+      "traffic_per_day": {
+        "extraction": 500.0,
+        "short_qa": 200.0,
+        "long_synthesis": 50.0
+      },
+      "eligible": [
+        {
+          "cls": "extraction",
+          "backend": "gguf",
+          "accuracy": 0.6915,
+          "usd_per_request": 1.2677738958333334e-05,
+          "mean_latency_s": 3.3491,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gemini",
+          "accuracy": 0.7175,
+          "usd_per_request": 0.000554375,
+          "mean_latency_s": 6.2258,
+          "prompt_tokens": 1741.1
+        },
+        {
+          "cls": "short_qa",
+          "backend": "gguf",
+          "accuracy": 0.5385,
+          "usd_per_request": 4.769246458333334e-06,
+          "mean_latency_s": 1.2599,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "long_synthesis",
+          "backend": "gemini",
+          "accuracy": null,
+          "usd_per_request": 0.004596,
+          "mean_latency_s": null,
+          "prompt_tokens": 15984
+        }
+      ],
+      "floors": {
+        "extraction": 0.7075,
+        "short_qa": 0.5285,
+        "long_synthesis": null
+      },
+      "lp": {
+        "status": "optimal",
+        "cost_usd_per_day": 0.40376879909134555,
+        "shares": {
+          "extraction/gguf": 0.38461538461538675,
+          "extraction/gemini": 0.6153846153846133,
+          "short_qa/gguf": 1.0,
+          "long_synthesis/gemini": 1.0
+        },
+        "requests": {
+          "extraction/gguf": 192.30769230769337,
+          "extraction/gemini": 307.69230769230666,
+          "short_qa/gguf": 200.0,
+          "long_synthesis/gemini": 50.0
+        },
+        "binding": [
+          "floor:extraction"
+        ],
+        "slack": {
+          "floor:extraction": 0.0,
+          "floor:short_qa": 0.010000000000000009,
+          "gemini_rpd": 142.30769230769334,
+          "gemini_rpm": 14.751602564102566,
+          "gemini_tpm": 249072.9700854701,
+          "busy:gguf": 85503.9623076923
+        },
+        "duals_usd_per_unit": {
+          "floor:extraction": -10.417255020032027,
+          "floor:short_qa": -0.0,
+          "gemini_rpd": -0.0,
+          "gemini_rpm": -0.0,
+          "gemini_tpm": -0.0,
+          "busy:gguf": -0.0
+        }
+      },
+      "greedy": {
+        "status": "unrouted",
+        "cost_usd_per_day": 0.2781413492916666,
+        "requests": {
+          "extraction/gemini": 500.0,
+          "short_qa/gguf": 200.0
+        },
+        "unrouted": {
+          "extraction": 0.0,
+          "short_qa": 0.0,
+          "long_synthesis": 50.0
+        },
+        "violates_lp_rows": []
+      },
+      "comparison": {
+        "savings": null,
+        "note": "greedy leaves 50 requests/day unrouted; the LP routes all"
+      },
+      "sweep": {
+        "extraction": [
+          {
+            "floor": 0.6915,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.23709271877083335,
+            "greedy_status": "all routed",
+            "greedy_cost_usd_per_day": 0.23709271877083335,
+            "greedy_unrouted": 0.0
+          },
+          {
+            "floor": 0.694,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.2631358563209132,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.6965,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.2891789938709939,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.699,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.3152221314210729,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.7015,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.3412652689711536,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.704,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.3673084065212334,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.7065,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.3933515440713141,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.709,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.41939468162139315,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.7115,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.44543781917147385,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.714,
+            "lp_status": "optimal",
+            "lp_cost_usd_per_day": 0.4714809567215537,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          },
+          {
+            "floor": 0.7165,
+            "lp_status": "infeasible",
+            "lp_cost_usd_per_day": null,
+            "greedy_status": "unrouted",
+            "greedy_cost_usd_per_day": 0.2781413492916666,
+            "greedy_unrouted": 50.0
+          }
+        ],
+        "short_qa": []
+      }
+    },
+    "S2_gpu_off/infeasible_case": {
+      "traffic_per_day": {
+        "extraction": 500.0,
+        "short_qa": 200.0,
+        "long_synthesis": 600.0
+      },
+      "eligible": [
+        {
+          "cls": "extraction",
+          "backend": "gguf",
+          "accuracy": 0.6915,
+          "usd_per_request": 1.2677738958333334e-05,
+          "mean_latency_s": 3.3491,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "extraction",
+          "backend": "gemini",
+          "accuracy": 0.7175,
+          "usd_per_request": 0.000554375,
+          "mean_latency_s": 6.2258,
+          "prompt_tokens": 1741.1
+        },
+        {
+          "cls": "short_qa",
+          "backend": "gguf",
+          "accuracy": 0.5385,
+          "usd_per_request": 4.769246458333334e-06,
+          "mean_latency_s": 1.2599,
+          "prompt_tokens": null
+        },
+        {
+          "cls": "long_synthesis",
+          "backend": "gemini",
+          "accuracy": null,
+          "usd_per_request": 0.004596,
+          "mean_latency_s": null,
+          "prompt_tokens": 15984
+        }
+      ],
+      "floors": {
+        "extraction": 0.7075,
+        "short_qa": 0.5285,
+        "long_synthesis": null
+      },
+      "lp": {
+        "status": "infeasible",
+        "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+      },
+      "greedy": {
+        "status": "unrouted",
+        "cost_usd_per_day": 0.2781413492916666,
+        "requests": {
+          "extraction/gemini": 500.0,
+          "short_qa/gguf": 200.0
+        },
+        "unrouted": {
+          "extraction": 0.0,
+          "short_qa": 0.0,
+          "long_synthesis": 600.0
+        },
+        "violates_lp_rows": []
+      },
+      "comparison": {
+        "savings": null,
+        "note": "LP infeasible; greedy unrouted"
+      },
+      "infeasible_because": [
+        "gemini_rpd"
+      ]
+    }
+  }
+}
