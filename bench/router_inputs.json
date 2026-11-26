@@ -1,0 +1,255 @@
+{
+  "command": "python -m filinglens.serve.router_inputs assemble",
+  "finished_utc": "2026-11-26T22:46:15+00:00",
+  "split": "dev",
+  "classes": {
+    "extraction": {
+      "accuracy_metric": "category macro-F1 vs silver labels (71 dev rows)",
+      "max_output_tokens": 400
+    },
+    "short_qa": {
+      "accuracy_metric": "token-F1 vs synthetic Qwen3-4B answers (182 ret-dev questions)",
+      "max_output_tokens": 100
+    },
+    "long_synthesis": {
+      "accuracy_metric": "none: eligibility only (context window >= required context)",
+      "required_context_tokens": 16384,
+      "nominal_tokens": {
+        "prompt": 15984,
+        "output": 400
+      }
+    }
+  },
+  "backends": {
+    "vllm": {
+      "model": "gptq-w4a16",
+      "context_tokens": 4608,
+      "power_w": 64.1,
+      "power_basis": "GPU board power, mean at c=1 during extraction load (measured)",
+      "extraction": {
+        "accuracy": 0.7273,
+        "accuracy_ci95": [
+          0.514,
+          0.807
+        ],
+        "requests": 64,
+        "failed": 0,
+        "error_rate": 0.0,
+        "latency_mean_s": 0.4369,
+        "latency_p95_s": 0.5269,
+        "usd_per_request": 1.4134892202777776e-06,
+        "usd_per_1k_requests": 0.001413,
+        "sources": {
+          "accuracy": "bench/fields_zero_dev_gptq-w4a16.json",
+          "latency": "bench/load_gptq-w4a16.json"
+        }
+      },
+      "short_qa": {
+        "accuracy": 0.5481,
+        "accuracy_ci95": [
+          0.5145,
+          0.5824
+        ],
+        "requests": 182,
+        "failed": 0,
+        "error_rate": 0.0,
+        "latency_mean_s": 0.2057,
+        "latency_p95_s": 0.3248,
+        "usd_per_request": 6.654949247222221e-07,
+        "usd_per_1k_requests": 0.000665,
+        "sources": {
+          "accuracy_latency": "bench/qa_dev_vllm-gptq-w4a16.json",
+          "power": "bench/load_gptq-w4a16.json"
+        }
+      },
+      "long_synthesis": {
+        "eligible": false
+      },
+      "throughput_extraction": {
+        "1": {
+          "requests_per_s": 2.2891,
+          "latency_p95_s": 0.5269
+        },
+        "4": {
+          "requests_per_s": 5.0545,
+          "latency_p95_s": 1.0417
+        },
+        "16": {
+          "requests_per_s": 7.6029,
+          "latency_p95_s": 3.0045
+        }
+      }
+    },
+    "gguf": {
+      "model": "student-q4_k_m.gguf (llama.cpp, CPU)",
+      "context_tokens": 4608,
+      "power_w": 75.0,
+      "power_basis": "estimate (upper bound), not measured",
+      "gpu_idle_power_w_measured": 25.72,
+      "extraction": {
+        "accuracy": 0.6915,
+        "accuracy_ci95": [
+          0.473,
+          0.767
+        ],
+        "requests": 64,
+        "failed": 0,
+        "error_rate": 0.0,
+        "latency_mean_s": 3.3491,
+        "latency_p95_s": 4.8413,
+        "usd_per_request": 1.2677738958333334e-05,
+        "usd_per_1k_requests": 0.012678,
+        "sources": {
+          "accuracy": "bench/fields_zero_dev_gguf-q4_k_m.json",
+          "latency": "bench/load_gguf-q4_k_m.json"
+        }
+      },
+      "short_qa": {
+        "accuracy": 0.5385,
+        "accuracy_ci95": [
+          0.5051,
+          0.5733
+        ],
+        "requests": 182,
+        "failed": 0,
+        "error_rate": 0.0,
+        "latency_mean_s": 1.2599,
+        "latency_p95_s": 1.8064,
+        "usd_per_request": 4.769246458333334e-06,
+        "usd_per_1k_requests": 0.004769,
+        "sources": {
+          "accuracy_latency": "bench/qa_dev_gguf-q4_k_m.json"
+        }
+      },
+      "long_synthesis": {
+        "eligible": false
+      },
+      "throughput_extraction": {
+        "1": {
+          "requests_per_s": 0.2986,
+          "latency_p95_s": 4.8413
+        },
+        "4": {
+          "requests_per_s": 0.3646,
+          "latency_p95_s": 15.0787
+        },
+        "16": {
+          "requests_per_s": 0.3798,
+          "latency_p95_s": 63.6348
+        }
+      }
+    },
+    "gemini": {
+      "model": "gemini-3.1-flash-lite",
+      "context_tokens": 1048576,
+      "extraction": {
+        "accuracy": 0.7175,
+        "accuracy_ci95": [
+          0.523,
+          0.785
+        ],
+        "requests": 71,
+        "failed": 0,
+        "error_rate": 0.0,
+        "latency_mean_s": 6.2258,
+        "latency_p95_s": 35.8576,
+        "tokens_mean": {
+          "prompt": 1741.1,
+          "output": 79.4,
+          "thinking": 0.0
+        },
+        "usd_per_request": 0.000554375,
+        "usd_per_1k_requests": 0.554375,
+        "sources": {
+          "accuracy": "bench/fields_zero_dev_gemini-3.1-flash-lite.json",
+          "latency_tokens": "bench/fields_zero_dev_gemini-3.1-flash-lite_run.json"
+        }
+      },
+      "short_qa": {
+        "accuracy": 0.4994,
+        "accuracy_ci95": [
+          0.4646,
+          0.5332
+        ],
+        "requests": 182,
+        "failed": 1,
+        "error_rate": 0.0055,
+        "latency_mean_s": 3.8948,
+        "latency_p95_s": 20.3861,
+        "tokens_mean": {
+          "prompt": 364.6,
+          "output": 32.4,
+          "thinking": 0.0
+        },
+        "usd_per_request": 0.00013975,
+        "usd_per_1k_requests": 0.13975,
+        "sources": {
+          "accuracy_latency_tokens": "bench/qa_dev_gemini-gemini-3.1-flash-lite.json"
+        }
+      },
+      "long_synthesis": {
+        "eligible": true,
+        "usd_per_request_nominal": 0.004596,
+        "latency": "not measured"
+      }
+    }
+  },
+  "capacity": {
+    "gemini_free_tier": {
+      "rpm": 15,
+      "tpm": 250000,
+      "rpd": 500,
+      "note": "Google AI Studio > Rate Limit, project filinglens (personal account, Free tier); RPD resets at midnight Pacific",
+      "checked": "2026-11-26"
+    },
+    "gemini_tpm_check": {
+      "largest_prompt_tokens_seen": 2369,
+      "tokens_per_minute_at_rpm": 35535,
+      "within_tpm": true,
+      "long_synthesis_tokens_per_minute_at_rpm": 245760,
+      "long_synthesis_within_tpm": true
+    }
+  },
+  "spend": {
+    "actual_usd": 0,
+    "why": "Gemini free tier (no billing linked); local backends on the author's laptop",
+    "modelled": "list prices (Gemini) and electricity at the EIA US average (local)"
+  },
+  "electricity_usd_per_kwh": 0.1817,
+  "sources": {
+    "gemini_price": {
+      "model": "gemini-3.1-flash-lite",
+      "usd_per_1m_input": 0.25,
+      "usd_per_1m_output": 1.5,
+      "note": "paid-tier Standard list price (output includes thinking); free tier: free",
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "checked": "2026-11-26"
+    },
+    "gemini_context": {
+      "input_tokens": 1048576,
+      "output_tokens": 65536,
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite",
+      "checked": "2026-11-26"
+    },
+    "gemini_free_tier": {
+      "rpm": 15,
+      "tpm": 250000,
+      "rpd": 500,
+      "note": "Google AI Studio > Rate Limit, project filinglens (personal account, Free tier); RPD resets at midnight Pacific",
+      "checked": "2026-11-26"
+    },
+    "electricity": {
+      "usd_per_kwh": 0.1817,
+      "note": "US average residential price, September 2026 (EIA Electric Power Monthly Table 5.3, released 24 Nov 2026)",
+      "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_3",
+      "checked": "2026-11-26"
+    },
+    "cpu_power": {
+      "watts": 75.0,
+      "kind": "estimate (upper bound), not measured",
+      "note": "Ryzen 9 8940HX: 55 W base TDP, officially configurable up to 75 W",
+      "url": "https://www.notebookcheck.net/R9-8940HX-vs-R9-8945HX_19595_19594.247596.0.html",
+      "checked": "2026-11-26"
+    }
+  }
+}
