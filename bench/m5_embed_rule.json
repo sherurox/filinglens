@@ -1,0 +1,27 @@
+{
+  "rule": "FL-M5 T12 query encoder for the Cloud Run API: which ONNX graph ships; committed before `onnx_embedder check` runs on any graph",
+  "decided": "2026-11-26 (user chose bge-base ONNX int8 in the image, subject to this check)",
+  "split": "ret-dev (182 queries) only; the test split is not used: retrieval quality was settled in FL-M3, this checks that the new encoder reproduces it",
+  "fl_m3_dev_recall_at_10": 0.2967,
+  "fl_m3_source": "bench/embed_queries_dev.json (exact recall@10, bge-base fp16 GPU query vectors vs the stored corpus vectors)",
+  "pipeline_check": {
+    "graph": "opt-fp32",
+    "min_cosine": 0.999,
+    "measure": "lowest cosine between the ONNX fp32 CPU query vectors and FL-M3's stored dev query vectors",
+    "basis": "FL-M3's own fp16-GPU vs fp32-CPU check gave a lowest cosine of 0.9999995 (bench/embed_corpus.json); an fp32 graph below 0.999 means the pipeline differs (tokenizer, instruction, pooling), not precision"
+  },
+  "int8_accept": {
+    "graph": "int8",
+    "max_recall_drop": 0.01,
+    "measure": "0.2967 minus the int8 graph's exact recall@10 on the same 182 queries and stored corpus vectors",
+    "basis": "one query is 1/182 = 0.0055 of recall@10, so 0.01 allows at most 1 query to lose its relevant chunk from the top 10; also requires the pipeline check to pass"
+  },
+  "ship": "int8 if int8_accept holds; else opt-fp32 if the pipeline check holds (image size then checked in T12e against 0.5 GB); else nothing ships and the export is fixed first",
+  "reported_not_thresholded": [
+    "same exact top-10 sets vs FL-M3's query vectors (of 182)",
+    "lowest cosine of the int8 vectors vs FL-M3's",
+    "max |CLS| difference vs torch fp32 on 8 queries",
+    "latency per query on 1 CPU thread (p50 / p95, tokenization included)",
+    "graph bytes"
+  ]
+}
