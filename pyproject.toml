@@ -38,8 +38,10 @@ dependencies = [
 
 [dependency-groups]
 api = [
+    "fastapi>=0.165.0",
     "onnxruntime>=1.32.0",
     "tokenizers>=0.23.3",
+    "uvicorn>=0.54.0",
 ]
 dev = [
     "pytest>=8",

@@ -841,8 +841,10 @@ dependencies = [
 
 [package.dev-dependencies]
 api = [
+    { name = "fastapi" },
     { name = "onnxruntime" },
     { name = "tokenizers" },
+    { name = "uvicorn" },
 ]
 dev = [
     { name = "pytest" },
@@ -882,8 +884,10 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 api = [
+    { name = "fastapi", specifier = ">=0.165.0" },
     { name = "onnxruntime", specifier = ">=1.32.0" },
     { name = "tokenizers", specifier = ">=0.23.3" },
+    { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 dev = [
     { name = "pytest", specifier = ">=8" },
