@@ -1,0 +1,42 @@
+{
+  "rule": "FL-M5 T7: serving benchmark and test-split accuracy per format, fixed before any test-split run",
+  "fixed_on": "2026-11-26",
+  "approved_in": "FL-M5 chat, 26 Nov 2026 (option 'OK as proposed')",
+  "test_runs_allowed": 1,
+  "builds": {
+    "merged-bf16": {"engine": "vLLM 0.34", "device": "GPU", "role": "reference"},
+    "fp8-dynamic": {"engine": "vLLM 0.34", "device": "GPU"},
+    "gptq-w4a16": {"engine": "vLLM 0.34", "device": "GPU"},
+    "awq-w4a16": {"engine": "vLLM 0.34", "device": "GPU"},
+    "gguf-q4_k_m": {"engine": "llama.cpp fa9f928", "device": "CPU"}
+  },
+  "not_scored_on_test": {
+    "rtn-w4a16": "dev-only control for the AWQ row (QA Q182)"
+  },
+  "accuracy": {
+    "split": "test (65 rows, FL-M2 split; never used for prompts, training or choices)",
+    "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+    "decoding": "as on dev: zero-shot prompt, temperature 0, max 400 tokens, JSON schema, thinking off; vLLM with --gpu-memory-utilization 0.83 --max-model-len 4608 --max-num-seqs 1 (eager); llama-server with one slot (-np 1 -c 4608 -t 12 -tb 24 --jinja --seed 0)",
+    "metric": "category macro-F1 (primary), category accuracy, rule-valid rows",
+    "command": "bash scripts/fl_m5_serving.sh test \"<power mode>\""
+  },
+  "comparison": {
+    "method": "paired bootstrap of each build vs merged-bf16 on the same 65 rows (filinglens.train.compare: 2,000 resamples, seed 0, 95% percentile CI of b - a)",
+    "label_lower": "'lower than BF16' iff the upper end of the 95% CI of the macro-F1 difference is below 0",
+    "label_otherwise": "'no difference detected'",
+    "not_claimed": "equivalence (65 rows cannot establish it)"
+  },
+  "router_inputs": "dev split only; test numbers appear in bench/serving.csv only",
+  "load": {
+    "prompts": "the dev-split extraction prompts (71), in order, cycled; the test split is never sent",
+    "decoding": "same as accuracy, streamed with usage",
+    "loop": "closed loop: exactly k requests in flight",
+    "levels": [1, 4, 16],
+    "requests_per_level": 64,
+    "warmup_per_level": 4,
+    "vllm_server": "python -m filinglens.serve.vllm_server --build <build> (gpu_memory_utilization 0.83, max_model_len 4608, max_num_seqs 16, CUDA graphs on)",
+    "llama_server": "-np 16 -c 49152 -t 12 -tb 24 --jinja --seed 0 (3,072 tokens per slot)",
+    "recorded_per_row": "TTFT p50/p95, latency p50/p95, output tokens/s, decode tokens/s per request, requests/s, errors, server VRAM (peak minus idle before start), GPU max temperature and mean power, power mode, KV-cache size from the server log",
+    "command": "bash scripts/fl_m5_serving.sh load \"<power mode>\""
+  }
+}

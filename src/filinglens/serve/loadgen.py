@@ -17,6 +17,12 @@ from the server's `usage` in the last chunk, decode rate (tokens - 1) / (latency
 Per level: p50/p95/p99 of TTFT and latency, mean decode rate, aggregate output tokens/s (all
 completion tokens / wall time), requests/s, errors, and the GPU monitor's summary for that level.
 Writes bench/load_<tag>.json.
+
+VRAM: vLLM claims its whole memory budget at start, before the first sample, so the monitor's own
+baseline shows no growth. `--idle-vram-mib` (measured before the server started; WSL counts the
+Windows desktop too) gives the server's real footprint: peak during the level minus idle.
+`--server-log` copies the server's KV-cache, kernel and context lines into the record, so they
+survive without the git-ignored logs/.
 """
 
 from __future__ import annotations
@@ -25,6 +31,7 @@ import argparse
 import asyncio
 import itertools
 import json
+import re
 import sys
 import time
 from collections.abc import Awaitable, Callable
@@ -32,6 +39,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 DONE = "[DONE]"
+SERVER_LOG_LINES = re.compile(
+    r"GPU KV cache size|Maximum concurrency|Kernel for|Model loading took|n_ctx|n_slots|n_parallel"
+    r"|file type|model size|system_info|kv_unified|CPU_REPACK",
+    re.IGNORECASE,
+)
 MAX_TOKENS = 400  # as extract.fields.generate
 
 
@@ -171,6 +183,30 @@ def make_sender(client, url: str) -> Callable[[dict], Awaitable[dict]]:
     return send
 
 
+def server_log_facts(text: str, limit: int = 40) -> list[str]:
+    """The lines of a server log that say how it was configured (deduplicated, prefixes cut)."""
+    seen, out = set(), []
+    for line in text.splitlines():
+        if not SERVER_LOG_LINES.search(line):
+            continue
+        fact = re.sub(r"^.*?\] ", "", line).strip()
+        if fact and fact not in seen:
+            seen.add(fact)
+            out.append(fact)
+    return out[:limit]
+
+
+def add_server_vram(gpu: dict, idle_mib: float | None) -> dict:
+    """The server's VRAM: peak during the level minus the idle reading taken before it started."""
+    if idle_mib is None or not gpu.get("samples"):
+        return gpu
+    return {
+        **gpu,
+        "idle_mib_before_server": idle_mib,
+        "server_vram_mib_peak": gpu["memory_used_mib_peak"] - idle_mib,
+    }
+
+
 def dev_bodies(model: str) -> list[dict]:
     from filinglens.extract.fields import PROMPT, TASKS, conversations, load_rows
     from filinglens.extract.silver_label import schema
@@ -201,7 +237,7 @@ async def run(args: argparse.Namespace) -> dict:
                 rows, wall = await closed_loop(send, bodies, k, args.requests, offset)
             offset += args.requests
             summary = level_summary(rows, wall, k)
-            summary["gpu"] = gpu.summary()
+            summary["gpu"] = add_server_vram(gpu.summary(), args.idle_vram_mib)
             summary["error_examples"] = [r["error"] for r in rows if "error" in r][:3]
             levels.append({**summary, "rows": rows})
             print(
@@ -224,6 +260,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout-s", type=float, default=600)
     parser.add_argument("--note", required=True, help="power mode, e.g. 'AC power, Best perf'")
     parser.add_argument("--server-cmd", default="", help="how the server was started (recorded)")
+    parser.add_argument("--server-log", type=Path, default=None, help="server log to excerpt")
+    parser.add_argument("--idle-vram-mib", type=float, default=None, help="before the server")
     parser.add_argument("--bench", type=Path, default=Path("bench"))
     argv = sys.argv[1:] if argv is None else argv
     args = parser.parse_args(argv)
@@ -236,6 +274,9 @@ def main(argv: list[str] | None = None) -> int:
         "finished_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "power_note": args.note,
         "server_cmd": args.server_cmd,
+        "server_log_facts": server_log_facts(args.server_log.read_text(errors="replace"))
+        if args.server_log
+        else [],
         "url": args.url,
         "requests_per_level": args.requests,
         "warmup_per_level": args.warmup,

@@ -5,11 +5,13 @@ import pytest
 from filinglens.serve.gpu_monitor import parse_gpu_line, summarize
 from filinglens.serve.loadgen import (
     DONE,
+    add_server_vram,
     closed_loop,
     content_delta,
     level_summary,
     parse_sse,
     request_metrics,
+    server_log_facts,
     stream_request,
 )
 from filinglens.serve.vllm_server import serve_argv
@@ -109,3 +111,25 @@ def test_serve_argv_fixed_flags():
     assert argv[argv.index("--max-num-seqs") + 1] == "16"
     assert "--enforce-eager" not in argv
     assert "--enforce-eager" in serve_argv("v", "b", eager=True)
+
+
+def test_server_log_facts_keeps_config_lines_once():
+    log = "\n".join(
+        [
+            "(EngineCore) INFO [kv_cache_utils.py:1168] GPU KV cache size: 15,872 tokens",
+            "(EngineCore) INFO [kv_cache_utils.py:1168] GPU KV cache size: 15,872 tokens",
+            "(EngineCore) INFO [x.py:1] Using MarlinLinearKernel for CompressedTensorsWNA16",
+            "(APIServer) INFO 11-26 [api.py:9] Started server process",
+        ]
+    )
+    assert server_log_facts(log) == [
+        "GPU KV cache size: 15,872 tokens",
+        "Using MarlinLinearKernel for CompressedTensorsWNA16",
+    ]
+
+
+def test_add_server_vram():
+    gpu = {"samples": 3, "memory_used_mib_peak": 6740.0}
+    assert add_server_vram(gpu, 2199.0)["server_vram_mib_peak"] == 4541.0
+    assert add_server_vram(gpu, None) == gpu
+    assert add_server_vram({"samples": 0}, 2199.0) == {"samples": 0}
