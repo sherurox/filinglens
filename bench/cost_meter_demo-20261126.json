@@ -1,0 +1,123 @@
+{
+  "command": "python -m filinglens.serve.cost_demo report --tag demo-20261126",
+  "finished_utc": "2026-11-26T23:26:01+00:00",
+  "tag": "demo-20261126",
+  "query": "SELECT route, user_id, backend, model, prompt_tokens, output_tokens, thinking_tokens, latency_s, cost_usd, error, trace_id FROM serve.requests WHERE user_id LIKE %(prefix)s ORDER BY id",
+  "rows": 251,
+  "spend": {
+    "actual_usd": 0,
+    "modelled": "list prices (see serve/cost_meter.py)"
+  },
+  "total_cost_usd": 0.006108300577807289,
+  "by_route_backend": [
+    {
+      "route": "extraction",
+      "backend": "vllm",
+      "requests": 71,
+      "errors": 0,
+      "prompt_tokens": 121797,
+      "output_tokens": 3342,
+      "latency_s": {
+        "n": 71,
+        "mean": 0.4411,
+        "p50": 0.4222,
+        "p95": 0.5573,
+        "p99": 0.8935
+      },
+      "cost_usd": 0.00010131791304656864,
+      "usd_per_1k_requests": 0.0014270128598108261
+    },
+    {
+      "route": "short_qa",
+      "backend": "gemini",
+      "requests": 40,
+      "errors": 0,
+      "prompt_tokens": 14756,
+      "output_tokens": 1303,
+      "latency_s": {
+        "n": 40,
+        "mean": 1.8294,
+        "p50": 0.84,
+        "p95": 5.1769,
+        "p99": 7.1471
+      },
+      "cost_usd": 0.0056435,
+      "usd_per_1k_requests": 0.1410875
+    },
+    {
+      "route": "short_qa",
+      "backend": "gguf",
+      "requests": 40,
+      "errors": 0,
+      "prompt_tokens": 14219,
+      "output_tokens": 987,
+      "latency_s": {
+        "n": 40,
+        "mean": 1.9989,
+        "p50": 1.5558,
+        "p95": 3.6083,
+        "p99": 3.9403
+      },
+      "cost_usd": 0.00030266176264278646,
+      "usd_per_1k_requests": 0.007566544066069661
+    },
+    {
+      "route": "short_qa",
+      "backend": "vllm",
+      "requests": 100,
+      "errors": 0,
+      "prompt_tokens": 36653,
+      "output_tokens": 2488,
+      "latency_s": {
+        "n": 100,
+        "mean": 0.188,
+        "p50": 0.1808,
+        "p95": 0.2695,
+        "p99": 0.327
+      },
+      "cost_usd": 6.082090211793326e-05,
+      "usd_per_1k_requests": 0.0006082090211793327
+    }
+  ],
+  "by_user": [
+    {
+      "user_id": "demo-20261126/analyst-a",
+      "requests": 126,
+      "errors": 0,
+      "prompt_tokens": 95768,
+      "output_tokens": 4061,
+      "latency_s": {
+        "n": 126,
+        "mean": 0.7625,
+        "p50": 0.4155,
+        "p95": 3.1172,
+        "p99": 4.2362
+      },
+      "cost_usd": 0.0030587842916323864,
+      "usd_per_1k_requests": 0.024276065806606243
+    },
+    {
+      "user_id": "demo-20261126/analyst-b",
+      "requests": 125,
+      "errors": 0,
+      "prompt_tokens": 91657,
+      "output_tokens": 4059,
+      "latency_s": {
+        "n": 125,
+        "mean": 0.8573,
+        "p50": 0.382,
+        "p95": 3.611,
+        "p99": 5.0327
+      },
+      "cost_usd": 0.0030495162861749023,
+      "usd_per_1k_requests": 0.02439613028939922
+    }
+  ],
+  "span_check": {
+    "rows": 251,
+    "spans": 251,
+    "same_trace_ids": true,
+    "zero_trace_ids": 0
+  },
+  "chart": "bench/cost_meter_demo-20261126.png"
+}

@@ -1,0 +1,28 @@
+{
+  "command": "python -m filinglens.serve.cost_demo replay --tag demo-20261126 --rpm 15 --rpd 500",
+  "finished_utc": "2026-11-26T23:26:00+00:00",
+  "tag": "demo-20261126",
+  "started_utc": "2026-11-26T23:21:04+00:00",
+  "wall_s": 296.6,
+  "lanes": {
+    "vllm": "gptq-w4a16",
+    "gguf": "student-q4_k_m.gguf",
+    "gemini": "gemini-3.1-flash-lite"
+  },
+  "requests": {
+    "vllm": 171,
+    "gguf": 40,
+    "gemini": 40
+  },
+  "failed": {
+    "vllm": 0,
+    "gguf": 0,
+    "gemini": 0
+  },
+  "sink_errors": {
+    "vllm": 0,
+    "gguf": 0,
+    "gemini": 0
+  },
+  "spans": "logs/cost_meter_spans_demo-20261126.jsonl"
+}
