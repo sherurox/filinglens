@@ -1,0 +1,115 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker compare --split test --allow-test",
+  "finished_utc": "2026-11-26T21:43:02+00:00",
+  "queries": 1137,
+  "k": 10,
+  "tokenize_latency": {
+    "p50_ms": 11.98,
+    "p95_ms": 13.75,
+    "p99_ms": 14.38,
+    "mean_ms": 11.89,
+    "samples": 1137
+  },
+  "variants": {
+    "ort-cuda-fp16-eager-opt": {
+      "metrics": {
+        "recall_before": 0.6904,
+        "recall_after": 0.7863,
+        "mrr_before": 0.4792,
+        "mrr_after": 0.5919,
+        "ndcg_before": 0.4238,
+        "ndcg_after": 0.5123,
+        "recall_at_depth": 0.8725
+      },
+      "forward_latency": {
+        "p50_ms": 184.98,
+        "p95_ms": 218.83,
+        "p99_ms": 229.18,
+        "mean_ms": 184.09,
+        "samples": 1137
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "graph": "bge-reranker-base.eager.opt-fp16.onnx",
+        "provider_options": {
+          "CPUExecutionProvider": {},
+          "CUDAExecutionProvider": {
+            "external_data_loader_chunk_bytes": "2097152",
+            "external_data_loader_pinned_memory_bytes": "33554432",
+            "sdpa_kernel": "0",
+            "use_tf32": "1",
+            "fuse_conv_bias": "0",
+            "prefer_nhwc": "0",
+            "tunable_op_max_tuning_duration_ms": "0",
+            "tunable_op_enable": "0",
+            "tunable_op_tuning_enable": "0",
+            "enable_cudnn": "1",
+            "use_ep_level_unified_stream": "0",
+            "device_id": "0",
+            "cudnn_conv1d_pad_to_nc1d": "0",
+            "cudnn_conv_algo_search": "EXHAUSTIVE",
+            "has_user_compute_stream": "0",
+            "external_data_loader_reading_threads": "4",
+            "gpu_external_empty_cache": "0",
+            "gpu_mem_limit": "18446744073709551615",
+            "gpu_external_alloc": "0",
+            "gpu_external_free": "0",
+            "arena_extend_strategy": "kNextPowerOfTwo",
+            "do_copy_in_default_stream": "1",
+            "min_num_runs_before_cuda_graph_capture": "2",
+            "enable_cuda_graph": "0",
+            "user_compute_stream": "0",
+            "cudnn_conv_use_max_workspace": "1"
+          }
+        },
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.152344,
+      "same_top10_vs_torch-cuda-fp16": 1039
+    },
+    "torch-cuda-fp16": {
+      "metrics": {
+        "recall_before": 0.6904,
+        "recall_after": 0.7872,
+        "mrr_before": 0.4792,
+        "mrr_after": 0.5919,
+        "ndcg_before": 0.4238,
+        "ndcg_after": 0.5125,
+        "recall_at_depth": 0.8725
+      },
+      "forward_latency": {
+        "p50_ms": 215.24,
+        "p95_ms": 228.55,
+        "p99_ms": 235.47,
+        "mean_ms": 201.61,
+        "samples": 1137
+      },
+      "engine_info": {
+        "torch": "2.15.0+cu132",
+        "threads": 12
+      }
+    }
+  },
+  "rule": "bench/m5_onnx_rule.json",
+  "rule_checks": {
+    "fl_m3_test_ndcg_at_10": 0.5125,
+    "reference_ndcg_at_10": 0.5125,
+    "reproduce_gap": 0.0,
+    "pipeline_reproduces_fl_m3": true,
+    "candidate_vs_reference_gaps": {
+      "ndcg_after": 0.0002,
+      "recall_after": 0.0009,
+      "mrr_after": 0.0
+    },
+    "export_matches": true
+  }
+}

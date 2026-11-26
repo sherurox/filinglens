@@ -1,0 +1,27 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker score --split test --allow-test --engine torch --device cuda --dtype fp16 --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-26T21:39:28+00:00",
+  "variant": "torch-cuda-fp16",
+  "queries": 1137,
+  "forward_latency": {
+    "p50_ms": 215.24,
+    "p95_ms": 228.55,
+    "p99_ms": 235.47,
+    "mean_ms": 201.61,
+    "samples": 1137
+  },
+  "engine_info": {
+    "torch": "2.15.0+cu132",
+    "threads": 12
+  },
+  "gpu": {
+    "gpu.name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu.temperature.gpu": "63.60",
+    "gpu.memory.used": "3481",
+    "gpu.memory.total": "8151",
+    "gpu.power.draw": "24.67",
+    "gpu.clocks.sm": "2130"
+  },
+  "cpu": "x86_64",
+  "power_note": "AC power, Best performance"
+}
