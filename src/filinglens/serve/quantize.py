@@ -10,7 +10,10 @@ Recipes (llmcompressor 0.15; `lm_head` is never quantized: it is tied to the emb
 - awq:  AWQ scale search (a transform in 0.15), then W4A16 round-to-nearest, group 128;
 - gptq: GPTQ W4A16, group 128 (columns rounded with second-order error correction);
 - fp8:  FP8_DYNAMIC: fp8 weights with per-channel scales, activation scales per token at run time,
-        so no calibration data.
+        so no calibration data;
+- rtn:  W4A16 round-to-nearest with no AWQ step (data-free): the control for the AWQ row. AWQ only
+        adds a scale search before this same rounding, so it should score at least as well; on dev
+        (26 Nov) it scored 0.6256 vs GPTQ 0.7273, and this build says whether the AWQ step helped.
 
 Calibration (awq, gptq): the first N gold-train rows by task number (train only; dev and test are
 never seen), each rendered exactly as `extract.fields` prompts the model (same system prompt, same
@@ -42,7 +45,7 @@ from filinglens.serve.student import tree_sha256
 
 MERGED = Path("data/interim/serve/merged-bf16")
 OUT_ROOT = Path("data/interim/serve")
-BUILDS = {"awq": "awq-w4a16", "gptq": "gptq-w4a16", "fp8": "fp8-dynamic"}
+BUILDS = {"awq": "awq-w4a16", "gptq": "gptq-w4a16", "fp8": "fp8-dynamic", "rtn": "rtn-w4a16"}
 NEEDS_DATA = {"awq", "gptq"}
 VRAM_MARGIN_MIB = 256
 
@@ -121,6 +124,8 @@ def recipe(scheme: str) -> list:
         return [GPTQModifier(targets="Linear", scheme="W4A16", ignore=["lm_head"])]
     if scheme == "fp8":
         return [QuantizationModifier(targets="Linear", scheme="FP8_DYNAMIC", ignore=["lm_head"])]
+    if scheme == "rtn":
+        return [QuantizationModifier(targets="Linear", scheme="W4A16", ignore=["lm_head"])]
     raise ValueError(f"unknown scheme {scheme!r}")
 
 

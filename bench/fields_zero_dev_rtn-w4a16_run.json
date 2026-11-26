@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --gpu-memory-utilization 0.83 --max-model-len 4608 --max-num-seqs 1 --model data/interim/serve/rtn-w4a16 --tag rtn-w4a16",
+  "finished_utc": "2026-11-26T17:58:54+00:00",
+  "split": "dev",
+  "model": "data/interim/serve/rtn-w4a16",
+  "lora": null,
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 71,
+  "elapsed_s_incl_model_load": 94.1,
+  "peak_gpu_memory_mib": 6959,
+  "predictions": "data/interim/fields/fields_zero_dev_rtn-w4a16.jsonl"
+}

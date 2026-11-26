@@ -93,7 +93,12 @@ def test_quantization_summary_w4a16_and_fp8():
 
 
 def test_builds_and_calibration_needs():
-    assert BUILDS == {"awq": "awq-w4a16", "gptq": "gptq-w4a16", "fp8": "fp8-dynamic"}
+    assert BUILDS == {
+        "awq": "awq-w4a16",
+        "gptq": "gptq-w4a16",
+        "fp8": "fp8-dynamic",
+        "rtn": "rtn-w4a16",
+    }
     assert NEEDS_DATA == {"awq", "gptq"}
 
 
