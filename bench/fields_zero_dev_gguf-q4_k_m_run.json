@@ -1,0 +1,24 @@
+{
+  "command": "python -m filinglens.serve.llama_client generate --split dev --tag gguf-q4_k_m",
+  "finished_utc": "2026-11-26T18:14:36+00:00",
+  "split": "dev",
+  "server": {
+    "model_path": "data/interim/serve/gguf/student-q4_k_m.gguf",
+    "build_info": "b12794-fa9f928f2",
+    "n_ctx": 4608,
+    "total_slots": 1
+  },
+  "variant": "zero",
+  "rows": 71,
+  "valid": 71,
+  "request_errors": [],
+  "elapsed_s": 227.3,
+  "timings": {
+    "requests_with_timings": 71,
+    "prompt_tokens": 44222,
+    "generated_tokens": 3363,
+    "prompt_tok_per_s": 362.53,
+    "generate_tok_per_s": 32.1
+  },
+  "predictions": "data/interim/fields/fields_zero_dev_gguf-q4_k_m.jsonl"
+}

@@ -1,0 +1,23 @@
+{
+  "command": "python -m filinglens.serve.llama_client template --split dev",
+  "finished_utc": "2026-11-26T18:10:48+00:00",
+  "split": "dev",
+  "a": "HF tokenizer data/interim/serve/merged-bf16",
+  "b": "llama-server http://127.0.0.1:58081 (/apply-template + /tokenize)",
+  "server": {
+    "model_path": "data/interim/serve/gguf/student-q4_k_m.gguf",
+    "build_info": "b12794-fa9f928f2",
+    "n_ctx": 4608,
+    "total_slots": 1
+  },
+  "conversations": 71,
+  "text_identical": 71,
+  "ids_identical": 71,
+  "ids_differ": [],
+  "first_difference": null,
+  "prompt_tokens_min_max": [
+    1324,
+    2335
+  ],
+  "ok": true
+}

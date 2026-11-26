@@ -1,0 +1,15 @@
+{
+  "command": "bash scripts/fl_m5_gguf.sh",
+  "finished_utc": "2026-11-26T18:09:04+00:00",
+  "llama_cpp_commit": "fa9f928f25a5fc765c7d0d1c7deb64e8f1a762a4",
+  "llama_cpp_license": "MIT License",
+  "cmake_flags": "-DCMAKE_BUILD_TYPE=Release -DGGML_CUDA=OFF -DGGML_NATIVE=ON -DLLAMA_CURL=OFF",
+  "source": "data/interim/serve/merged-bf16",
+  "build": "built",
+  "build_s": 2.2,
+  "convert_bf16_s": 13.0,
+  "quantize_q4_k_m_s": 7.3,
+  "bf16_gguf_bytes": 3447349088,
+  "q4_k_m_gguf_bytes": 1107408736,
+  "q4_k_m_sha256": "2559e568f5cfcbd63ecccce0013e4e072824c66770d95849ec9a2708148e0b1b"
+}

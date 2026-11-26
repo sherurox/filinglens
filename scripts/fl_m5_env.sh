@@ -48,7 +48,7 @@ packages() {  # $1 = python, rest = distribution names
 
   echo; echo "## python packages: fl-train venv ($TRAIN_PY)"
   packages "$TRAIN_PY" torch transformers peft accelerate bitsandbytes safetensors huggingface-hub \
-    onnx onnxruntime onnxruntime-gpu mlflow
+    sentencepiece onnx onnxruntime onnxruntime-gpu mlflow
   [[ -x "$TRAIN_PY" ]] && "$TRAIN_PY" -c \
     "import torch; print('torch cuda', torch.version.cuda, '| capability', torch.cuda.get_device_capability(0))" 2>&1
 
