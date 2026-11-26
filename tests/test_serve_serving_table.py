@@ -69,3 +69,14 @@ def test_build_rows_copies_values_and_lists_missing(tmp_path, monkeypatch):
     st.write_csv(rows, tmp_path / "serving.csv")
     header = (tmp_path / "serving.csv").read_text().splitlines()[0].split(",")
     assert header == st.COLUMNS
+
+
+def test_dodge_keeps_order_and_min_gap():
+    ys = [100.0, 102.0, 300.0, 101.0]
+    out = st.dodge(ys, 10.0)
+    order = sorted(range(4), key=lambda i: ys[i])
+    placed = [out[i] for i in order]
+    assert all(b - a >= 10.0 - 1e-9 for a, b in zip(placed, placed[1:], strict=False))
+    assert out[2] >= 300.0 - 10.0  # a far-away label barely moves
+    assert st.dodge([5.0], 10.0) == [5.0]
+    assert st.dodge([], 10.0) == []

@@ -127,11 +127,29 @@ def build_rows(missing: list[str]) -> list[dict]:
                     "server_vram_mib_peak": gpu.get("server_vram_mib_peak")
                     if device == "GPU"
                     else None,
-                    "gpu_temp_max_c": gpu.get("temperature_c_max"),
-                    "gpu_power_mean_w": gpu.get("power_w_mean"),
+                    # a CPU run leaves the GPU idle: its readings would describe the wrong device
+                    "gpu_temp_max_c": gpu.get("temperature_c_max") if device == "GPU" else None,
+                    "gpu_power_mean_w": gpu.get("power_w_mean") if device == "GPU" else None,
                 }
             )
     return rows
+
+
+def dodge(ys: list[float], min_gap: float) -> list[float]:
+    """Spread label positions so neighbours are at least min_gap apart, keeping their order and
+    staying as close as possible to the data (positions in display units, e.g. pixels)."""
+    order = sorted(range(len(ys)), key=lambda i: ys[i])
+    placed = [ys[i] for i in order]
+    for k in range(1, len(placed)):
+        placed[k] = max(placed[k], placed[k - 1] + min_gap)
+    shift = (sum(placed) - sum(ys[i] for i in order)) / len(placed) if placed else 0
+    placed = [y - shift for y in placed]  # recentre the group on the data
+    for k in range(1, len(placed)):
+        placed[k] = max(placed[k], placed[k - 1] + min_gap)
+    out = [0.0] * len(ys)
+    for k, i in enumerate(order):
+        out[i] = placed[k]
+    return out
 
 
 def write_csv(rows: list[dict], path: Path) -> None:
@@ -154,10 +172,12 @@ def plot(rows: list[dict], path: Path) -> None:
         ax.grid(axis="y", color="#e5e5e5", linewidth=0.8)
         ax.set_axisbelow(True)
     panels = [
-        (axes[0], "output_tok_per_s", "Output tokens/s (all requests)"),
-        (axes[1], "latency_p95_s", "p95 end-to-end latency (s)"),
+        (axes[0], "output_tok_per_s", "Output tokens/s (all requests)", "linear"),
+        (axes[1], "latency_p95_s", "p95 end-to-end latency (s, log scale)", "log"),
     ]
-    for ax, key, title in panels:
+    label_jobs = []
+    for ax, key, title, yscale in panels:
+        ends = []
         for build in BUILDS:
             pts = [(r["concurrency"], r[key]) for r in rows if r["build"] == build and r[key]]
             if not pts:
@@ -165,12 +185,17 @@ def plot(rows: list[dict], path: Path) -> None:
             xs, ys = zip(*sorted(pts), strict=True)
             ax.plot(xs, ys, color=COLORS[build], linewidth=2, marker="o", markersize=8,
                     markeredgecolor="white", markeredgewidth=2, label=build)  # fmt: skip
-            ax.annotate(build, (xs[-1], ys[-1]), xytext=(6, 0), textcoords="offset points",
-                        fontsize=8, color="#444444", va="center")  # fmt: skip
+            ends.append((build, xs[-1], ys[-1]))
         ax.set_xscale("log", base=2)
         ax.set_xticks([1, 4, 16], labels=["1", "4", "16"])
         ax.set_xlabel("Concurrent requests (closed loop)")
         ax.set_title(title, loc="left", fontsize=11)
+        if yscale == "log":
+            ax.set_yscale("log")
+            ticks = [0.5, 1, 2, 5, 10, 20, 50, 100]
+            ax.set_yticks(ticks, labels=[f"{t:g}" for t in ticks])
+            ax.minorticks_off()
+        label_jobs.append((ax, ends))
     axes[0].legend(frameon=False, fontsize=8, loc="upper left")
 
     ax = axes[2]
@@ -197,6 +222,19 @@ def plot(rows: list[dict], path: Path) -> None:
         x=0.01,
         ha="left",
     )
+    fig.canvas.draw()  # lay out everything (title too) first; label gap: 12 pt at any dpi
+    for ax, ends in label_jobs:  # direct labels at the line ends, pushed apart so none overlap
+        if not ends:
+            continue
+        to_px, to_data = ax.transData, ax.transData.inverted()
+        points = [to_px.transform((x, y)) for _, x, y in ends]
+        for (build, x, _), (x_px, _), y_px in zip(
+            ends, points, dodge([p[1] for p in points], 12 * fig.dpi / 72), strict=True
+        ):
+            y = to_data.transform((x_px, y_px))[1]
+            ax.annotate(build, (x, y), xytext=(8, 0), textcoords="offset points", fontsize=8,
+                        color="#444444", va="center", annotation_clip=False)  # fmt: skip
+
     fig.savefig(path, dpi=150)
 
 
@@ -208,12 +246,13 @@ def commands_md(missing: list[str]) -> str:
         lines += ["Rule (committed before the test run): `bench/m5_serving_rule.json`", ""]
         lines += [f"- load: `{r['load']['command']}`", f"- test: `{r['accuracy']['command']}`"]
         lines += ["- table: `bash scripts/fl_m5_serving.sh table`", ""]
-    lines += ["## Per build (copied from the bench files)", ""]
+    lines += ["## Server per build (copied from bench/load_<build>.json)", ""]
+    lines += ["The load settings are the script's (levels 1/4/16, 64 requests, 4 warm-up)", ""]
     for build in BUILDS:
         path = BENCH / f"load_{build}.json"
         if path.is_file():
             load = json.loads(path.read_text())
-            lines += [f"- {build}: server `{load['server_cmd']}`; load `{load['command']}`"]
+            lines += [f"- {build}: server `{load['server_cmd']}`"]
     if missing:
         lines += ["", "Not yet present: " + ", ".join(sorted(set(missing)))]
     return "\n".join(lines) + "\n"

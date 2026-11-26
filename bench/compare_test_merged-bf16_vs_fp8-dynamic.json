@@ -1,0 +1,32 @@
+{
+  "command": "python -m filinglens.train.compare --a merged-bf16 --b fp8-dynamic --split test --allow-test",
+  "finished_utc": "2026-11-26T18:56:02+00:00",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "split": "test",
+  "a": "merged-bf16",
+  "b": "fp8-dynamic",
+  "bootstrap_resamples": 2000,
+  "category_macro_f1": {
+    "a": 0.7948,
+    "b": 0.8011,
+    "diff_b_minus_a": 0.0063,
+    "diff_ci95": [
+      -0.0372,
+      0.0522
+    ],
+    "share_b_not_better": 0.4175
+  },
+  "category_accuracy": {
+    "a": 0.7846,
+    "b": 0.8,
+    "diff_b_minus_a": 0.0154,
+    "diff_ci95": [
+      -0.0308,
+      0.0615
+    ],
+    "share_b_not_better": 0.392
+  },
+  "rows": 65,
+  "rows_where_only_a_right": 1,
+  "rows_where_only_b_right": 2
+}

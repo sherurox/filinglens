@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.extract.fields score --variant zero --split test --allow-test --tag gptq-w4a16",
+  "finished_utc": "2026-11-26T18:55:56+00:00",
+  "split": "test",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "predictions": "data/interim/fields/fields_zero_test_gptq-w4a16.jsonl",
+  "all_rows": {
+    "rows": 65,
+    "rule_valid": 65,
+    "category_macro_f1": 0.8081,
+    "category_macro_f1_ci95": [
+      0.643,
+      0.882
+    ],
+    "category_accuracy": 0.8,
+    "severity_macro_f1": 0.2931,
+    "first_seen_exact": 0.7846,
+    "first_seen_within_1y": 0.8615
+  },
+  "rows_where_silver_labelers_agree": {
+    "rows": 48,
+    "rule_valid": 48,
+    "category_macro_f1": 0.9428,
+    "category_macro_f1_ci95": [
+      0.717,
+      1.0
+    ],
+    "category_accuracy": 0.9583,
+    "severity_macro_f1": 0.2811,
+    "first_seen_exact": 0.8125,
+    "first_seen_within_1y": 0.875
+  }
+}

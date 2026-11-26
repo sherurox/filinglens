@@ -1,0 +1,32 @@
+{
+  "command": "python -m filinglens.train.compare --a merged-bf16 --b gguf-q4_k_m --split test --allow-test",
+  "finished_utc": "2026-11-26T18:56:18+00:00",
+  "labels": "silver (agreement with ibm-granite/granite-4.1-3b, not correctness)",
+  "split": "test",
+  "a": "merged-bf16",
+  "b": "gguf-q4_k_m",
+  "bootstrap_resamples": 2000,
+  "category_macro_f1": {
+    "a": 0.7948,
+    "b": 0.7641,
+    "diff_b_minus_a": -0.0307,
+    "diff_ci95": [
+      -0.1407,
+      0.0552
+    ],
+    "share_b_not_better": 0.73
+  },
+  "category_accuracy": {
+    "a": 0.7846,
+    "b": 0.7692,
+    "diff_b_minus_a": -0.0154,
+    "diff_ci95": [
+      -0.0923,
+      0.0615
+    ],
+    "share_b_not_better": 0.726
+  },
+  "rows": 65,
+  "rows_where_only_a_right": 4,
+  "rows_where_only_b_right": 3
+}
