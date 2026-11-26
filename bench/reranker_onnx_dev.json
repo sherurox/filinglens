@@ -1,0 +1,342 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker compare --split dev",
+  "finished_utc": "2026-11-26T21:18:56+00:00",
+  "queries": 182,
+  "k": 10,
+  "tokenize_latency": {
+    "p50_ms": 11.49,
+    "p95_ms": 13.59,
+    "p99_ms": 14.79,
+    "mean_ms": 11.51,
+    "samples": 182
+  },
+  "variants": {
+    "ort-cpu-fp32-eager-opt": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4877,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 5810.57,
+        "p95_ms": 6583.89,
+        "p99_ms": 6607.33,
+        "mean_ms": 5585.92,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "graph": "bge-reranker-base.eager.opt-fp32.onnx",
+        "provider_options": {
+          "CPUExecutionProvider": {}
+        },
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 5.6e-05,
+      "same_top10_vs_torch-cpu-fp32": 180,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.032462,
+      "same_top10_vs_torch-cuda-fp16": 174
+    },
+    "ort-cpu-fp32-opt": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4877,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 8790.88,
+        "p95_ms": 10045.14,
+        "p99_ms": 10176.09,
+        "mean_ms": 8350.82,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "graph": "bge-reranker-base.opt-fp32.onnx",
+        "provider_options": {
+          "CPUExecutionProvider": {}
+        },
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 5.2e-05,
+      "same_top10_vs_torch-cpu-fp32": 180,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.032472,
+      "same_top10_vs_torch-cuda-fp16": 174
+    },
+    "ort-cpu-fp32": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4877,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 8924.63,
+        "p95_ms": 10324.67,
+        "p99_ms": 10552.6,
+        "mean_ms": 8554.32,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 3.3e-05,
+      "same_top10_vs_torch-cpu-fp32": 180,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.032474,
+      "same_top10_vs_torch-cuda-fp16": 174
+    },
+    "ort-cuda-fp16-eager-opt": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4879,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 202.17,
+        "p95_ms": 219.34,
+        "p99_ms": 233.91,
+        "mean_ms": 195.48,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "graph": "bge-reranker-base.eager.opt-fp16.onnx",
+        "provider_options": {
+          "CPUExecutionProvider": {},
+          "CUDAExecutionProvider": {
+            "external_data_loader_chunk_bytes": "2097152",
+            "external_data_loader_pinned_memory_bytes": "33554432",
+            "sdpa_kernel": "0",
+            "use_tf32": "1",
+            "fuse_conv_bias": "0",
+            "prefer_nhwc": "0",
+            "tunable_op_max_tuning_duration_ms": "0",
+            "tunable_op_enable": "0",
+            "tunable_op_tuning_enable": "0",
+            "enable_cudnn": "1",
+            "use_ep_level_unified_stream": "0",
+            "device_id": "0",
+            "cudnn_conv1d_pad_to_nc1d": "0",
+            "cudnn_conv_algo_search": "EXHAUSTIVE",
+            "has_user_compute_stream": "0",
+            "external_data_loader_reading_threads": "4",
+            "gpu_external_empty_cache": "0",
+            "gpu_mem_limit": "18446744073709551615",
+            "gpu_external_alloc": "0",
+            "gpu_external_free": "0",
+            "arena_extend_strategy": "kNextPowerOfTwo",
+            "do_copy_in_default_stream": "1",
+            "min_num_runs_before_cuda_graph_capture": "2",
+            "enable_cuda_graph": "0",
+            "user_compute_stream": "0",
+            "cudnn_conv_use_max_workspace": "1"
+          }
+        },
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 0.041239,
+      "same_top10_vs_torch-cpu-fp32": 165,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.045227,
+      "same_top10_vs_torch-cuda-fp16": 167
+    },
+    "ort-cuda-fp16-opt": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4889,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 304.28,
+        "p95_ms": 348.03,
+        "p99_ms": 384.28,
+        "mean_ms": 289.53,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "graph": "bge-reranker-base.opt-fp16.onnx",
+        "provider_options": {
+          "CPUExecutionProvider": {},
+          "CUDAExecutionProvider": {
+            "external_data_loader_chunk_bytes": "2097152",
+            "external_data_loader_pinned_memory_bytes": "33554432",
+            "sdpa_kernel": "0",
+            "use_tf32": "1",
+            "fuse_conv_bias": "0",
+            "prefer_nhwc": "0",
+            "tunable_op_max_tuning_duration_ms": "0",
+            "tunable_op_enable": "0",
+            "tunable_op_tuning_enable": "0",
+            "enable_cudnn": "1",
+            "use_ep_level_unified_stream": "0",
+            "device_id": "0",
+            "cudnn_conv1d_pad_to_nc1d": "0",
+            "cudnn_conv_algo_search": "EXHAUSTIVE",
+            "has_user_compute_stream": "0",
+            "external_data_loader_reading_threads": "4",
+            "gpu_external_empty_cache": "0",
+            "gpu_mem_limit": "18446744073709551615",
+            "gpu_external_alloc": "0",
+            "gpu_external_free": "0",
+            "arena_extend_strategy": "kNextPowerOfTwo",
+            "do_copy_in_default_stream": "1",
+            "min_num_runs_before_cuda_graph_capture": "2",
+            "enable_cuda_graph": "0",
+            "user_compute_stream": "0",
+            "cudnn_conv_use_max_workspace": "1"
+          }
+        },
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 0.057821,
+      "same_top10_vs_torch-cpu-fp32": 165,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.06181,
+      "same_top10_vs_torch-cuda-fp16": 167
+    },
+    "ort-cuda-fp32": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4877,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 661.66,
+        "p95_ms": 742.38,
+        "p99_ms": 761.06,
+        "mean_ms": 621.8,
+        "samples": 182
+      },
+      "engine_info": {
+        "onnxruntime": "1.32.0",
+        "available_providers": [
+          "TensorrtExecutionProvider",
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "session_providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "intra_op_threads": 0
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 0.017791,
+      "same_top10_vs_torch-cpu-fp32": 171,
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.023364,
+      "same_top10_vs_torch-cuda-fp16": 168
+    },
+    "torch-cpu-fp32": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.4877,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 7751.6,
+        "p95_ms": 8754.42,
+        "p99_ms": 8917.32,
+        "mean_ms": 7447.5,
+        "samples": 182
+      },
+      "engine_info": {
+        "torch": "2.15.0+cu132",
+        "threads": 12
+      },
+      "max_abs_logit_diff_vs_torch-cuda-fp16": 0.032467,
+      "same_top10_vs_torch-cuda-fp16": 172
+    },
+    "torch-cuda-fp16": {
+      "metrics": {
+        "recall_before": 0.6758,
+        "recall_after": 0.7308,
+        "mrr_before": 0.5264,
+        "mrr_after": 0.5708,
+        "ndcg_before": 0.4368,
+        "ndcg_after": 0.488,
+        "recall_at_depth": 0.8626
+      },
+      "forward_latency": {
+        "p50_ms": 211.65,
+        "p95_ms": 239.22,
+        "p99_ms": 272.37,
+        "mean_ms": 200.96,
+        "samples": 182
+      },
+      "engine_info": {
+        "torch": "2.15.0+cu132",
+        "threads": 12
+      },
+      "max_abs_logit_diff_vs_torch-cpu-fp32": 0.032467,
+      "same_top10_vs_torch-cpu-fp32": 172
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker optimize --source eager",
+  "finished_utc": "2026-11-26T20:58:00+00:00",
+  "onnxruntime": "1.32.0",
+  "num_heads": 12,
+  "hidden": 768,
+  "source": "bge-reranker-base.eager.onnx",
+  "eager-opt-fp32": {
+    "fused_operators": {
+      "Attention": 12,
+      "BiasGelu": 12,
+      "LayerNormalization": 1,
+      "SkipLayerNormalization": 24
+    },
+    "nodes": 132,
+    "bytes": 1112224456,
+    "seconds": 14.2
+  },
+  "eager-opt-fp16": {
+    "fused_operators": {
+      "Attention": 12,
+      "BiasGelu": 12,
+      "LayerNormalization": 1,
+      "SkipLayerNormalization": 24
+    },
+    "nodes": 133,
+    "bytes": 556144980,
+    "seconds": 23.3
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "rule": "FL-M5 T8: ONNX reranker on ret-test, fixed before the one ret-test run",
+  "fixed_on": "2026-11-26",
+  "test_runs_allowed": 1,
+  "queries": "all 1,137 ret-test queries, FL-M3's candidates.test.jsonl (filtered dense top 50)",
+  "reference_variant": "torch-cuda-fp16",
+  "candidate_variant": "ort-cuda-fp16-eager-opt",
+  "chosen_on_dev_because": "fastest ONNX variant on ret-dev with parity: forward p50 202.17 ms vs 211.65 ms (torch-cuda-fp16), NDCG@10 0.4879 vs 0.488, recall@10 and MRR@10 equal, same top 10 on 167 of 182 queries",
+  "fl_m3_test_ndcg_at_10": 0.5125,
+  "fl_m3_record": "bench/reranker_test.json (metrics.ndcg_after)",
+  "checks": {
+    "pipeline_reproduces_fl_m3": "abs(NDCG@10 of reference_variant - 0.5125) <= reproduce_tolerance",
+    "export_matches": "abs(metric of candidate_variant - metric of reference_variant) <= match_tolerance for every metric in match_metrics"
+  },
+  "reproduce_tolerance": 0.001,
+  "match_tolerance": 0.005,
+  "match_metrics": ["ndcg_after", "recall_after", "mrr_after"],
+  "tolerance_basis": "largest NDCG@10 gap between an fp16 ONNX variant and torch-cuda-fp16 on ret-dev: 0.0009",
+  "reported_not_thresholded": ["max abs logit difference", "queries with the same top 10", "forward latency p50/p95/p99"],
+  "dev_only": "all CPU variants (1,137 queries on the CPU would take hours) and the unfused ONNX variants",
+  "commands": [
+    "~/venvs/fl-train/bin/python -m filinglens.serve.onnx_reranker inputs --split test --allow-test",
+    "~/venvs/fl-train/bin/python -m filinglens.serve.onnx_reranker score --split test --allow-test --engine torch --device cuda --dtype fp16 --note \"<power mode>\"",
+    "PYTHONPATH=src ~/venvs/fl-onnx/bin/python -m filinglens.serve.onnx_reranker score --split test --allow-test --engine ort --device cuda --graph eager-opt-fp16 --note \"<power mode>\"",
+    "uv run python -m filinglens.serve.onnx_reranker compare --split test --allow-test"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker score --split dev --engine ort --device cpu --graph opt-fp32 --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-26T20:37:44+00:00",
+  "variant": "ort-cpu-fp32-opt",
+  "queries": 182,
+  "forward_latency": {
+    "p50_ms": 8790.88,
+    "p95_ms": 10045.14,
+    "p99_ms": 10176.09,
+    "mean_ms": 8350.82,
+    "samples": 182
+  },
+  "engine_info": {
+    "onnxruntime": "1.32.0",
+    "graph": "bge-reranker-base.opt-fp32.onnx",
+    "provider_options": {
+      "CPUExecutionProvider": {}
+    },
+    "available_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "session_providers": [
+      "CPUExecutionProvider"
+    ],
+    "intra_op_threads": 0
+  },
+  "gpu": {},
+  "cpu": "x86_64",
+  "power_note": "AC power, Best performance"
+}

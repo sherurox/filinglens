@@ -1,0 +1,68 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker score --split dev --engine ort --device cuda --graph opt-fp16 --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-26T20:11:57+00:00",
+  "variant": "ort-cuda-fp16-opt",
+  "queries": 182,
+  "forward_latency": {
+    "p50_ms": 304.28,
+    "p95_ms": 348.03,
+    "p99_ms": 384.28,
+    "mean_ms": 289.53,
+    "samples": 182
+  },
+  "engine_info": {
+    "onnxruntime": "1.32.0",
+    "graph": "bge-reranker-base.opt-fp16.onnx",
+    "provider_options": {
+      "CPUExecutionProvider": {},
+      "CUDAExecutionProvider": {
+        "external_data_loader_chunk_bytes": "2097152",
+        "external_data_loader_pinned_memory_bytes": "33554432",
+        "sdpa_kernel": "0",
+        "use_tf32": "1",
+        "fuse_conv_bias": "0",
+        "prefer_nhwc": "0",
+        "tunable_op_max_tuning_duration_ms": "0",
+        "tunable_op_enable": "0",
+        "tunable_op_tuning_enable": "0",
+        "enable_cudnn": "1",
+        "use_ep_level_unified_stream": "0",
+        "device_id": "0",
+        "cudnn_conv1d_pad_to_nc1d": "0",
+        "cudnn_conv_algo_search": "EXHAUSTIVE",
+        "has_user_compute_stream": "0",
+        "external_data_loader_reading_threads": "4",
+        "gpu_external_empty_cache": "0",
+        "gpu_mem_limit": "18446744073709551615",
+        "gpu_external_alloc": "0",
+        "gpu_external_free": "0",
+        "arena_extend_strategy": "kNextPowerOfTwo",
+        "do_copy_in_default_stream": "1",
+        "min_num_runs_before_cuda_graph_capture": "2",
+        "enable_cuda_graph": "0",
+        "user_compute_stream": "0",
+        "cudnn_conv_use_max_workspace": "1"
+      }
+    },
+    "available_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "session_providers": [
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "intra_op_threads": 0
+  },
+  "gpu": {
+    "gpu.name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu.temperature.gpu": "59.40",
+    "gpu.memory.used": "4518",
+    "gpu.memory.total": "8151",
+    "gpu.power.draw": "62.28",
+    "gpu.clocks.sm": "1597"
+  },
+  "cpu": "x86_64",
+  "power_note": "AC power, Best performance"
+}

@@ -1,0 +1,36 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker score --split dev --engine ort --device cuda --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-26T20:05:32+00:00",
+  "variant": "ort-cuda-fp32",
+  "queries": 182,
+  "forward_latency": {
+    "p50_ms": 661.66,
+    "p95_ms": 742.38,
+    "p99_ms": 761.06,
+    "mean_ms": 621.8,
+    "samples": 182
+  },
+  "engine_info": {
+    "onnxruntime": "1.32.0",
+    "available_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "session_providers": [
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "intra_op_threads": 0
+  },
+  "gpu": {
+    "gpu.name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "gpu.temperature.gpu": "62.90",
+    "gpu.memory.used": "6546",
+    "gpu.memory.total": "8151",
+    "gpu.power.draw": "79.15",
+    "gpu.clocks.sm": "2340"
+  },
+  "cpu": "x86_64",
+  "power_note": "AC power, Best performance"
+}

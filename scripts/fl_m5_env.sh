@@ -9,7 +9,8 @@ NOTE="${1:?usage: bash scripts/fl_m5_env.sh \"<power mode note>\"}"
 OUT=bench/serving_env.txt
 TRAIN_PY="$HOME/venvs/fl-train/bin/python"
 GPU_PY="$HOME/venvs/fl-gpu/bin/python"
-QUANT_PY="$HOME/venvs/fl-quant/bin/python"        # T3, only if it gets its own venv
+QUANT_PY="$HOME/venvs/fl-quant/bin/python"        # T3 quantizers
+ONNX_PY="$HOME/venvs/fl-onnx/bin/python"          # T8 ONNX Runtime
 LLAMA_DIR="${LLAMA_CPP_DIR:-$HOME/src/llama.cpp}"  # T4
 
 packages() {  # $1 = python, rest = distribution names
@@ -57,6 +58,9 @@ packages() {  # $1 = python, rest = distribution names
 
   echo; echo "## python packages: fl-quant venv ($QUANT_PY)"
   packages "$QUANT_PY" llmcompressor compressed-tensors torch transformers
+
+  echo; echo "## python packages: fl-onnx venv ($ONNX_PY)"
+  packages "$ONNX_PY" onnxruntime-gpu onnx numpy nvidia-cublas nvidia-cudnn-cu13
 
   echo; echo "## llama.cpp ($LLAMA_DIR)"
   if [[ -x "$LLAMA_DIR/build/bin/llama-server" ]]; then

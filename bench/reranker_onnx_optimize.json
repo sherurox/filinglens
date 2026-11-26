@@ -1,0 +1,27 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker optimize",
+  "finished_utc": "2026-11-26T20:11:00+00:00",
+  "onnxruntime": "1.32.0",
+  "num_heads": 12,
+  "hidden": 768,
+  "opt-fp32": {
+    "fused_operators": {
+      "BiasGelu": 12,
+      "LayerNormalization": 1,
+      "SkipLayerNormalization": 24
+    },
+    "nodes": 914,
+    "bytes": 1112388108,
+    "seconds": 13.4
+  },
+  "opt-fp16": {
+    "fused_operators": {
+      "BiasGelu": 12,
+      "LayerNormalization": 1,
+      "SkipLayerNormalization": 24
+    },
+    "nodes": 915,
+    "bytes": 556359980,
+    "seconds": 25.8
+  }
+}

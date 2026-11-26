@@ -1,12 +1,12 @@
 # FL-M5 serving environment
-recorded_utc: 2026-11-26T18:17:06Z
+recorded_utc: 2026-11-26T21:35:14Z
 command: bash scripts/fl_m5_env.sh "AC power, Best performance"
-git: 03b3d17; uncommitted outside bench/: scripts/fl_m5_env.sh scripts/fl_m5_gguf.sh src/filinglens/serve/llama_client.py tests/test_serve_llama_client.py 
+git: 111217d; uncommitted outside bench/: scripts/fl_m5_env.sh src/filinglens/serve/onnx_reranker.py tests/test_serve_onnx_reranker.py 
 power: AC power, Best performance
 
 ## gpu (idle, before any model is loaded)
 name, compute_cap, driver_version, memory.used [MiB], memory.total [MiB], temperature.gpu, power.draw [W], power.limit [W], pstate
-NVIDIA GeForce RTX 5070 Laptop GPU, 12.0, 621.01, 1144 MiB, 8151 MiB, 35.90, 37.24 W, [N/A], P2
+NVIDIA GeForce RTX 5070 Laptop GPU, 12.0, 621.01, 1171 MiB, 8151 MiB, 48.00, 25.75 W, [N/A], P4
 note: WSL can't list Windows processes; memory.used includes the Windows desktop and apps
 Cuda compilation tools, release 13.2, V13.2.86
 Build cuda_13.2.r13.2/compiler.37953736_0
@@ -15,11 +15,11 @@ Build cuda_13.2.r13.2/compiler.37953736_0
 CPU(s): 24
 Model name: AMD Ryzen 9 8940HX with Radeon Graphics
 Thread(s) per core: 2
-ram_mib total 19998, available 17881
+ram_mib total 19998, available 17950
 kernel: 6.18.58.1-microsoft-standard-WSL2
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/sdd       1007G  126G  830G  14% /
-D:\             932G  817G  115G  88% /mnt/d
+/dev/sdd       1007G  134G  823G  14% /
+D:\             932G  825G  108G  89% /mnt/d
 
 ## containers (name, image, image ID)
 filinglens-postgres pgvector/pgvector:0.8.7-pg18-trixie sha256:ab49524d18df7200b74ac9a475e1db6297fc1eb57da4c214c63d10ecc4b754fa
@@ -47,7 +47,7 @@ bitsandbytes 0.50.2 | license: MIT | classifiers: -
 safetensors 0.8.0 | license: - | classifiers: Apache Software License
 huggingface-hub 2.4.0 | license: Apache-2.0 | classifiers: Apache Software License
 sentencepiece 0.2.3 | license: Apache-2.0 | classifiers: -
-onnx | not installed
+onnx 1.23.2 | license: Apache-2.0 | classifiers: -
 onnxruntime | not installed
 onnxruntime-gpu | not installed
 mlflow 3.18.0 | license: Copyright 2018 Databricks, Inc. All rights reserved. Apache  | classifiers: Apache Software License
@@ -67,6 +67,13 @@ compressed-tensors 0.20.1 | license: Apache 2.0 | classifiers: -
 torch 2.14.1+cu132 | license: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clau | classifiers: -
 transformers 5.21.0 | license: Apache 2.0 License | classifiers: -
 
+## python packages: fl-onnx venv (/home/shreyas/venvs/fl-onnx/bin/python)
+onnxruntime-gpu 1.32.0 | license: MIT License | classifiers: MIT License
+onnx 1.23.2 | license: Apache-2.0 | classifiers: -
+numpy 2.5.5 | license: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | classifiers: -
+nvidia-cublas 13.10.1.6 | license: LicenseRef-NVIDIA-Proprietary | classifiers: -
+nvidia-cudnn-cu13 9.28.1.4 | license: LicenseRef-NVIDIA-Proprietary | classifiers: -
+
 ## llama.cpp (/home/shreyas/src/llama.cpp)
 commit: fa9f928f25a5fc765c7d0d1c7deb64e8f1a762a4
 version: 1.1.0-dev (build 12794, commit fa9f928f2)
@@ -75,5 +82,5 @@ LICENSE: MIT License
 
 ## models (local Hugging Face cache)
 Qwen/Qwen3-1.7B revision 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e | card license: apache-2.0
-BAAI/bge-reranker-base revision 2cfc18c9415c912f9d8155881c133215df768a70 | card license: - (no README in snapshot)
+BAAI/bge-reranker-base revision 2cfc18c9415c912f9d8155881c133215df768a70 | card license: mit
 BAAI/bge-base-en-v1.5 revision a5beb1e3e68b9ab74eb54cfd186867f64f240e1a | card license: mit

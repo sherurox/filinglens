@@ -1,0 +1,26 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker export --attn eager",
+  "finished_utc": "2026-11-26T20:57:21+00:00",
+  "model": "BAAI/bge-reranker-base@2cfc18c9415c912f9d8155881c133215df768a70",
+  "attn_implementation": "eager",
+  "exporter": "torchscript",
+  "exporter_errors": [],
+  "opset": 17,
+  "torch": "2.15.0+cu132",
+  "onnx": "1.23.2",
+  "export_s": 7.7,
+  "inputs": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "outputs": [
+    "logits"
+  ],
+  "nodes": 986,
+  "bytes": 1112405008,
+  "sample_logits_torch_fp32": [
+    -4.077506,
+    -7.705839
+  ],
+  "out": "data/interim/serve/onnx/bge-reranker-base.eager.onnx"
+}

@@ -1,0 +1,20 @@
+{
+  "command": "python -m filinglens.serve.onnx_reranker score --split dev --engine torch --device cpu --dtype fp32 --note 'AC power, Best performance'",
+  "finished_utc": "2026-11-26T19:37:01+00:00",
+  "variant": "torch-cpu-fp32",
+  "queries": 182,
+  "forward_latency": {
+    "p50_ms": 7751.6,
+    "p95_ms": 8754.42,
+    "p99_ms": 8917.32,
+    "mean_ms": 7447.5,
+    "samples": 182
+  },
+  "engine_info": {
+    "torch": "2.15.0+cu132",
+    "threads": 12
+  },
+  "gpu": {},
+  "cpu": "x86_64",
+  "power_note": "AC power, Best performance"
+}
