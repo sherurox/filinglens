@@ -1,0 +1,15 @@
+{
+  "command": "python -m filinglens.extract.fields generate --variant zero --split dev --gpu-memory-utilization 0.83 --max-model-len 4608 --max-num-seqs 1 --model data/interim/serve/gptq-w4a16 --tag gptq-w4a16",
+  "finished_utc": "2026-11-26T17:53:25+00:00",
+  "split": "dev",
+  "model": "data/interim/serve/gptq-w4a16",
+  "lora": null,
+  "max_num_seqs": 1,
+  "variant": "zero",
+  "examples": [],
+  "rows": 71,
+  "valid": 71,
+  "elapsed_s_incl_model_load": 106.6,
+  "peak_gpu_memory_mib": 6933,
+  "predictions": "data/interim/fields/fields_zero_dev_gptq-w4a16.jsonl"
+}

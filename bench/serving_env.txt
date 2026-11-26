@@ -1,12 +1,12 @@
 # FL-M5 serving environment
-recorded_utc: 2026-11-25T16:56:27Z
+recorded_utc: 2026-11-26T17:57:03Z
 command: bash scripts/fl_m5_env.sh "AC power, Best performance"
-git: 44bd3a4; uncommitted outside bench/: scripts/env_info.py scripts/fl_m5_env.sh tests/test_env_info.py src/filinglens/serve/merge.py src/filinglens/serve/parity.py tests/test_serve_merge.py tests/test_serve_parity.py 
+git: 75ae3ee; uncommitted outside bench/: src/filinglens/serve/quantize.py tests/test_serve_quantize.py 
 power: AC power, Best performance
 
 ## gpu (idle, before any model is loaded)
 name, compute_cap, driver_version, memory.used [MiB], memory.total [MiB], temperature.gpu, power.draw [W], power.limit [W], pstate
-NVIDIA GeForce RTX 5070 Laptop GPU, 12.0, 621.01, 2071 MiB, 8151 MiB, 45.80, 18.74 W, [N/A], P4
+NVIDIA GeForce RTX 5070 Laptop GPU, 12.0, 621.01, 1093 MiB, 8151 MiB, 36.20, 25.13 W, [N/A], P2
 note: WSL can't list Windows processes; memory.used includes the Windows desktop and apps
 Cuda compilation tools, release 13.2, V13.2.86
 Build cuda_13.2.r13.2/compiler.37953736_0
@@ -15,11 +15,11 @@ Build cuda_13.2.r13.2/compiler.37953736_0
 CPU(s): 24
 Model name: AMD Ryzen 9 8940HX with Radeon Graphics
 Thread(s) per core: 2
-ram_mib total 19998, available 17879
+ram_mib total 19998, available 18035
 kernel: 6.18.58.1-microsoft-standard-WSL2
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/sdd       1007G  111G  846G  12% /
-D:\             932G  801G  131G  86% /mnt/d
+/dev/sdd       1007G  120G  837G  13% /
+D:\             932G  811G  122G  87% /mnt/d
 
 ## containers (name, image, image ID)
 filinglens-postgres pgvector/pgvector:0.8.7-pg18-trixie sha256:ab49524d18df7200b74ac9a475e1db6297fc1eb57da4c214c63d10ecc4b754fa
@@ -61,7 +61,10 @@ triton 3.8.0 | license: MIT | classifiers: -
 mlflow | not installed
 
 ## python packages: fl-quant venv (/home/shreyas/venvs/fl-quant/bin/python)
-(/home/shreyas/venvs/fl-quant/bin/python not found)
+llmcompressor 0.15.0 | license: Apache 2.0 | classifiers: Apache Software License
+compressed-tensors 0.20.1 | license: Apache 2.0 | classifiers: -
+torch 2.14.1+cu132 | license: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clau | classifiers: -
+transformers 5.21.0 | license: Apache 2.0 License | classifiers: -
 
 ## llama.cpp (/home/shreyas/src/llama.cpp)
 not built yet (T4)
