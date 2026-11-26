@@ -1,0 +1,91 @@
+{
+  "rule": "FL-M5 T10 router: pre-registered before serve/router.py exists or any route is solved",
+  "committed_before": "serve/router.py, greedy_route(), notebooks/router.ipynb",
+  "decided": "2026-11-26 (user, from options)",
+  "inputs": {
+    "file": "bench/router_inputs.json",
+    "commit": "dc5e101",
+    "sha256": "7e1dcf21501a1f7eda91005851494c62083aa2e897fd3e9998b8652c4a68295f",
+    "split": "dev only; the test split is not used by the router"
+  },
+  "classes": [
+    "extraction",
+    "short_qa",
+    "long_synthesis"
+  ],
+  "traffic_per_day": {
+    "basis": "stated demo scenario sized to the 500 RPD free tier, not a measurement",
+    "main": {
+      "extraction": 500,
+      "short_qa": 200,
+      "long_synthesis": 50
+    },
+    "infeasible_case": {
+      "extraction": 500,
+      "short_qa": 200,
+      "long_synthesis": 600,
+      "why": "long synthesis is Gemini-only; 600/day exceeds 500 RPD"
+    },
+    "arrival": "spread evenly over 24 h (for the per-minute RPM and TPM checks)"
+  },
+  "scenarios": {
+    "S1_gpu_on": {
+      "backends": [
+        "vllm",
+        "gguf",
+        "gemini"
+      ]
+    },
+    "S2_gpu_off": {
+      "backends": [
+        "gguf",
+        "gemini"
+      ],
+      "why": "the laptop GPU isn't serving; CPU GGUF and the hosted API remain"
+    }
+  },
+  "eligibility": {
+    "context": "a backend takes long_synthesis only if context_tokens >= 16384 (router_inputs)",
+    "p95_latency_max_s": {
+      "short_qa": 5.0,
+      "extraction": 60.0,
+      "long_synthesis": null
+    },
+    "latency_basis": "short Q&A is interactive (a user waits); extraction is a batch job; long synthesis latency is not measured, so no limit",
+    "why_not_linear": "p95 of a traffic mix is not the share-weighted mean of p95s, so latency filters backends per class instead of entering the LP"
+  },
+  "accuracy_floor": {
+    "rule": "per (scenario, class): highest dev accuracy among that class's eligible backends in the scenario, minus 0.01",
+    "applies_to": [
+      "extraction",
+      "short_qa"
+    ],
+    "long_synthesis": "none (accuracy not measured; eligibility only)",
+    "lp_form": "sum over backends of share x accuracy >= floor (expected accuracy is linear in the shares)",
+    "sweep": "the notebook also reports LP and greedy cost over floors from the lowest to the highest eligible accuracy in steps of 0.0025, per class and scenario"
+  },
+  "capacity": {
+    "gemini_rpd": "sum over classes of share x traffic <= 500",
+    "gemini_rpm": "sum over classes of share x traffic / 1440 <= 15",
+    "gemini_tpm": "sum over classes of share x traffic / 1440 x prompt tokens <= 250000 (long synthesis at its nominal 15,984-token prompt)",
+    "local_busy_seconds": "per local backend: sum over classes of share x traffic x mean latency (c=1) <= 86400",
+    "error_rate": "recorded in router_inputs, not a constraint"
+  },
+  "objective": "minimize sum of share x traffic x usd_per_request (list prices; actual spend is $0)",
+  "solver": "scipy.optimize.linprog, method='highs'; shares in [0, 1]; each class's shares sum to 1",
+  "greedy_baseline": {
+    "author": "hand-written by the user (greedy_route)",
+    "rule": "classes in the order extraction, short_qa, long_synthesis; for each, the eligible backends whose own accuracy meets the floor, cheapest first; give each as much of the class's traffic as its remaining capacity allows, then the next; traffic left over is unrouted (greedy infeasible for that class). Greedy never blends a below-floor backend in.",
+    "capacity_order": "greedy uses the same capacity limits as the LP, consumed in class order"
+  },
+  "report": {
+    "per_scenario": "status, cost per day (LP, greedy), savings = greedy - LP in $ and %, shares, binding constraints (slack 0) and their duals",
+    "infeasible": "LP status for the infeasible case, and which constraint makes it infeasible",
+    "if_greedy_unrouted": "savings are not defined; report that greedy leaves N requests unrouted while the LP routes all (or that both fail)",
+    "if_equal": "if LP and greedy cost the same, report $0 savings as found"
+  },
+  "checks": {
+    "brute_force": "on 200 random small cases (2-3 backends, 2 classes, random accuracies, costs, capacities), the LP's cost <= the best grid search (shares in steps of 0.05) + 1e-9, and the LP solution satisfies every constraint within 1e-9",
+    "greedy_review": "the user's greedy_route is checked against the same constraints: never above capacity, never below floor, unrouted counted"
+  }
+}
