@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.api.demo_db check",
+  "finished_utc": "2026-11-26T23:39:46+00:00",
+  "queries": 182,
+  "fl_m3_filtered_exact_recall_at_10": 0.6758,
+  "results": {
+    "fl_m3_stored_vectors": {
+      "recall_at_10": 0.6758,
+      "sql_ms": {
+        "p50": 2.8,
+        "p95": 6.09
+      }
+    },
+    "int8_onnx_encoder": {
+      "recall_at_10": 0.6648,
+      "sql_ms": {
+        "p50": 3.09,
+        "p95": 5.96
+      }
+    }
+  },
+  "reproduces_fl_m3": true,
+  "reproduce_gap": 0.0,
+  "plan_first_query": [
+    "Limit  (cost=1852.00..1852.02 rows=10 width=1012)",
+    "  ->  Sort  (cost=1852.00..1853.47 rows=587 width=1012)",
+    "        Sort Key: ((embedding <#> <query vector>))",
+    "        ->  Bitmap Heap Scan on chunks  (cost=8.84..1839.31 rows=587 width=1012)",
+    "              Recheck Cond: (cik = '4904'::smallint)",
+    "              ->  Bitmap Index Scan on chunks_cik_idx  (cost=0.00..8.69 rows=587 width=0)",
+    "                    Index Cond: (cik = '4904'::smallint)"
+  ]
+}

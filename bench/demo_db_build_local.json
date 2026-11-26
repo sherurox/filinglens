@@ -1,0 +1,19 @@
+{
+  "command": "python -m filinglens.api.demo_db build",
+  "finished_utc": "2026-11-26T23:37:53+00:00",
+  "target": "local",
+  "server": "PostgreSQL 18.7 (Debian 18.7-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "companies": 77,
+  "rows": 59263,
+  "load_s": 2.6,
+  "bytes": {
+    "chunks": 317014016,
+    "companies": 49152
+  },
+  "bytes_total": 317063168,
+  "indexes": [
+    "demo.chunks primary key",
+    "chunks_cik_idx (B-tree)",
+    "no HNSW (see docstring)"
+  ]
+}
