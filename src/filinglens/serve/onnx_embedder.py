@@ -195,6 +195,7 @@ def run_export(args: argparse.Namespace) -> dict:
 
 
 def run_optimize(args: argparse.Namespace) -> dict:
+    import onnx
     import onnxruntime
     from onnxruntime.quantization import QuantType, quantize_dynamic
     from onnxruntime.transformers.optimizer import optimize_model
@@ -207,7 +208,12 @@ def run_optimize(args: argparse.Namespace) -> dict:
     fused = {k: v for k, v in model.get_fused_operator_statistics().items() if v}
     opt_s = time.perf_counter() - started
     started = time.perf_counter()
-    quantize_dynamic(str(GRAPHS["opt-fp32"]), str(GRAPHS["int8"]), weight_type=QuantType.QInt8)
+    # The fused graph uses ONNX Runtime's own operators (com.microsoft Attention, SkipLayerNorm,
+    # ...), which standard shape inference can't type, so the quantizer can't find the type of
+    # the MatMul after the first fused attention (26 Nov). Every tensor here is float apart from
+    # the int64 token inputs, so float is the right default.
+    quantize_dynamic(str(GRAPHS["opt-fp32"]), str(GRAPHS["int8"]), weight_type=QuantType.QInt8,
+                     extra_options={"DefaultTensorType": onnx.TensorProto.FLOAT})  # fmt: skip
     quant_s = time.perf_counter() - started
     return {
         "onnxruntime": onnxruntime.__version__,
@@ -220,6 +226,7 @@ def run_optimize(args: argparse.Namespace) -> dict:
         "optimize_s": round(opt_s, 1),
         "quantize_s": round(quant_s, 1),
         "quantization": "dynamic, weights QInt8, activations quantized at run time",
+        "quantize_extra_options": {"DefaultTensorType": "FLOAT"},
     }
 
 

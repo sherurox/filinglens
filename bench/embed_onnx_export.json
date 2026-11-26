@@ -1,0 +1,33 @@
+{
+  "command": "python -m filinglens.serve.onnx_embedder export",
+  "finished_utc": "2026-11-26T23:31:45+00:00",
+  "model": "BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a",
+  "attn_implementation": "eager",
+  "opset": 17,
+  "torch": "2.15.0+cu132",
+  "onnx": "1.23.2",
+  "export_s": 2.7,
+  "inputs": [
+    "input_ids",
+    "attention_mask"
+  ],
+  "outputs": [
+    "cls"
+  ],
+  "nodes": 979,
+  "bytes": 435772162,
+  "sha256": "f8ee931355e3584f6422a22e60956657545c6507d48b6940be38636e89b61411",
+  "tokenizer": {
+    "file": "data/interim/serve/onnx/bge-base.tokenizer.json",
+    "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+  },
+  "tokenizer_parity": {
+    "queries": 182,
+    "ids_differ": 0,
+    "first": []
+  },
+  "reference": {
+    "file": "data/interim/serve/onnx/bge-base.torch-fp32-cls.npz",
+    "queries": 8
+  }
+}

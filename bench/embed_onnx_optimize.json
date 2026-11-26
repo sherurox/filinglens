@@ -1,0 +1,28 @@
+{
+  "command": "python -m filinglens.serve.onnx_embedder optimize",
+  "finished_utc": "2026-11-26T23:33:16+00:00",
+  "onnxruntime": "1.32.0",
+  "fused_operators": {
+    "EmbedLayerNormalization": 1,
+    "Attention": 12,
+    "BiasGelu": 12,
+    "SkipLayerNormalization": 24
+  },
+  "nodes_opt": 124,
+  "graphs": {
+    "opt-fp32": {
+      "bytes": 435612018,
+      "sha256": "72a42f432bc637942fc0a4dbbcec65ecf041eaed04b5ff14c0701f6e0a1dc167"
+    },
+    "int8": {
+      "bytes": 109361320,
+      "sha256": "d522fabb823212031e93807369d7f30812e9b2112c4e7f305b653db7bb6d9f2e"
+    }
+  },
+  "optimize_s": 4.8,
+  "quantize_s": 1.4,
+  "quantization": "dynamic, weights QInt8, activations quantized at run time",
+  "quantize_extra_options": {
+    "DefaultTensorType": "FLOAT"
+  }
+}

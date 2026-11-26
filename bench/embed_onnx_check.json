@@ -1,0 +1,42 @@
+{
+  "command": "python -m filinglens.serve.onnx_embedder check --split dev",
+  "finished_utc": "2026-11-26T23:33:35+00:00",
+  "onnxruntime": "1.32.0",
+  "queries": 182,
+  "fl_m3_dev_recall_at_10": 0.2967,
+  "results": {
+    "opt-fp32": {
+      "bytes": 435612018,
+      "latency_1_thread": {
+        "n": 182,
+        "p50_ms": 54.47,
+        "p95_ms": 63.63,
+        "mean_ms": 54.57
+      },
+      "min_cosine_vs_fl_m3": 0.999999,
+      "same_top10_vs_fl_m3": 145,
+      "exact_recall_at_10": 0.2967,
+      "max_abs_cls_diff_vs_torch_fp32": 4e-06
+    },
+    "int8": {
+      "bytes": 109361320,
+      "latency_1_thread": {
+        "n": 182,
+        "p50_ms": 18.06,
+        "p95_ms": 21.05,
+        "mean_ms": 18.21
+      },
+      "min_cosine_vs_fl_m3": 0.960219,
+      "same_top10_vs_fl_m3": 12,
+      "exact_recall_at_10": 0.2912,
+      "max_abs_cls_diff_vs_torch_fp32": 0.549554
+    }
+  },
+  "decision": {
+    "pipeline_ok": true,
+    "int8_recall_drop": 0.0055,
+    "int8_ok": true,
+    "ship": "int8"
+  },
+  "rule": "bench/m5_embed_rule.json"
+}
