@@ -38,7 +38,14 @@ QUERIES = Path("gold/retrieval/queries.dev.jsonl")
 CHUNKS = Path("data/interim/retrieval/chunks.parquet")
 EMB_DIR = Path("data/interim/retrieval/bge-base")
 FL_M3_FILTERED_RECALL = 0.6758  # bench/vector_stores.json, reproduce_t4b (faiss-flat, filtered)
-ONE_QUERY = 1 / 182
+ONE_QUERY = 1 / 182  # kept for reference; comparisons use hit counts (within_one_query)
+
+
+def within_one_query(recall: float, expected: float, queries: int) -> bool:
+    """Compare as hit counts: 4-decimal recalls can't resolve 1/182 (0.0055 > 0.0054945)."""
+    return abs(round(recall * queries) - round(expected * queries)) <= 1
+
+
 DIM = 768
 
 DDL = f"""
@@ -217,6 +224,7 @@ def run_check(args: argparse.Namespace) -> dict:
             hits += recall_hit([r[0] for r in rows], q["grades"])
         a = np.asarray(ms)
         out[name] = {
+            "hits": hits,
             "recall_at_10": round(hits / len(queries), 4),
             "sql_ms": {
                 "p50": round(float(np.percentile(a, 50)), 2),
@@ -227,14 +235,17 @@ def run_check(args: argparse.Namespace) -> dict:
         "EXPLAIN " + SEARCH_SQL, {"q": stored[0], "cik": queries[0]["cik"], "k": 10}
     ).fetchall()
     con.close()
-    gap = abs(out["fl_m3_stored_vectors"]["recall_at_10"] - FL_M3_FILTERED_RECALL)
+    stored_hits = out["fl_m3_stored_vectors"]["hits"]
+    gap = abs(stored_hits / len(queries) - FL_M3_FILTERED_RECALL)
     return {
         "target": target(),
         "server": server,
         "queries": len(queries),
         "fl_m3_filtered_exact_recall_at_10": FL_M3_FILTERED_RECALL,
         "results": out,
-        "reproduces_fl_m3": gap <= ONE_QUERY + 1e-9,
+        "reproduces_fl_m3": within_one_query(
+            stored_hits / len(queries), FL_M3_FILTERED_RECALL, len(queries)
+        ),
         "reproduce_gap": round(gap, 4),
         "plan_first_query": short_plan([r[0] for r in plan]),
     }

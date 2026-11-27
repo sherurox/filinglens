@@ -11,6 +11,7 @@ from filinglens.api.demo_db import (
     require_target,
     short_plan,
     subset_rows,
+    within_one_query,
 )
 
 
@@ -55,3 +56,11 @@ def test_tag_must_match_where_it_runs(monkeypatch):
     require_target("neon")
     with pytest.raises(SystemExit, match="--tag local but"):
         require_target("local")
+
+
+def test_one_query_tolerance_is_counted_in_hits_not_rounded_recall():
+    # T13: 122 vs 121 hits of 182 is one query, but the 4-decimal recalls differ by 0.0055 > 1/182
+    assert abs(0.6703 - 0.6648) > 1 / 182
+    assert within_one_query(0.6703, 0.6648, 182)
+    assert within_one_query(0.6758, 0.6758, 182)
+    assert not within_one_query(0.6758, 0.6648, 182)  # 123 vs 121: two queries

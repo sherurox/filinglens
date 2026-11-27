@@ -54,6 +54,7 @@ def test_recall_counts_failed_searches_as_misses():
     out = run(client, queries(10), expected=0.5)
     # even i hit: 0,2,4,6,8 = 5 of 10; i=5 failed (a miss either way), still over all 10
     assert out["search"]["recall_at_10"] == 0.5
+    assert out["search"]["hits"] == 5 and out["search"]["expected_hits"] == 5
     assert out["search"]["matches_expected"] is True
     assert out["search"]["errors"] == ["q5: HTTP 503"]
     assert out["search"]["client_ms"]["n"] == 9
@@ -62,7 +63,8 @@ def test_recall_counts_failed_searches_as_misses():
 
 def test_recall_outside_one_query_is_flagged():
     client, _ = fake_service()
-    assert run(client, queries(10), expected=0.7)["search"]["matches_expected"] is False
+    assert run(client, queries(10), expected=0.6)["search"]["matches_expected"] is True  # 5 vs 6
+    assert run(client, queries(10), expected=0.7)["search"]["matches_expected"] is False  # 5 vs 7
 
 
 def test_answers_one_per_company_and_tagged():

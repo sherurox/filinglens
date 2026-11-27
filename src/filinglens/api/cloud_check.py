@@ -5,9 +5,9 @@
 Sends the 182 ret-dev questions to POST /search on the public URL and scores recall@10 exactly
 as `demo_db check` does (a hit = any graded chunk in the top 10). The same image and the same
 rows answer, so the expected value is the int8 encoder's recall from bench/demo_db_check_neon.json;
-a gap of at most one query is allowed, because ONNX Runtime may pick different int8 kernels on
-Cloud Run's CPU than on the Ryzen. Latency is client wall time from this machine to us-east1, so
-it includes the network and is an upper bound on service time.
+a gap of at most one query (compared as hit counts) is allowed, because ONNX Runtime may pick
+different int8 kernels on Cloud Run's CPU than on the Ryzen. Latency is client wall time from
+this machine to us-east1, so it includes the network and is an upper bound on service time.
 
 The first request is timed on its own. Whether it was a cold start is not guessed: with
 --project, the service's startup log lines ("Starting new instance", uvicorn's "Application
@@ -29,7 +29,7 @@ from pathlib import Path
 
 import numpy as np
 
-from filinglens.api.demo_db import ONE_QUERY, dev_queries, recall_hit
+from filinglens.api.demo_db import dev_queries, recall_hit, within_one_query
 
 ANSWER_QUESTIONS = 3
 CHECK_USER = "cloud-check"
@@ -129,9 +129,11 @@ def run(client, queries: list[dict], expected: float) -> dict:
         "companies": companies,
         "search": {
             "queries": len(queries),
+            "hits": hits,
             "recall_at_10": recall,
             "expected_int8_recall_at_10": expected,
-            "matches_expected": abs(recall - expected) <= ONE_QUERY + 1e-9,
+            "expected_hits": round(expected * len(queries)),
+            "matches_expected": within_one_query(hits / len(queries), expected, len(queries)),
             "errors": errors,
             "client_ms": latency_ms(seconds),
         },
