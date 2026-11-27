@@ -1,0 +1,35 @@
+{
+  "command": "python -m filinglens.api.demo_db check --tag neon",
+  "finished_utc": "2026-11-27T17:10:12+00:00",
+  "target": "DATABASE_URL",
+  "server": "PostgreSQL 18.7 (3190d2f) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+  "queries": 182,
+  "fl_m3_filtered_exact_recall_at_10": 0.6758,
+  "results": {
+    "fl_m3_stored_vectors": {
+      "recall_at_10": 0.6758,
+      "sql_ms": {
+        "p50": 126.68,
+        "p95": 142.59
+      }
+    },
+    "int8_onnx_encoder": {
+      "recall_at_10": 0.6648,
+      "sql_ms": {
+        "p50": 126.38,
+        "p95": 141.05
+      }
+    }
+  },
+  "reproduces_fl_m3": true,
+  "reproduce_gap": 0.0,
+  "plan_first_query": [
+    "Limit  (cost=1617.09..1617.12 rows=10 width=1012)",
+    "  ->  Sort  (cost=1617.09..1618.35 rows=502 width=1012)",
+    "        Sort Key: ((embedding <#> <query vector>))",
+    "        ->  Bitmap Heap Scan on chunks  (cost=8.18..1606.24 rows=502 width=1012)",
+    "              Recheck Cond: (cik = '4904'::smallint)",
+    "              ->  Bitmap Index Scan on chunks_cik_idx  (cost=0.00..8.05 rows=502 width=0)",
+    "                    Index Cond: (cik = '4904'::smallint)"
+  ]
+}

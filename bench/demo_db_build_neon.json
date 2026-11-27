@@ -1,0 +1,19 @@
+{
+  "command": "python -m filinglens.api.demo_db build --tag neon",
+  "finished_utc": "2026-11-27T17:09:20+00:00",
+  "target": "DATABASE_URL",
+  "server": "PostgreSQL 18.7 (3190d2f) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+  "companies": 77,
+  "rows": 59263,
+  "load_s": 3188.9,
+  "bytes": {
+    "chunks": 316145664,
+    "companies": 49152
+  },
+  "bytes_total": 316194816,
+  "indexes": [
+    "demo.chunks primary key",
+    "chunks_cik_idx (B-tree)",
+    "no HNSW (see docstring)"
+  ]
+}
