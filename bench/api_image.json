@@ -1,13 +1,13 @@
 {
   "command": "bash scripts/fl_m5_image.sh",
-  "finished_utc": "2026-11-26T23:56:00+00:00",
+  "finished_utc": "2026-11-27T15:53:57+00:00",
   "image": "filinglens-api:local",
-  "image_id": "sha256:e4d41d7b6f1028b79ad240e8f00b320d2ca813d1a0ec99c127b0d0aaea988030",
-  "base": "\nunknown",
-  "build_s": 0.8,
+  "image_id": "sha256:fbd3844d19dfc34056e2bb94e6d1eccd139f413d165207b9da0ba2b6a940e5af",
+  "base": "python:3.12-slim@sha256:191083cdf6c7bda8c76158983163ead5d5cf7b77cf3033e805bb0f5296f51b4b",
+  "build_s_no_cache": 22.2,
   "bytes": {
-    "docker_image_inspect_size": 181358157,
-    "docker_save_gzip": 180719407,
+    "docker_image_inspect_size": 181358039,
+    "docker_save_gzip": 180716436,
     "unpacked_rootfs_du": 447713438
   },
   "registry_budget_bytes": 500000000,
@@ -63,7 +63,7 @@
     }
   ],
   "startup": {
-    "seconds_to_healthy": 1.4,
+    "seconds_to_healthy": 1.3,
     "health": {
       "status": "ok",
       "database": true,

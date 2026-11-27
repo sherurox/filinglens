@@ -2,6 +2,8 @@
 # FL-M5 T12: build the API image and record its measured sizes and startup in bench/api_image.json.
 #   set -a; source .env; set +a; docker compose up -d --wait postgres
 #   bash scripts/fl_m5_image.sh
+# The build runs with --no-cache, so build_s is a real build (download + install), not a cache hit.
+# The base image is read from the Dockerfile's FROM line (pinned by digest).
 # Sizes, all measured: `docker image inspect .Size` (with Docker Desktop's containerd image store
 # this is the compressed content size, what a registry stores), the gzipped `docker save` stream,
 # and the unpacked root filesystem (`du -sxb /` inside a container of the image). Startup: seconds
@@ -16,14 +18,15 @@ uv export --only-group api --no-emit-project --format requirements-txt -o requir
 git diff --quiet -- requirements-api.txt || echo "note: requirements-api.txt changed (commit it)"
 
 start=$(date +%s.%N)
-docker build -t "$IMAGE" . >logs/docker_build.log 2>&1
+docker build --no-cache -t "$IMAGE" . >logs/docker_build.log 2>&1
 BUILD_S=$(echo "$(date +%s.%N) - $start" | bc)
 
 CONTENT=$(docker image inspect "$IMAGE" -f '{{.Size}}')
 GZIP=$(docker save "$IMAGE" | gzip -1 | wc -c)
 UNPACKED=$(docker run --rm --entrypoint sh "$IMAGE" -c 'du -sxb / 2>/dev/null | cut -f1')
 IMAGE_ID=$(docker image inspect "$IMAGE" -f '{{.Id}}')
-BASE=$(docker image inspect python:3.12-slim -f '{{index .RepoDigests 0}}' 2>/dev/null || echo unknown)
+BASE=$(grep -m1 '^FROM ' Dockerfile | awk '{print $2}')
+case "$BASE" in *@sha256:*) ;; *) echo "pin the base image by digest in the Dockerfile first" >&2; exit 1 ;; esac
 LAYERS=$(docker history "$IMAGE" --no-trunc --format '{{.Size}}|{{.CreatedBy}}' | head -n 12)
 
 docker rm -f "$NAME" >/dev/null 2>&1 || true
@@ -50,7 +53,7 @@ out = {
     "image": "filinglens-api:local",
     "image_id": e["IMAGE_ID"],
     "base": e["BASE"],
-    "build_s": round(float(e["BUILD_S"]), 1),
+    "build_s_no_cache": round(float(e["BUILD_S"]), 1),
     "bytes": {
         "docker_image_inspect_size": int(e["CONTENT"]),
         "docker_save_gzip": int(e["GZIP"]),
