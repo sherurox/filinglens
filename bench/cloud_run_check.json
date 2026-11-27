@@ -1,0 +1,108 @@
+{
+  "command": "python -m filinglens.api.cloud_check --url https://filinglens-api-557912440708.us-east1.run.app --project filinglens-run-261127",
+  "finished_utc": "2026-11-27T17:44:29+00:00",
+  "url": "https://filinglens-api-557912440708.us-east1.run.app",
+  "expected_from": "bench/demo_db_check_neon.json",
+  "latency_note": "client wall time from the caller to us-east1, network included",
+  "first_request": {
+    "utc": "2026-11-27T17:43:36+00:00",
+    "path": "/health",
+    "client_s": 0.13,
+    "body": {
+      "status": "ok",
+      "database": true,
+      "spend_usd": 0
+    },
+    "startup_log_lines": []
+  },
+  "companies": 77,
+  "search": {
+    "queries": 182,
+    "hits": 122,
+    "recall_at_10": 0.6703,
+    "expected_int8_recall_at_10": 0.6648,
+    "expected_hits": 121,
+    "matches_expected": true,
+    "errors": [],
+    "client_ms": {
+      "n": 182,
+      "p50": 149.2,
+      "p95": 169.7,
+      "max": 179.3
+    }
+  },
+  "answers": [
+    {
+      "query_id": "0000004904-25-000027:72:q1",
+      "ticker": "AEP",
+      "question": "According to its FY2024 10-K, what factors affect AEP's ability to procure or construct generation capacity?",
+      "status": 200,
+      "client_s": 1.04,
+      "model": "gemini-3.1-flash-lite",
+      "model_latency_s": 0.876,
+      "tokens": {
+        "prompt": 1443,
+        "output": 149
+      },
+      "list_price_usd": 0.00058425,
+      "citations": [
+        2,
+        4
+      ],
+      "answer": "AEP\u2019s ability to procure or construct generation capacity depends on load growth, retirement of existing facilities, and requirements imposed by states and RTOs [2]. Execution is subject to variables including project management expertise; escalating costs for capital, labor, and materials; supply chain constraints and storm-related disruptions; and compliance with environmental regulations [2]. Further factors include permitting delays, land-siting challenges, public opposition, contractor performance or financial issues, project scope changes, and the inability to raise capital [2][4]. Additionally, commodity price changes, trade and tariff issues, economic downturns, and regulatory decisions regarding project approval and cost recovery can materially affect the schedule, cost, and performance of these acquisitions or construction projects [4]."
+    },
+    {
+      "query_id": "0000006951-19-000046:43:q1",
+      "ticker": "AMAT",
+      "question": "According to its FY2019 10-K, what is a risk associated with AMAT's operations in foreign jurisdictions?",
+      "status": 200,
+      "client_s": 8.88,
+      "model": "gemini-3.1-flash-lite",
+      "model_latency_s": 5.474,
+      "tokens": {
+        "prompt": 1283,
+        "output": 122
+      },
+      "list_price_usd": 0.00050375,
+      "citations": [
+        4
+      ],
+      "answer": "According to the FY2019 10-K, AMAT faces risks from the global regulatory environment because laws and regulations may differ across jurisdictions [4]. Inconsistent, changing, or conflicting regulations, as well as ambiguities in their interpretation, create challenges and uncertainty [4]. Compliance can be expensive and onerous, potentially diverting management's attention from revenue-generating activities [4]. Furthermore, violations of these laws could result in criminal sanctions, fines, restrictions on business operations, and reputational damage, all of which could negatively affect the company\u2019s financial condition and results of operations [4]."
+    },
+    {
+      "query_id": "0000019617-21-000236:130:q1",
+      "ticker": "JPM",
+      "question": "According to its FY2020 10-K, what could adversely affect JPM's operational costs and customer satisfaction?",
+      "status": 200,
+      "client_s": 14.51,
+      "model": "gemini-3.1-flash-lite",
+      "model_latency_s": 14.339,
+      "tokens": {
+        "prompt": 927,
+        "output": 83
+      },
+      "list_price_usd": 0.00035625,
+      "citations": [
+        5
+      ],
+      "answer": "JPMorgan Chase\u2019s operational costs and customer satisfaction could be adversely affected by the failure of an external operational system [5]. Additionally, as the firm\u2019s interconnectivity with external parties expands, the risk of cyberattacks, system breakdowns, human error, or misconduct affecting those parties may necessitate protective measures\u2014such as restricting customer access to accounts\u2014which can increase operational costs and diminish customer satisfaction and confidence [5]."
+    }
+  ],
+  "answers_ok": 3,
+  "costs": {
+    "list_price_usd_total": 0.005776999999999999,
+    "actual_spend_usd": 0,
+    "by_route_backend": [
+      {
+        "route": "answer",
+        "backend": "gemini",
+        "requests": 12,
+        "prompt_tokens": 14612,
+        "output_tokens": 1416,
+        "latency_p95_s": 24.042212222499984,
+        "cost_usd": 0.005776999999999999,
+        "errors": 0
+      }
+    ]
+  }
+}
