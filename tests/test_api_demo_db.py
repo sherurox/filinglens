@@ -4,7 +4,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from filinglens.api.demo_db import DDL, SEARCH_SQL, recall_hit, short_plan, subset_rows
+from filinglens.api.demo_db import (
+    DDL,
+    SEARCH_SQL,
+    recall_hit,
+    require_target,
+    short_plan,
+    subset_rows,
+)
 
 
 def test_subset_rows_keeps_the_companies_and_aligns_vectors():
@@ -37,3 +44,14 @@ def test_search_is_per_company_exact_and_parameterized():
 def test_short_plan_hides_the_query_vector():
     line = "Sort Key: ((embedding <#> '[-0.01,0.03,0.5]'::vector))"
     assert short_plan([line, "Limit"]) == ["Sort Key: ((embedding <#> <query vector>))", "Limit"]
+
+
+def test_tag_must_match_where_it_runs(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    require_target("local")
+    with pytest.raises(SystemExit, match="--tag neon needs"):
+        require_target("neon")  # the T13c slip: the record would say neon, the rows went local
+    monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@ep-x.us-east-1.aws.neon.tech/neondb")
+    require_target("neon")
+    with pytest.raises(SystemExit, match="--tag local but"):
+        require_target("local")

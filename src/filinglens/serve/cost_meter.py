@@ -138,7 +138,9 @@ def pg_conninfo() -> str:
     POSTGRES_HOST / POSTGRES_PORT override 127.0.0.1:55432, e.g. from a container on the compose
     network (host filinglens-postgres, port 5432), where 127.0.0.1 is the container itself."""
     url = os.environ.get("DATABASE_URL")
-    if url:
+    if url is not None:
+        if not url.strip():  # DATABASE_URL="$UNSET_VAR" must not silently mean the local database
+            raise SystemExit("DATABASE_URL is set but empty (source .env first?)")
         return url
     password = os.environ.get("POSTGRES_PASSWORD")
     if not password:

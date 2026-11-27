@@ -76,6 +76,19 @@ SIZES_SQL = (
 )
 
 
+def target() -> str:
+    return "DATABASE_URL" if os.environ.get("DATABASE_URL") else "local"
+
+
+def require_target(tag: str) -> None:
+    """--tag names where the record says it ran; refuse a record that would lie (T13c)."""
+    url = os.environ.get("DATABASE_URL", "")
+    if tag == "local" and url:
+        raise SystemExit("--tag local but DATABASE_URL is set: unset it or pass --tag neon")
+    if tag == "neon" and ".neon.tech" not in url:
+        raise SystemExit("--tag neon needs DATABASE_URL set to the Neon connection string")
+
+
 def connect():
     import psycopg
     from pgvector.psycopg import register_vector
@@ -164,7 +177,7 @@ def run_build(args: argparse.Namespace) -> dict:
     server = con.execute("SELECT version()").fetchone()[0]
     con.close()
     return {
-        "target": "DATABASE_URL" if os.environ.get("DATABASE_URL") else "local",
+        "target": target(),
         "server": server,
         "companies": len(companies),
         "rows": len(sub),
@@ -191,6 +204,7 @@ def run_check(args: argparse.Namespace) -> dict:
     encoder = OnnxEmbedder(onnx_dir / "bge-base.eager-opt-int8.onnx",
                            onnx_dir / "bge-base.tokenizer.json", threads=1)  # fmt: skip
     con = connect()
+    server = con.execute("SELECT version()").fetchone()[0]
     out = {}
     for name in ("fl_m3_stored_vectors", "int8_onnx_encoder"):
         hits, ms = 0, []
@@ -215,6 +229,8 @@ def run_check(args: argparse.Namespace) -> dict:
     con.close()
     gap = abs(out["fl_m3_stored_vectors"]["recall_at_10"] - FL_M3_FILTERED_RECALL)
     return {
+        "target": target(),
+        "server": server,
         "queries": len(queries),
         "fl_m3_filtered_exact_recall_at_10": FL_M3_FILTERED_RECALL,
         "results": out,
@@ -228,9 +244,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("command", choices=["build", "check"])
     parser.add_argument("--bench", type=Path, default=Path("bench"))
-    parser.add_argument("--tag", default="local", help="output suffix: local or neon")
+    parser.add_argument("--tag", default="local", choices=["local", "neon"], help="output suffix")
     argv = sys.argv[1:] if argv is None else argv
     args = parser.parse_args(argv)
+    require_target(args.tag)
     body = run_build(args) if args.command == "build" else run_check(args)
     result = {
         "command": " ".join(["python -m filinglens.api.demo_db", *argv]),

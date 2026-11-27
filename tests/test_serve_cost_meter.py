@@ -181,3 +181,11 @@ def test_pg_conninfo_prefers_database_url_then_host_and_port(monkeypatch):
     monkeypatch.delenv("POSTGRES_PASSWORD")
     with pytest.raises(SystemExit):
         pg_conninfo()
+
+
+def test_pg_conninfo_refuses_an_empty_database_url(monkeypatch):
+    # DATABASE_URL="$NEON_DATABASE_URL" with the variable unset must not fall back to local
+    monkeypatch.setenv("DATABASE_URL", "")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "pw")
+    with pytest.raises(SystemExit, match="set but empty"):
+        pg_conninfo()
