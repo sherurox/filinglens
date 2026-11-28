@@ -1,0 +1,15 @@
+{
+  "decision": "device of the reranker sidecar the FL-M6 agent tools call (filinglens.agents.rerank)",
+  "committed_before": "the first `agents.rerank bench` run",
+  "split": "dev (182 ret-dev questions, FL-M3's dense top-50 candidates); ret-test is not used",
+  "setup": "the vLLM GPTQ-W4A16 student server running (the crew's planner and extract_risks use it), then the sidecar started with --device cuda, then bench with --vllm-running",
+  "fl_m3_ndcg_after": 0.488,
+  "fl_m3_source": "bench/reranker_dev.json (FL-M3 T8: dense top 50 -> bge-reranker-base fp16 on CUDA, NDCG@10 0.4368 -> 0.488)",
+  "cuda_if": {
+    "max_abs_ndcg_diff": 0.002,
+    "max_p95_ms": 1000,
+    "errors": 0,
+    "why": "same model, weights, inputs and fp16 setting as FL-M3, so NDCG@10 must reproduce it up to fp16 rounding; 1 s p95 per search keeps a 3-4 search question under ~4 s of reranking; any error (e.g. CUDA out of memory next to vLLM) rules CUDA out"
+  },
+  "else": "cpu: the same model in fp32 on the CPU (ranking quality is FL-M3's, so no quality run is needed to adopt it; its latency is measured and reported)"
+}
