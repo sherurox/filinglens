@@ -1,19 +1,22 @@
 {
   "command": "python -m filinglens.api.cloud_check --url https://filinglens-api-557912440708.us-east1.run.app --project filinglens-run-261127",
-  "finished_utc": "2026-11-27T17:44:29+00:00",
+  "finished_utc": "2026-11-28T18:02:53+00:00",
   "url": "https://filinglens-api-557912440708.us-east1.run.app",
   "expected_from": "bench/demo_db_check_neon.json",
   "latency_note": "client wall time from the caller to us-east1, network included",
   "first_request": {
-    "utc": "2026-11-27T17:43:36+00:00",
+    "utc": "2026-11-28T18:01:24+00:00",
     "path": "/health",
-    "client_s": 0.13,
+    "client_s": 9.77,
     "body": {
       "status": "ok",
       "database": true,
       "spend_usd": 0
     },
-    "startup_log_lines": []
+    "startup_log_lines": [
+      "2026-11-28T18:01:22.439359Z Starting new instance. Reason: AUTOSCALING - Instance started due to configured scaling fa",
+      "2026-11-28T18:01:31.836159Z INFO:     Application startup complete."
+    ]
   },
   "companies": 77,
   "search": {
@@ -26,9 +29,9 @@
     "errors": [],
     "client_ms": {
       "n": 182,
-      "p50": 149.2,
-      "p95": 169.7,
-      "max": 179.3
+      "p50": 175.4,
+      "p95": 554.0,
+      "max": 1155.4
     }
   },
   "answers": [
@@ -37,9 +40,9 @@
       "ticker": "AEP",
       "question": "According to its FY2024 10-K, what factors affect AEP's ability to procure or construct generation capacity?",
       "status": 200,
-      "client_s": 1.04,
+      "client_s": 1.11,
       "model": "gemini-3.1-flash-lite",
-      "model_latency_s": 0.876,
+      "model_latency_s": 0.772,
       "tokens": {
         "prompt": 1443,
         "output": 149
@@ -56,9 +59,9 @@
       "ticker": "AMAT",
       "question": "According to its FY2019 10-K, what is a risk associated with AMAT's operations in foreign jurisdictions?",
       "status": 200,
-      "client_s": 8.88,
+      "client_s": 7.17,
       "model": "gemini-3.1-flash-lite",
-      "model_latency_s": 5.474,
+      "model_latency_s": 3.823,
       "tokens": {
         "prompt": 1283,
         "output": 122
@@ -74,9 +77,9 @@
       "ticker": "JPM",
       "question": "According to its FY2020 10-K, what could adversely affect JPM's operational costs and customer satisfaction?",
       "status": 200,
-      "client_s": 14.51,
+      "client_s": 21.52,
       "model": "gemini-3.1-flash-lite",
-      "model_latency_s": 14.339,
+      "model_latency_s": 21.051,
       "tokens": {
         "prompt": 927,
         "output": 83
@@ -90,17 +93,17 @@
   ],
   "answers_ok": 3,
   "costs": {
-    "list_price_usd_total": 0.005776999999999999,
+    "list_price_usd_total": 0.0086655,
     "actual_spend_usd": 0,
     "by_route_backend": [
       {
         "route": "answer",
         "backend": "gemini",
-        "requests": 12,
-        "prompt_tokens": 14612,
-        "output_tokens": 1416,
-        "latency_p95_s": 24.042212222499984,
-        "cost_usd": 0.005776999999999999,
+        "requests": 18,
+        "prompt_tokens": 21918,
+        "output_tokens": 2124,
+        "latency_p95_s": 23.64432489549999,
+        "cost_usd": 0.0086655,
         "errors": 0
       }
     ]
