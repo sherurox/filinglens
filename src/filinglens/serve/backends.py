@@ -22,14 +22,27 @@ Free-tier limits are enforced on the client, before a request is sent:
   Every attempt counts, including retried ones, so the count can only be too high, never too low.
 A 429 is retried once after the server's RetryInfo delay (at most 60 s); a second 429 fails the row.
 
+Time limits on Gemini (FL-M6 T3; FL-M5's measurements ran with a 120 s timeout and no 503 retry):
+- each attempt gets at most GEMINI_TIMEOUT_S (60 s), enforced as a total by HttpxTransport;
+- a free-tier 503 ("high demand") is retried once after a full-jitter backoff, a random wait in
+  [0, min(BACKOFF_CAP_S, BACKOFF_BASE_S * 2**retries)) so many callers don't retry in step;
+- a timed-out attempt is not retried: a call that already took 60 s is more likely the slow tail
+  than a blip, and retrying it would double the wait;
+- one chat() call, rate-limiter wait, attempts and backoffs included, ends by GEMINI_DEADLINE_S
+  (100 s, below Cloud Run's 120 s request timeout): an attempt gets at most the time left, and a
+  retry is skipped when less than MIN_ATTEMPT_S would be left for it. deadline_s=None turns this
+  off (batch runs where no caller is waiting).
+
 The API key goes only into the `x-goog-api-key` header: never into a URL, a Reply or a log line.
 HTTP sits behind `Transport` so tests run without a network; `HttpxTransport` is the real one.
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
+import random
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -44,7 +57,12 @@ GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta"
 PACIFIC = ZoneInfo("America/Los_Angeles")
 QUOTA_FILE = Path("data/interim/serve/gemini_quota.json")
 MAX_RETRY_WAIT_S = 60.0
-TIMEOUT_S = 120.0
+TIMEOUT_S = 120.0  # local OpenAI-compatible servers (unchanged)
+GEMINI_TIMEOUT_S = 60.0  # one Gemini attempt
+GEMINI_DEADLINE_S = 100.0  # one chat() call in all; Cloud Run's request timeout is 120 s
+MIN_ATTEMPT_S = 10.0  # no attempt (or retry) is started with less time than this left
+BACKOFF_BASE_S = 2.0
+BACKOFF_CAP_S = 8.0
 
 
 @dataclass(frozen=True)
@@ -77,17 +95,24 @@ class Transport(Protocol):
 
 
 class HttpxTransport:
-    """The real transport. httpx is imported here, so the pure helpers need no network library."""
+    """The real transport. httpx is imported here, so the pure helpers need no network library.
 
-    def __init__(self) -> None:
+    httpx's `timeout` limits each phase (connect, each read, write) separately, so a slow trickle
+    could outlast it; asyncio.timeout makes it a limit on the whole call as well.
+    """
+
+    def __init__(self, client=None) -> None:
         import httpx
 
         self._httpx = httpx
-        self._client = httpx.AsyncClient()
+        self._client = client or httpx.AsyncClient()
 
     async def post(self, url: str, headers: dict[str, str], body: dict, timeout: float):
         try:
-            response = await self._client.post(url, headers=headers, json=body, timeout=timeout)
+            async with asyncio.timeout(timeout):
+                response = await self._client.post(url, headers=headers, json=body, timeout=timeout)
+        except TimeoutError:
+            raise TransportError("Timeout") from None
         except self._httpx.HTTPError as error:
             raise TransportError(type(error).__name__) from None  # no URL or headers in the text
         try:
@@ -315,12 +340,20 @@ class GeminiBackend:
         clock: Clock | None = None,
         thinking_level: str = "minimal",
         retries_on_429: int = 1,
+        retries_on_503: int = 1,
+        timeout_s: float = GEMINI_TIMEOUT_S,
+        deadline_s: float | None = GEMINI_DEADLINE_S,
+        rng: Callable[[], float] = random.random,
     ) -> None:
         if rpm < 1:
             raise ValueError("rpm must be >= 1")
         if not api_key:
             raise ValueError("empty Gemini API key")
+        if timeout_s <= 0 or (deadline_s is not None and deadline_s < MIN_ATTEMPT_S):
+            raise ValueError("timeout_s must be > 0 and deadline_s >= MIN_ATTEMPT_S (or None)")
         self.model, self.thinking_level, self.retries = model, thinking_level, retries_on_429
+        self.retries_503, self.timeout_s, self.deadline_s = retries_on_503, timeout_s, deadline_s
+        self.rng = rng
         self.quota = quota
         self.clock = clock or MonotonicClock()
         self.transport = transport or HttpxTransport()
@@ -339,31 +372,49 @@ class GeminiBackend:
     def __repr__(self) -> str:  # the key is never part of the representation
         return f"GeminiBackend(model={self.model!r}, thinking_level={self.thinking_level!r})"
 
+    def _left(self, deadline: float | None) -> float:
+        return float("inf") if deadline is None else deadline - self.clock.now()
+
+    def _backoff(self, retried: int) -> float:
+        """Full jitter: uniform in [0, min(cap, base * 2**retried))."""
+        return self.rng() * min(BACKOFF_CAP_S, BACKOFF_BASE_S * 2**retried)
+
     async def chat(
         self, conv: list[dict], schema: dict | None = None, max_tokens: int = 400
     ) -> Reply:
         body = gemini_body(conv, schema, max_tokens, self.thinking_level)
-        for attempt in range(self.retries + 1):
+        deadline = None if self.deadline_s is None else self.clock.now() + self.deadline_s
+        retried_429 = retried_503 = 0
+        while True:
+            await self.bucket.acquire()
+            left = self._left(deadline)
+            if left < MIN_ATTEMPT_S:
+                return self._failed(f"deadline: {self.deadline_s:g} s reached before sending", 0.0)
             try:
                 self.quota.take()
             except QuotaExhausted as error:
                 return self._failed(f"quota: {error}", 0.0)
-            await self.bucket.acquire()
             started = self.clock.now()
             try:
-                result = await self.transport.post(self.url, self._headers, body, TIMEOUT_S)
+                timeout = min(self.timeout_s, left)
+                result = await self.transport.post(self.url, self._headers, body, timeout)
             except TransportError as error:
                 return self._failed(f"transport: {error}", self.clock.now() - started)
             latency = self.clock.now() - started
-            if result.status == 429 and attempt < self.retries:
+            wait = None
+            if result.status == 429 and retried_429 < self.retries:
                 wait = min(retry_delay(result.body) or MAX_RETRY_WAIT_S, MAX_RETRY_WAIT_S)
+                retried_429 += 1
+            elif result.status == 503 and retried_503 < self.retries_503:
+                wait = self._backoff(retried_503)
+                retried_503 += 1
+            if wait is not None and self._left(deadline) - wait >= MIN_ATTEMPT_S:
                 await self.clock.sleep(wait)
-                continue
+                continue  # a retry that wouldn't fit before the deadline falls through: fails
             if result.status != 200:
                 return self._failed(f"HTTP {result.status}: {short(result.body)}", latency)
             text, prompt, answer, thinking, finish = parse_gemini(result.body)
             return Reply(self.name, self.model, text, prompt, answer, thinking, latency, finish)
-        raise AssertionError("unreachable: the last attempt always returns")
 
     def _failed(self, error: str, latency: float) -> Reply:
         return Reply(self.name, self.model, "", 0, 0, 0, latency, None, error)

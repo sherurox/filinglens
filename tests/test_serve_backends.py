@@ -8,9 +8,13 @@ from fakes import FakeClock
 from filinglens.extract.silver_label import schema as risk_schema
 from filinglens.ingest.rate_limit import max_in_window
 from filinglens.serve.backends import (
+    GEMINI_DEADLINE_S,
+    GEMINI_TIMEOUT_S,
+    MIN_ATTEMPT_S,
     DailyQuota,
     GeminiBackend,
     HttpResult,
+    HttpxTransport,
     OpenAICompatBackend,
     TransportError,
     gemini_body,
@@ -55,7 +59,15 @@ class FakeTransport:
         self.calls: list[dict] = []
 
     async def post(self, url, headers, body, timeout):
-        self.calls.append({"t": self.clock.now(), "url": url, "headers": headers, "body": body})
+        self.calls.append(
+            {
+                "t": self.clock.now(),
+                "url": url,
+                "headers": headers,
+                "body": body,
+                "timeout": timeout,
+            }
+        )
         await self.clock.sleep(self.seconds)  # the call "takes" this long
         result = self.results.pop(0) if len(self.results) > 1 else self.results[0]
         if isinstance(result, Exception):
@@ -63,12 +75,16 @@ class FakeTransport:
         return result
 
 
-def gemini(tmp_path, results, rpm=15, rpd=100, clock=None):
+def gemini(tmp_path, results, rpm=15, rpd=100, clock=None, seconds=0.5, **kwargs):
     clock = clock or FakeClock()
-    transport = FakeTransport(clock, results)
+    transport = FakeTransport(clock, results, seconds)
     quota = DailyQuota(rpd, tmp_path / "quota.json", today=lambda: "2026-11-27")
-    backend = GeminiBackend("m", KEY, rpm, quota, transport=transport, clock=clock)
+    backend = GeminiBackend("m", KEY, rpm, quota, transport=transport, clock=clock, **kwargs)
     return backend, transport, quota
+
+
+def unavailable() -> HttpResult:
+    return HttpResult(503, {"error": {"code": 503, "message": "high demand"}})
 
 
 def test_to_gemini_moves_system_and_renames_assistant():
@@ -216,3 +232,106 @@ def test_openai_backend_http_error_is_a_failed_reply():
     backend = OpenAICompatBackend("gguf", "http://x:1", "gguf", transport=transport, clock=clock)
     reply = asyncio.run(backend.chat(CONV))
     assert reply.error == "HTTP 500: boom" and reply.text == ""
+
+
+# ---------- FL-M6 T3: timeout, deadline, one retry on 503 ----------
+
+
+def test_each_attempt_gets_the_per_call_timeout(tmp_path):
+    backend, transport, _ = gemini(tmp_path, [ok_gemini()])
+    asyncio.run(backend.chat(CONV))
+    assert transport.calls[0]["timeout"] == GEMINI_TIMEOUT_S == 60.0
+    assert GEMINI_DEADLINE_S == 100.0  # below Cloud Run's 120 s request timeout
+
+
+def test_503_is_retried_once_after_a_jittered_backoff(tmp_path):
+    backend, transport, quota = gemini(tmp_path, [unavailable(), ok_gemini()], rng=lambda: 0.5)
+    reply = asyncio.run(backend.chat(CONV))
+    assert reply.error is None and len(transport.calls) == 2
+    assert backend.clock.sleeps.count(1.0) == 1  # 0.5 * min(8, 2 * 2**0)
+    assert quota.used() == 2  # the retry counts against the daily cap too
+
+
+def test_backoff_is_full_jitter_and_capped(tmp_path):
+    backend, _, _ = gemini(tmp_path, [ok_gemini()], rng=lambda: 0.999)
+    assert [round(backend._backoff(n), 3) for n in range(4)] == [1.998, 3.996, 7.992, 7.992]
+    backend.rng = lambda: 0.0
+    assert backend._backoff(3) == 0.0
+
+
+def test_second_503_fails_the_row(tmp_path):
+    backend, transport, _ = gemini(tmp_path, [unavailable(), unavailable()], rng=lambda: 0.5)
+    reply = asyncio.run(backend.chat(CONV))
+    assert reply.error.startswith("HTTP 503") and len(transport.calls) == 2
+
+
+def test_429_and_503_each_get_their_own_single_retry(tmp_path):
+    results = [too_many("3s"), unavailable(), ok_gemini()]
+    backend, transport, _ = gemini(tmp_path, results, rng=lambda: 0.5)
+    assert asyncio.run(backend.chat(CONV)).error is None and len(transport.calls) == 3
+
+
+def test_a_timed_out_attempt_is_not_retried(tmp_path):
+    backend, transport, _ = gemini(tmp_path, [TransportError("Timeout"), ok_gemini()])
+    reply = asyncio.run(backend.chat(CONV))
+    assert reply.error == "transport: Timeout" and len(transport.calls) == 1
+
+
+def test_no_retry_when_it_would_not_fit_before_the_deadline(tmp_path):
+    # the first attempt answers 503 after 95 s: 5 s left < MIN_ATTEMPT_S, so no retry
+    backend, transport, _ = gemini(tmp_path, [unavailable(), ok_gemini()], seconds=95.0)
+    reply = asyncio.run(backend.chat(CONV))
+    assert reply.error.startswith("HTTP 503") and len(transport.calls) == 1
+    assert backend.clock.now() < GEMINI_DEADLINE_S
+
+
+def test_the_retry_gets_only_the_time_left(tmp_path):
+    # deadline 50 s; 0.5 s call + 7 s server delay: the retry gets 50 - 7.5 = 42.5 s
+    backend, transport, _ = gemini(tmp_path, [too_many("7s"), ok_gemini()], deadline_s=50.0)
+    assert asyncio.run(backend.chat(CONV)).error is None
+    assert transport.calls[0]["timeout"] == 50.0
+    assert transport.calls[1]["timeout"] == pytest.approx(50.0 - 7.5)
+
+
+def test_rate_limiter_wait_counts_against_the_deadline(tmp_path):
+    clock = FakeClock()
+    backend, transport, _ = gemini(
+        tmp_path, [ok_gemini()], clock=clock, seconds=0.0, deadline_s=MIN_ATTEMPT_S
+    )
+    asyncio.run(backend.chat(CONV))  # takes the bucket's one token
+    reply = asyncio.run(backend.chat(CONV))  # waits ~4.3 s for the next: < 10 s would be left
+    assert reply.error.startswith("deadline:") and len(transport.calls) == 1
+
+
+def test_deadline_none_keeps_the_old_unbounded_behaviour(tmp_path):
+    backend, transport, _ = gemini(
+        tmp_path, [too_many("60s"), ok_gemini()], seconds=59.0, deadline_s=None
+    )
+    assert asyncio.run(backend.chat(CONV)).error is None
+    assert [c["timeout"] for c in transport.calls] == [60.0, 60.0]
+
+
+def test_bad_limits_are_rejected(tmp_path):
+    with pytest.raises(ValueError):
+        gemini(tmp_path, [ok_gemini()], timeout_s=0)
+    with pytest.raises(ValueError):
+        gemini(tmp_path, [ok_gemini()], deadline_s=MIN_ATTEMPT_S - 1)
+
+
+def test_httpx_transport_limits_the_whole_call():
+    httpx = pytest.importorskip("httpx")
+
+    async def slow(request):
+        await asyncio.sleep(1.0)
+        return httpx.Response(200, json={})
+
+    async def run():
+        client = httpx.AsyncClient(transport=httpx.MockTransport(slow))
+        transport = HttpxTransport(client)
+        try:
+            with pytest.raises(TransportError, match="Timeout"):
+                await transport.post("http://x/y", {}, {}, timeout=0.05)
+        finally:
+            await transport.aclose()
+
+    asyncio.run(run())
