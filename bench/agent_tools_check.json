@@ -1,0 +1,29 @@
+{
+  "command": "uv run --group api python -m filinglens.agents.tools check --split dev --rerank-url http://127.0.0.1:58090",
+  "queries": 182,
+  "dense": {
+    "recall_at_10": 0.6648,
+    "mrr_at_10": 0.513,
+    "ndcg_at_10": 0.4384,
+    "latency_ms": {
+      "p50": 16.4,
+      "p95": 35.3
+    }
+  },
+  "reranked": {
+    "recall_at_10": 0.7363,
+    "mrr_at_10": 0.5726,
+    "ndcg_at_10": 0.4971,
+    "latency_ms": {
+      "p50": 276.4,
+      "p95": 328.2
+    }
+  },
+  "reproduces_fl_m5_int8": {
+    "expected": 0.6648,
+    "got": 0.6648,
+    "within_one_query": true
+  },
+  "ok": true,
+  "finished_utc": "2026-11-28T20:18:08+00:00"
+}

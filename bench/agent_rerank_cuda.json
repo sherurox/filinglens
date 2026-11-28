@@ -1,0 +1,47 @@
+{
+  "command": "uv run python -m filinglens.agents.rerank bench --split dev --vllm-running --note AC power, Best performance",
+  "finished_utc": "2026-11-28T20:17:15+00:00",
+  "device": "cuda",
+  "sidecar": {
+    "status": "ok",
+    "model": "BAAI/bge-reranker-base@2cfc18c9415c912f9d8155881c133215df768a70",
+    "device": "cuda",
+    "dtype": "fp16"
+  },
+  "queries": 182,
+  "scored": 182,
+  "errors": 0,
+  "error_examples": [],
+  "metrics": {
+    "recall_before": 0.6758,
+    "recall_after": 0.7308,
+    "mrr_before": 0.5264,
+    "mrr_after": 0.5708,
+    "ndcg_before": 0.4368,
+    "ndcg_after": 0.488,
+    "recall_at_depth": 0.8626
+  },
+  "latency_ms": {
+    "p50_ms": 265.98,
+    "p95_ms": 319.82,
+    "p99_ms": 685.39,
+    "mean_ms": 271.66,
+    "samples": 182
+  },
+  "latency_note": "client-observed per query: HTTP + tokenize + forward pass over 50 pairs",
+  "gpu_memory_used_total": {
+    "before": "7684 MiB, 8151 MiB",
+    "after": "7705 MiB, 8151 MiB"
+  },
+  "vllm_running": true,
+  "power_note": "AC power, Best performance",
+  "decision": {
+    "checks": {
+      "device_is_cuda": true,
+      "no_errors": true,
+      "ndcg_reproduces_fl_m3": true,
+      "p95_within_limit": true
+    },
+    "device": "cuda"
+  }
+}

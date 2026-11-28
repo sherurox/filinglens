@@ -1,0 +1,57 @@
+{
+  "build": {
+    "command": "uv run python -m filinglens.agents.tool_tables build",
+    "finished_utc": "2026-11-28T20:11:24+00:00",
+    "chunks_loaded": 203200,
+    "peer_rows_loaded": 5880,
+    "alpha": 0.9,
+    "peer_info": {
+      "companies": 294,
+      "latest_10k_chunks": 30220,
+      "latest_10k_period_year": {
+        "2018": 1,
+        "2019": 1,
+        "2024": 4,
+        "2025": 288
+      },
+      "ratios": {
+        "companies_without_ratios": 13,
+        "missing_share_per_feature": {
+          "net_margin": 0.1429,
+          "operating_margin": 0.2177,
+          "liabilities_to_equity": 0.4082,
+          "equity_multiplier": 0.1939,
+          "revenue_growth": 0.0476,
+          "assets_growth": 0.0476
+        },
+        "latest_ratio_year": {
+          "2018": 1,
+          "2019": 2,
+          "2023": 1,
+          "2024": 1,
+          "2025": 223,
+          "2026": 53
+        }
+      }
+    },
+    "load_s": 5.1
+  },
+  "check": {
+    "command": "uv run python -m filinglens.agents.tool_tables check",
+    "finished_utc": "2026-11-28T20:11:25+00:00",
+    "parquet_rows": 203200,
+    "chunks": 203200,
+    "chunk_vectors": 203200,
+    "only_in_chunks": 0,
+    "only_in_vectors": 0,
+    "cik_mismatch": 0,
+    "companies": 294,
+    "filings": 2198,
+    "peer_rows": 5880,
+    "peer_companies": 294,
+    "self_peers": 0,
+    "short_peer_lists": 0,
+    "table_bytes": 407044096,
+    "ok": true
+  }
+}
