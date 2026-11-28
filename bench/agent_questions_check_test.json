@@ -1,0 +1,13 @@
+{
+  "command": "uv run python -m filinglens.agents.questions check --split test --allow-test",
+  "finished_utc": "2026-11-28T19:55:48+00:00",
+  "split": "test",
+  "file_sha256": "1bcd5cf6717f87a89d92ba15853c9199f6343c4e32228ff0e2405ba3d7d3617f",
+  "questions": 30,
+  "figures_checked": 66,
+  "derived_checked": 34,
+  "missing_checked": 4,
+  "evidence_chunks_checked": 187,
+  "problems": [],
+  "ok": true
+}

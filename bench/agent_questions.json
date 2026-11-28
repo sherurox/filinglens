@@ -1,0 +1,130 @@
+{
+  "command": "uv run python -m filinglens.agents.questions generate --overwrite",
+  "finished_utc": "2026-11-28T19:55:43+00:00",
+  "inputs": {
+    "splits": {
+      "path": "gold/splits.csv",
+      "sha256": "a526e57ee1860a0b10c5338a55148206df3e6c69cc6dfa04ac8a75f2dc3752d4"
+    },
+    "corpus": {
+      "path": "data/interim/risk_paragraphs.parquet",
+      "sha256": "e7fb93143faaaa419075f6e6a889baa168d119be8e62c1fc22f211dce3b7b64b"
+    },
+    "chunks": {
+      "path": "data/interim/retrieval/chunks.parquet",
+      "sha256": "ecc1e6fcba04aed186477b799856c62000e1bb4c789c611cb337fa502975ae86"
+    }
+  },
+  "settings": {
+    "seed": 20261128,
+    "counts": {
+      "dev": {
+        "risk_change_metric": 3,
+        "metric_margin_risk": 2,
+        "peer_compare": 2,
+        "growth": 2,
+        "missing_data": 1
+      },
+      "test": {
+        "risk_change_metric": 8,
+        "metric_margin_risk": 6,
+        "peer_compare": 6,
+        "growth": 6,
+        "missing_data": 4
+      }
+    },
+    "date_tolerance_days": 20,
+    "min_year_gap": 3,
+    "themes": {
+      "cybersecurity": "cyber|data breach|ransomware|security (breach|incident)",
+      "pandemic": "covid|coronavirus|pandemic|epidemic",
+      "inflation": "inflation",
+      "interest_rates": "interest rate",
+      "supply_chain": "supply chain",
+      "energy_prices": "fuel (price|cost)|energy (price|cost)|oil price|price of (oil|fuel|natural gas)",
+      "climate": "climate change|greenhouse gas|carbon emission",
+      "trade_tariffs": "tariff|trade polic|trade war|export control",
+      "artificial_intelligence": "artificial intelligence|generative ai|\\bai\\b|machine learning",
+      "labor": "labor (shortage|cost)|unioniz|collective bargaining|work stoppage|attract and retain|retain and attract"
+    }
+  },
+  "outputs": {
+    "dev": {
+      "path": "gold/agents/questions.dev.jsonl",
+      "sha256": "f95b65323a8091e14eae927ec6305c4ad009867925d4f573fe5d2b49783d2742"
+    },
+    "test": {
+      "path": "gold/agents/questions.test.jsonl",
+      "sha256": "1bcd5cf6717f87a89d92ba15853c9199f6343c4e32228ff0e2405ba3d7d3617f"
+    }
+  },
+  "summary": {
+    "dev": {
+      "questions": 10,
+      "answerable": 9,
+      "companies": 12,
+      "figures": 26,
+      "derived": 15,
+      "restated_figures": 2,
+      "sector_mentions": {
+        "finance": 2,
+        "manufacturing": 2,
+        "mining_energy": 2,
+        "retail": 1,
+        "services": 4,
+        "transport_utilities": 1
+      },
+      "template": {
+        "growth": 2,
+        "metric_margin_risk": 2,
+        "missing_data": 1,
+        "peer_compare": 2,
+        "risk_change_metric": 3
+      },
+      "theme": {
+        "artificial_intelligence": 1,
+        "climate": 2,
+        "cybersecurity": 2,
+        "inflation": 1,
+        "labor": 1,
+        "pandemic": 2,
+        "trade_tariffs": 1
+      }
+    },
+    "test": {
+      "questions": 30,
+      "answerable": 26,
+      "companies": 36,
+      "figures": 66,
+      "derived": 34,
+      "restated_figures": 5,
+      "sector_mentions": {
+        "finance": 5,
+        "manufacturing": 7,
+        "mining_energy": 6,
+        "retail": 6,
+        "services": 5,
+        "transport_utilities": 7
+      },
+      "template": {
+        "growth": 6,
+        "metric_margin_risk": 6,
+        "missing_data": 4,
+        "peer_compare": 6,
+        "risk_change_metric": 8
+      },
+      "theme": {
+        "artificial_intelligence": 2,
+        "climate": 2,
+        "cybersecurity": 9,
+        "energy_prices": 4,
+        "inflation": 3,
+        "interest_rates": 1,
+        "labor": 2,
+        "pandemic": 4,
+        "supply_chain": 1,
+        "trade_tariffs": 2
+      }
+    }
+  }
+}
