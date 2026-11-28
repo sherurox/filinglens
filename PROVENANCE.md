@@ -243,3 +243,4 @@ Who wrote what. Updated with every commit.
 | `src/filinglens/agents/context.py`, `tests/test_agents_context.py`; lint fix in `tests/test_agents_tools.py`, `tests/test_agents_rerank.py`; `task_no` fix in `src/filinglens/agents/tools.py` (`extract_risks`) | AI-assisted | FL-M6 T5 | deferred to final Q&A |
 | `src/filinglens/agents/figures.py` (`figure_matches()`), `tests/test_agents_figures.py` (6 tests) | **Hand-written** by me (FL-M6 live-coding piece); review fixes (comment wrapping, integer check on `decimals`, docstring) made by Claude at my request; checked against an independent Decimal implementation on 200,000 random cases (0 mismatches) | FL-M6 T6 | reviewed 2026-11-28 |
 | `src/filinglens/agents/numbers.py`, `tests/test_agents_numbers.py` | AI-assisted | FL-M6 T6 | deferred to final Q&A |
+| `src/filinglens/agents/crew.py`, `tests/test_agents_crew.py` | AI-assisted | FL-M6 T7 | deferred to final Q&A |
