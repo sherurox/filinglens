@@ -83,6 +83,41 @@ A 1.7B student (Qwen3-1.7B, QLoRA on the 8 GB laptop GPU) distilled from an 8B t
 - [x] **D2:** training curves and peak VRAM recorded.
 - [x] **D3:** model and adapter in the registry; `docs/EXPERIMENTS.md` updated.
 
+## Live demo (FL-M5, Cloud Run)
+
+**URL:** https://filinglens-api-557912440708.us-east1.run.app (public, no key; scales to zero, so the first request after an idle period takes about 10 s).
+
+```bash
+URL=https://filinglens-api-557912440708.us-east1.run.app
+curl -s $URL/health
+curl -s $URL/companies                       # the 77 demo companies
+curl -s -X POST $URL/search -H 'content-type: application/json' \
+  -d '{"ticker": "AEP", "question": "What affects the ability to build generation capacity?", "k": 3}'
+curl -s -X POST $URL/answer -H 'content-type: application/json' -H 'X-User: readme' \
+  -d '{"ticker": "AEP", "question": "What affects the ability to build generation capacity?"}'
+curl -s $URL/costs                           # list-price cost of the metered /answer calls
+```
+
+| Piece | Runs on | Free because |
+|---|---|---|
+| API (FastAPI; bge-base query encoder as int8 ONNX, 1 CPU thread) | Cloud Run, `us-east1`: 1 vCPU, 1 GiB, at most 1 instance, scales to zero | Google Cloud $300 trial credit (never upgraded) and the Cloud Run free tier; $5 budget alert |
+| Image (181,358,328 B, built from `dd18d48`, deployed by digest `sha256:8734b277…`) | Artifact Registry, `us-east1` | 0.5 GB free storage |
+| `GEMINI_API_KEY`, `DATABASE_URL` | Secret Manager (2 versions), read only by the service's own service account | 6 free active secret versions |
+| Demo database: 77 ret-dev companies, 59,263 chunks with FL-M3's stored vectors, pgvector, per-company exact search | Neon, AWS `us-east-1` | Neon Free plan: no card, 1 GB per project (324,321,280 B used), compute suspends when idle |
+| `/answer` model: `gemini-3.1-flash-lite` | Gemini API free tier (15 RPM, 500 requests/day; no billing linked) | Free tier. Free-tier inputs may be used by Google, so only public SEC text is sent |
+| vLLM (GPTQ student), llama.cpp (GGUF), the reranker | The laptop only | Not deployed: the serving and router results were measured on the laptop |
+
+| Check (from outside, against the public URL) | Result | Evidence |
+|---|---|---|
+| Same rows on Neon as locally | recall@10 0.6758 with FL-M3's stored vectors (= FL-M3 filtered exact, gap 0); 0.6648 with the int8 encoder; same query plan | `bench/demo_db_check_neon.json` |
+| The 182 ret-dev questions through `POST /search` | recall@10 **0.6703** (122 / 182) vs 121 / 182 locally with the same encoder: a one-query gap, allowed in advance because int8 kernels differ by CPU | `bench/cloud_run_check.json` |
+| Cold start (after a day idle) | 9.4 s from Cloud Run's `Starting new instance` to `Application startup complete`; first `/health` 9.77 s at the client | `bench/cloud_run_check.json` (startup log lines) |
+| `/search` latency from the laptop (network included) | cold-start run: p50 175.4 ms, p95 554.0 ms; warm run: p50 149.2 ms, p95 169.7 ms | `bench/cloud_run_check.json`; warm: `git show 032945e:bench/cloud_run_check.json` |
+| `/answer` (3 companies) | 3 / 3 answered with `[n]` citations; Gemini latency 0.77 s, 3.82 s and 21.05 s in one run (heavy tail, as in T9) | `bench/cloud_run_check.json` |
+| Cost | list price $0.00144425 per 3 answers, and `/costs` reports exactly the sum of all calls; **actual spend $0** | `bench/cloud_run_check.json` |
+
+**Limits:** a public demo, not a load test: one instance with one database connection (concurrency 4). `/answer` is capped by the Gemini free tier (beyond it the API returns 429); its daily counter lives in the container's `/tmp` and resets on a cold start, while Google's own quota still applies. Answers are not yet evaluated for faithfulness; citations are only checked to point at a real excerpt. Loading the demo database from the laptop took 3,188.9 s (`bench/demo_db_build_neon.json`).
+
 ## Layout
 
 ```
@@ -258,6 +293,11 @@ uv run python -m filinglens.train.final_comparison --allow-test
 | Local MLflow server (`compose.yaml`, volume `filinglens_mlflowdata`: runs, registry, adapters) | `docker compose up -d mlflow` (FL-M4 T2) | Local | After exporting what the docs need: `docker compose rm -sf mlflow && docker volume rm filinglens_mlflowdata` |
 | Local Qdrant (`compose.yaml`, volume `qdrantdata`) and the pgvector table `retrieval.chunk_vectors` in the local Postgres (FL-M3) | `docker compose up -d qdrant postgres`, `retrieval.build_indexes` | Local | `docker compose rm -sf qdrant && docker volume rm filinglens_qdrantdata`; `DROP SCHEMA retrieval CASCADE` in Postgres |
 | FL-M3 embeddings and FAISS indexes (`data/interim/retrieval/`, git-ignored) and the Hugging Face cache for `bge-base-en-v1.5` and `bge-reranker-base` | `retrieval.embed`, `retrieval.build_indexes` | Local disk | `rm -rf data/interim/retrieval`; remove the two `models--BAAI--*` folders under `~/.cache/huggingface/hub` |
+| Google Cloud project `filinglens-run-261127`: Cloud Run service `filinglens-api`, Artifact Registry repo `filinglens`, secrets `gemini-api-key` and `neon-database-url`, service account `filinglens-api` | `gcloud` (FL-M5 T13) | $300 trial credit, never upgraded (the trial ends about 25 Feb 2027 and then stops the project rather than billing it); Cloud Run free tier; at most 1 instance | `gcloud projects delete filinglens-run-261127` |
+| Budget alert "filinglens-run 5 USD" (on the trial billing account) | Billing → Budgets & alerts (FL-M5 T13) | Budgets are free | `gcloud billing budgets list --billing-account="$GCP_BILLING"`, then `gcloud billing budgets delete <budget-id> --billing-account="$GCP_BILLING"`; optionally close the trial billing account (Billing → Account management) |
+| Neon project `filinglens-demo` (schema `demo`, 324 MB) | Neon console + `python -m filinglens.api.demo_db build --tag neon` (FL-M5 T13) | Neon Free plan: no card | Neon Console → `filinglens-demo` → Settings → Delete project |
+| Gemini API key (AI Studio project `filinglens`, Free tier) | Google AI Studio (FL-M5 T9) | Free tier, no billing linked | AI Studio → API keys → delete the key |
+| Local `.env` entries `GEMINI_API_KEY`, `NEON_DATABASE_URL`, `GCP_PROJECT`, `GCP_REGION`, `GCP_BILLING` | by hand | Local | Delete the lines after the cloud teardown |
 
 ## Provenance and license
 
