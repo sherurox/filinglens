@@ -10,20 +10,38 @@ import pytest
 
 from filinglens.agents.tools import MAX_K, ToolError, Tools, growth, margins
 
-DAL = {"cik": 27904, "ticker": "DAL", "company_name": "DELTA AIR LINES, INC.", "sector": "transport"}
+DAL = {
+    "cik": 27904,
+    "ticker": "DAL",
+    "company_name": "DELTA AIR LINES, INC.",
+    "sector": "transport",
+}
 UAL = {"cik": 100517, "ticker": "UAL", "company_name": "UNITED AIRLINES", "sector": "transport"}
 
 
 def chunk(i: int, year: int, score: float) -> dict:
-    return {"chunk_id": f"c{year}-{i}", "period_year": year, "accession": f"0000027904-{year}-1",
-            "report_date": date(year, 12, 31), "heading": f"Heading {i}", "text": f"text {i}",
-            "embed_text": f"Heading {i}\ntext {i}", "dense_score": score}  # fmt: skip
+    return {
+        "chunk_id": f"c{year}-{i}",
+        "period_year": year,
+        "accession": f"0000027904-{year}-1",
+        "report_date": date(year, 12, 31),
+        "heading": f"Heading {i}",
+        "text": f"text {i}",
+        "embed_text": f"Heading {i}\ntext {i}",
+        "dense_score": score,
+    }
 
 
 def fact(tag: str, year: int, value: float) -> dict:
-    return {"cik": 27904, "tag": tag, "value_date": date(year, 12, 31), "value": value,
-            "first_reported_value": value, "was_restated": False,
-            "last_accession_number": f"0000027904-{year}-1"}  # fmt: skip
+    return {
+        "cik": 27904,
+        "tag": tag,
+        "value_date": date(year, 12, 31),
+        "value": value,
+        "first_reported_value": value,
+        "was_restated": False,
+        "last_accession_number": f"0000027904-{year}-1",
+    }
 
 
 class FakeDb:
@@ -43,21 +61,43 @@ class FakeDb:
         return sorted(rows, key=lambda c: -c["dense_score"])[:depth]
 
     def filings(self, cik):
-        return [{"cik": cik, "period_year": y, "accession": f"0000027904-{y}-1",
-                 "report_date": date(y, 12, 31)} for y in (2022, 2023)]  # fmt: skip
+        return [
+            {
+                "cik": cik,
+                "period_year": y,
+                "accession": f"0000027904-{y}-1",
+                "report_date": date(y, 12, 31),
+            }
+            for y in (2022, 2023)
+        ]
 
     def facts(self, cik):
-        rows = [fact("Revenues", 2023, 200.0), fact("OperatingIncomeLoss", 2023, 30.0),
-                fact("NetIncomeLoss", 2023, 20.0), fact("NetIncomeLoss", 2022, 10.0)]  # fmt: skip
+        rows = [
+            fact("Revenues", 2023, 200.0),
+            fact("OperatingIncomeLoss", 2023, 30.0),
+            fact("NetIncomeLoss", 2023, 20.0),
+            fact("NetIncomeLoss", 2022, 10.0),
+        ]
         return [r | {"cik": cik} for r in rows]
 
     def peers(self, cik, k):
-        return [{"rank": 1, "peer_cik": UAL["cik"], "score": 2.5, "z_text": 2.7, "z_ratio": 0.4,
-                 "ticker": "UAL", "company_name": UAL["company_name"], "sector": "transport"}][:k]  # fmt: skip
+        return [
+            {
+                "rank": 1,
+                "peer_cik": UAL["cik"],
+                "score": 2.5,
+                "z_text": 2.7,
+                "z_ratio": 0.4,
+                "ticker": "UAL",
+                "company_name": UAL["company_name"],
+                "sector": "transport",
+            }
+        ][:k]
 
     def earlier_chunks(self, cik, year):
-        return [{"para_id": "c2022-0", "period_year": 2022, "heading": "Heading 0",
-                 "text": "text 0"}]  # fmt: skip
+        return [
+            {"para_id": "c2022-0", "period_year": 2022, "heading": "Heading 0", "text": "text 0"}
+        ]
 
 
 class FakeEmbedder:
@@ -90,10 +130,18 @@ def test_company_by_ticker_or_cik_and_bad_keys():
 
 @pytest.mark.parametrize(
     "kwargs",
-    [{"k": 0}, {"k": MAX_K + 1}, {"k": True}, {"fiscal_years": [2017]}, {"fiscal_years": [2026]},
-     {"fiscal_years": list(range(2018, 2027))}, {"fiscal_years": ["2023"]}, {"query": "  "},
-     {"query": "x" * 501}],
-)  # fmt: skip
+    [
+        {"k": 0},
+        {"k": MAX_K + 1},
+        {"k": True},
+        {"fiscal_years": [2017]},
+        {"fiscal_years": [2026]},
+        {"fiscal_years": list(range(2018, 2027))},
+        {"fiscal_years": ["2023"]},
+        {"query": "  "},
+        {"query": "x" * 501},
+    ],
+)
 def test_search_inputs_are_validated(kwargs):
     t, _ = tools()
     args = {"company": "DAL", "query": "fuel prices", "fiscal_years": None, "k": 5} | kwargs
@@ -138,9 +186,11 @@ def test_get_financials_figures_margins_missing_and_no_filing():
 
 def test_margins_and_growth_need_positive_revenue():
     assert margins({"revenue": {"value": 0.0}, "net_income": {"value": 1.0}}) == {}
-    rows = [{"fiscal_year": 2022, "figures": {"revenue": {"value": 100.0}}},
-            {"fiscal_year": 2023, "figures": {"revenue": {"value": 110.0}}},
-            {"fiscal_year": 2025, "figures": {"revenue": {"value": 90.0}}}]  # fmt: skip
+    rows = [
+        {"fiscal_year": 2022, "figures": {"revenue": {"value": 100.0}}},
+        {"fiscal_year": 2023, "figures": {"revenue": {"value": 110.0}}},
+        {"fiscal_year": 2025, "figures": {"revenue": {"value": 90.0}}},
+    ]
     (g,) = growth(rows)  # 2023 vs 2022 only: 2024 is missing
     assert (g["from"], g["to"]) == (2022, 2023) and g["revenue_growth"] == pytest.approx(0.1)
 
@@ -162,8 +212,13 @@ def reply(text="", error=None):
 
 def test_extract_risks_labels_each_hit_and_reports_backend_errors():
     pytest.importorskip("pandas")
-    answer = {"rationale": "r", "category": "regulatory_legal", "severity": 2,
-              "first_seen_year": 2022, "unsure": False}  # fmt: skip
+    answer = {
+        "rationale": "r",
+        "category": "regulatory_legal",
+        "severity": 2,
+        "first_seen_year": 2022,
+        "unsure": False,
+    }
     calls = []
 
     async def extractor(conv, schema, max_tokens):

@@ -395,6 +395,7 @@ class Tools:
         risks = []
         for hit in found["hits"]:
             task = {
+                "task_no": hit["rank"],  # silver_label.parse records it
                 "para_id": hit["chunk_id"],
                 "ticker": c.ticker,
                 "sector": c.sector,

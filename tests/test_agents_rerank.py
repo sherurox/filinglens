@@ -15,16 +15,25 @@ RULE = {"fl_m3_ndcg_after": 0.488, "cuda_if": {"max_abs_ndcg_diff": 0.002, "max_
 
 def test_validate_accepts_good_bodies_and_rejects_bad_ones():
     assert validate({"question": "q", "texts": ["a", "b"]}) == ("q", ["a", "b"])
-    for bad in [[], {"question": "", "texts": ["a"]}, {"question": "q", "texts": []},
-                {"question": "q", "texts": ["a"] * (MAX_TEXTS + 1)},
-                {"question": "q", "texts": [1]}, {"question": "x" * 2001, "texts": ["a"]}]:  # fmt: skip
+    for bad in [
+        [],
+        {"question": "", "texts": ["a"]},
+        {"question": "q", "texts": []},
+        {"question": "q", "texts": ["a"] * (MAX_TEXTS + 1)},
+        {"question": "q", "texts": [1]},
+        {"question": "x" * 2001, "texts": ["a"]},
+    ]:
         with pytest.raises(ValueError):
             validate(bad)
 
 
 def result(device="cuda", errors=0, ndcg=0.4881, p95=300.0) -> dict:
-    return {"device": device, "errors": errors, "metrics": {"ndcg_after": ndcg},
-            "latency_ms": {"p95_ms": p95}}  # fmt: skip
+    return {
+        "device": device,
+        "errors": errors,
+        "metrics": {"ndcg_after": ndcg},
+        "latency_ms": {"p95_ms": p95},
+    }
 
 
 def test_decide_follows_the_rule():
