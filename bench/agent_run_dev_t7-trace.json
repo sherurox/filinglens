@@ -1,0 +1,33 @@
+{
+  "command": "uv run --group api --group agents python -m filinglens.agents.crew run --split dev --qid dev-004 --budget 4096 --max-gemini-calls 2 --tag t7-trace",
+  "started_utc": "2026-11-28T20:50:28+00:00",
+  "routes": {
+    "planner": "vllm",
+    "writer": "gemini",
+    "extract": "vllm"
+  },
+  "budget": 4096,
+  "answers": "data/interim/agents/answers_dev_t7-trace.jsonl",
+  "questions": 1,
+  "status": {
+    "answered": 1
+  },
+  "plan_source": {
+    "model": 1
+  },
+  "plan_valid_rate": 1.0,
+  "attempts": {
+    "1": 1
+  },
+  "gemini_calls": {
+    "used": 1,
+    "cap": 2
+  },
+  "seconds_per_question": {
+    "p50": 4.47,
+    "p95": 4.47
+  },
+  "context_tokens_mean": 2128.0,
+  "tool_errors": 0,
+  "finished_utc": "2026-11-28T20:50:33+00:00"
+}

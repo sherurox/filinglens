@@ -18,6 +18,8 @@ The crew's final output for one question: the answer text, its citations (each a
 
 **Task success** for a question = R1 and R2 and R3 and R4 and R5 all pass.
 
+**What R1's "asks for" means, per template** (fixed 28 Nov 2026, before any dev answer was scored and before the test run): `metric_margin_risk` asks for revenue, operating income and the operating margin; `peer_compare` for the two net margins; `growth` for the revenue growth; `risk_change_metric` for the change, which may be stated as the change itself (growth, or margin points) or as both years' values (revenue in both years, or the margin in both years). Figures a question stores only as inputs (e.g. the revenue behind a margin) are not required.
+
 ## Blocked answers and unanswerable questions
 
 - **Answerable question, answer blocked** (the numbers checker or a guardrail stopped it): task failure. It is counted separately as `blocked`, because a block is safer than a wrong figure; the report gives both numbers.
