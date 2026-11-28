@@ -399,3 +399,79 @@ Reading: all three beat random; filing text carries almost all of the signal, be
 - A/B: the test gain (+0.0888) is larger than dev's (+0.0512); 962 of the 1,137 test queries come from the second batch. A per-batch breakdown was not registered.
 - Peers: SIC codes are a noisy ground truth (one code per company, rarely updated). The 4-digit level passed the 80% rule by a small margin (0.8197). 41% of companies lack liabilities / equity and 13 have no ratios at all, so they sit at the median on those features. 2 companies' latest 10-K is from fiscal 2018 or 2019. The SIC level rule used all companies' label counts (never a score).
 - One run per setting; no seeds to vary except the bootstrap's (fixed at 0).
+
+## FL-M5: serve, optimize and route
+
+The model served here is the FL-M4 student (Qwen3-1.7B + the registry LoRA adapter, `filinglens-risk-student` v1), merged in fp32 on the CPU and cast to bf16 once (`bench/merge.json`; 196 / 196 target tensors). Accuracy is category macro-F1 on the FL-M2 extraction task against silver labels, so it measures agreement with the silver labeler, not correctness. Hardware: RTX 5070 Laptop GPU (8 GB), Ryzen 9 8940HX, AC power, Windows "Best performance" (recorded in every run; `bench/serving_env.txt`).
+
+### Serving formats (D1)
+
+Four GPU builds on vLLM 0.34 and one CPU build on llama.cpp `fa9f928`, all from the same merged weights. Quantization used llm-compressor with one calibration set (32 gold-train rows × 2,048 tokens). RTN-W4A16 (no calibration) was built as a dev-only control for AWQ.
+
+| Build | Kernel | Weights (bytes) | Dev macro-F1 (71 rows) |
+|---|---|---|---|
+| merged-bf16 | bf16 (no quantized linear kernel) | 3,441,185,608 | 0.7414 |
+| fp8-dynamic | Cutlass FP8 scaled MM | 2,033,069,632 | 0.7168 |
+| gptq-w4a16 | Marlin | 1,349,323,448 | 0.7273 |
+| awq-w4a16 | Marlin | 1,349,323,448 | 0.6256 (RTN control 0.6202, `bench/fields_zero_dev_rtn-w4a16.json`) |
+| gguf-q4_k_m | llama.cpp CPU | 1,107,408,736 | 0.6915 |
+
+Load: a closed-loop streaming generator sends the 64 dev prompts at concurrency 1, 4 and 16 after 4 warm-up requests; one server at a time, VRAM back to idle between builds (`scripts/fl_m5_serving.sh`). Highlights from `bench/serving.csv` (0 errors in every row):
+
+- At concurrency 1 the W4A16 builds are fastest (p95 latency GPTQ 0.5269 s, AWQ 0.5444 s vs BF16 0.9836 s): decoding one sequence is memory-bound, and 4-bit weights move a quarter of the bytes.
+- At concurrency 16 FP8 leads (412.96 output tokens/s vs 358.17 GPTQ and 291.75 BF16): batched decoding becomes compute-bound, where FP8 tensor-core matmuls help and W4A16's dequantization does not.
+- Smaller weights leave room for KV cache: 17,920 tokens (BF16), 28,672 (FP8), 34,816 (W4A16).
+- llama.cpp on the CPU gives 14.22–18.24 output tokens/s and p95 latency of 63.6348 s at concurrency 16: an edge fallback, not a serving option.
+
+The test run (65 rows, once, rule `bench/m5_serving_rule.json` committed in `3873679` first) compared each build with BF16 by paired bootstrap; a build counts as "lower than BF16" only if the CI's upper end is below 0. Test macro-F1: BF16 0.7948 (= the FL-M4 registry number), FP8 0.8011, GPTQ 0.8081, AWQ 0.7456, GGUF 0.7641; every CI includes 0 (AWQ −0.0492 [−0.1401, 0.029], GGUF −0.0307 [−0.1407, 0.0552]), so no build was detected as lower. With 65 rows the CIs are wide: a real drop of a few points would also go undetected. On dev, AWQ (0.6256) scored about the same as the uncalibrated RTN control (0.6202), so 32 calibration rows may be too few for AWQ's per-channel scales to help; that was not tested further.
+
+### ONNX reranker
+
+`BAAI/bge-reranker-base` exported to ONNX with eager attention (the SDPA export doesn't match ONNX Runtime's attention fusion), optimized and cast to fp16. On ret-dev it matched PyTorch (NDCG@10 0.4879 vs 0.488) and was the fastest ONNX variant, so it was the one candidate for ret-test (rule `bench/m5_onnx_rule.json`). On all 1,137 ret-test queries: NDCG@10 0.5123 vs 0.5125 for PyTorch fp16 (FL-M3's number reproduced, gap 0.0), recall@10 0.7863 vs 0.7872, MRR@10 0.5919 for both; forward p50 184.98 ms vs 215.24 ms (`bench/reranker_onnx_test.json`). On the CPU, ONNX Runtime fp32 took 5,810.57 ms per query on dev vs 7,751.6 ms for PyTorch: neither is usable for 50 pairs per query.
+
+### Router (D2)
+
+Inputs are dev measurements for three backends (local vLLM GPTQ, local llama.cpp GGUF, `gemini-3.1-flash-lite` on the free tier) and three request classes (`bench/router_inputs.json`, every price and limit with its source and date):
+
+- Extraction (71 dev rows): macro-F1 0.7273 / 0.6915 / 0.7175; Gemini's latency has a long tail (p50 0.9957 s, p95 35.8576 s).
+- Short Q&A (182 ret-dev questions with their source paragraph): token-F1 against the synthetic answers 0.5481 / 0.5385 / 0.4994, with seeded bootstrap CIs in `bench/qa_dev_*.json`.
+- Long synthesis: eligibility only. It needs 16,384 tokens of context; the local builds serve 4,608, so only Gemini qualifies.
+- Cost per request: Gemini tokens × the paid-tier list price (the free tier costs $0, so this is the price of the same traffic at scale); local backends: measured latency × power × electricity at the EIA US average (18.17 ¢/kWh), with CPU power an unmeasured 75 W upper bound.
+
+The linear program (`serve/router.py`, scipy HiGHS) chooses the share of each class sent to each eligible backend to minimize daily cost, subject to: each class fully routed; each class's mean accuracy at or above its floor; Gemini's free-tier requests per day, requests per minute and tokens per minute; and each local backend's busy seconds per day. The latency limit is not a row: p95 doesn't add up over a blend, so a backend whose dev p95 exceeds the class limit (5 s for Q&A, 60 s for extraction) is simply not eligible. Floors are the best eligible accuracy minus 0.01 (rule `bench/m5_router_rule.json`, committed before any router code). The baseline, `serve/greedy.py` (hand-written), sends each class to its cheapest backend above the floor and spills to the next when capacity runs out, class by class.
+
+Results (`bench/router_results.json`, 500 / 200 / 50 requests per day):
+
+- **GPU on:** the cheapest backend for each class is also above its floor, so the LP and greedy agree: $0.230640 / day; savings $0.
+- **GPU off:** the extraction floor (0.7075) sits between GGUF (0.6915) and Gemini (0.7175). The LP blends 192.31 requests to GGUF and 307.69 to Gemini so that the mean meets the floor exactly, and routes everything for $0.403769 / day. The floor's dual value is −10.417: each +0.01 of required extraction accuracy costs about $0.104 per day. Greedy can't blend: it sends all 500 extraction requests to Gemini, which uses up the 500 requests/day cap, and the 50 long-synthesis requests (Gemini only) go unrouted.
+- **Infeasible case:** at 600 long-synthesis requests per day no routing exists. Dropping one constraint row at a time, only removing the Gemini daily cap makes it feasible, so the report names `gemini_rpd`.
+- **Floor sweep** (31 floors, step 0.0025; `bench/router_sweep.png`): wherever both route all traffic (20 floors) they cost the same; at 9 floors the LP routes everything and greedy does not.
+
+Reading: on this traffic the LP's value is not a cheaper price for the same routing; it is meeting a quality target by blending, and finding a full routing under a shared cap where class-by-class greedy strands a class. The tests check the LP against a brute-force grid on 120 random small problems, and that whenever greedy routes everything, the LP is never more expensive, on 300 random problems (`tests/test_serve_router.py`).
+
+### Cost meter
+
+`serve/cost_meter.py` wraps any backend: each call writes one row to Postgres (`serve.requests`: route, user, backend, tokens, latency, list-price cost, error) and one OpenTelemetry span with the GenAI client-inference attributes; a failing sink never fails the request. A replay of 251 dev requests in 3 concurrent lanes across the three backends gave 251 rows and 251 spans with the same trace ids, 0 errors, and a list-price cost of $0.0061083, 92.4% of it from Gemini's 40 short-Q&A requests (16% of the traffic; `bench/cost_meter_demo-20261126.json`). Actual spend: $0.
+
+### API and deployment (D3)
+
+The deployed API answers questions about one company's risk factors: `/search` embeds the question and returns that company's top chunks; `/answer` sends the top 5 to Gemini and returns the answer with `[n]` citations checked against the excerpts; `/costs` reads the meter.
+
+- **Query encoder without torch:** bge-base exported to ONNX and quantized to int8 (dynamic, per tensor). Rule `bench/m5_embed_rule.json`, fixed first: the fp32 graph must reproduce FL-M3's query vectors (lowest cosine ≥ 0.999; measured 0.999999), and int8 ships if ret-dev recall@10 drops by at most 0.01. Measured: 0.2912 vs 0.2967 (drop 0.0055), p50 18.06 ms vs 54.47 ms on one CPU thread, 109,361,320 vs 435,612,018 bytes, so int8 ships. It reshuffles results, though: its top 10 equals FL-M3's on only 12 of 182 queries (fp32: 145).
+- **Demo database:** the 77 ret-dev companies' 59,263 chunks with FL-M3's stored vectors; exact inner-product search within the company (a bitmap scan on the `cik` B-tree, then a sort), no HNSW, because FL-M3's filtered queries never used it. With FL-M3's own query vectors recall@10 is 0.6758 (= FL-M3's filtered exact search), locally and on Neon; with the int8 encoder 0.6648 (`bench/demo_db_check_{local,neon}.json`).
+- **Image:** python:3.12-slim pinned by digest, hash-pinned requirements exported from the `api` dependency group (no torch, pandas or transformers), the int8 graph and tokenizer copied in, non-root uid 10001: 181,358,328 bytes in the registry, healthy 1.27 s after `docker run` (`bench/api_image.json`).
+- **From outside** (`bench/cloud_run_check.json`, `api/cloud_check.py`): the 182 ret-dev questions through the public `/search` gave 122 hits vs 121 locally with the same encoder. One query differs, within the tolerance fixed in the check before it ran: ONNX Runtime may pick different int8 kernels on Cloud Run's CPU. Cold start after a day idle: 9.4 s from Cloud Run's "Starting new instance" to uvicorn's "Application startup complete". `/search` from the laptop, network included: p50 175.4 ms and p95 554.0 ms right after the cold start, p50 149.2 ms and p95 169.7 ms warm (`git show 032945e:bench/cloud_run_check.json`).
+
+Findings from the deployment:
+
+- An empty `DATABASE_URL` used to mean "use the local database", so a shell variable that silently failed to load sent the first "Neon" run to the laptop's Postgres, and the record called it Neon. The cause was an unquoted `&` in `.env`: `source` ran the assignment in the background. Now an empty `DATABASE_URL` is an error and `demo_db --tag neon` refuses a non-Neon URL (`dd18d48`).
+- The first outside check reported a mismatch for a one-query difference: it compared recalls rounded to 4 decimals, and 0.0055 > 1/182 = 0.0054945. Tolerances are now compared as hit counts (`b46b193`).
+- Loading the 316 MB demo schema into Neon from the laptop took 3,188.9 s (about 67 KB/s), while pushing the 181 MB image took 8 s. One explanation that fits: the COPY stream was limited by the ~125 ms round trip rather than bandwidth. It was not tested (`docs/LATER.md`).
+- Gemini's free tier sometimes answers HTTP 503 (the API returns 502 with the search hits) and has a long latency tail: one `/answer` call took 117.6 s, close to Cloud Run's 120 s request timeout.
+
+### Limits
+
+- Accuracy is agreement with silver labels on small splits (71 dev, 65 test rows); test CIs are wide.
+- Serving numbers come from one laptop GPU and one CPU; one run per setting.
+- Router inputs are dev measurements on one day; Gemini latency varied widely between runs (short-Q&A p95 20.3861 s on 26 Nov in T9, 5.18 s in the T11 replay). Local electricity cost uses an estimated CPU power, not a measured one. Costs are list prices; actual spend was $0.
+- The deployed `/answer` is not evaluated for faithfulness: citations are checked to point at a real excerpt, not to support the sentence.

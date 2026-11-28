@@ -2,7 +2,7 @@
 
 Reads US public-company filings from SEC EDGAR and answers analyst questions about them with cited numbers. Full specification: [docs/SPEC.md](docs/SPEC.md).
 
-**Status:** milestones **FL-M1 (data foundation)**, **FL-M2 (labels, OCR and extraction)**, **FL-M3 (retrieval, ranking and offline A/B)** and **FL-M4 (fine-tune and distill)** are complete. The other milestones (serving, agents, evaluation) are not built yet.
+**Status:** milestones **FL-M1 (data foundation)**, **FL-M2 (labels, OCR and extraction)**, **FL-M3 (retrieval, ranking and offline A/B)**, **FL-M4 (fine-tune and distill)** and **FL-M5 (serve, optimize and route)** are complete. The other milestones (agents, evaluation) are not built yet. A live demo runs on Cloud Run: [Live demo](#live-demo-fl-m5-cloud-run).
 
 ## FL-M1 results
 
@@ -83,6 +83,26 @@ A 1.7B student (Qwen3-1.7B, QLoRA on the 8 GB laptop GPU) distilled from an 8B t
 - [x] **D2:** training curves and peak VRAM recorded.
 - [x] **D3:** model and adapter in the registry; `docs/EXPERIMENTS.md` updated.
 
+## FL-M5 results
+
+The FL-M4 student (Qwen3-1.7B + LoRA) served five ways on the laptop, a cost router over three backends, a cost meter, and a small search-and-answer API deployed at $0. Settings were chosen on dev; each test split was run once under a rule committed before it (`bench/m5_*_rule.json`). Details: [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md#fl-m5-serve-optimize-and-route).
+
+| Part | Result | Evidence |
+|---|---|---|
+| **Serving formats (D1)** | Merged BF16, FP8-dynamic, GPTQ-W4A16 and AWQ-W4A16 on vLLM 0.34 (RTX 5070 Laptop, 8 GB) and GGUF Q4_K_M on llama.cpp (CPU), 64 requests at concurrency 1 / 4 / 16, 0 errors. Output tokens/s at c=16: BF16 291.75, FP8 412.96, GPTQ 358.17, AWQ 358.93, GGUF 18.24; p95 latency at c=1: 0.9836 / 0.6332 / 0.5269 / 0.5444 / 4.8413 s. Test macro-F1 (65 rows, once): BF16 0.7948, FP8 0.8011, GPTQ 0.8081, AWQ 0.7456, GGUF 0.7641; every difference from BF16 is "no difference detected" (paired bootstrap CIs include 0); all 65 / 65 rule-valid | `bench/serving.csv`, `bench/serving.png`, `bench/serving_commands.md`, rule `bench/m5_serving_rule.json` |
+| ONNX reranker | `bge-reranker-base` exported to ONNX (fp16, CUDA): on all 1,137 ret-test queries NDCG@10 0.5123 vs 0.5125 for PyTorch (FL-M3's number reproduced), forward p50 184.98 ms vs 215.24 ms | `bench/reranker_onnx_test.json`, `bench/reranker_onnx.csv`, rule `bench/m5_onnx_rule.json` |
+| Router inputs (dev) | Three backends × three request classes. Extraction macro-F1: vLLM GPTQ 0.7273, GGUF 0.6915, Gemini 0.7175 (Gemini p95 35.8576 s). Short Q&A token-F1 (182 questions): 0.5481 / 0.5385 / 0.4994. Long synthesis: only Gemini fits the 16,384-token context. Costs from Gemini list prices and electricity at the EIA US average | `bench/router_inputs.json`, `bench/qa_dev_*.json`, `bench/fields_zero_dev_gemini-3.1-flash-lite.json` |
+| **Router (D2)** | Linear program (scipy HiGHS) vs a greedy baseline (`serve/greedy.py`, hand-written) on the same traffic (500 / 200 / 50 requests per day). GPU on: both $0.230640 / day. GPU off: the LP blends extraction across GGUF (192.31) and Gemini (307.69) to meet the accuracy floor exactly and routes everything for $0.403769 / day; greedy spends Gemini's 500 requests/day on extraction and leaves the 50 long-synthesis requests unrouted. At 600 long-synthesis requests the LP is infeasible and names Gemini's daily cap | `notebooks/router.ipynb`, `bench/router_results.json`, `bench/router_sweep.png`, rule `bench/m5_router_rule.json` |
+| Cost meter | Every model call writes a Postgres row and an OpenTelemetry GenAI span: a 251-request replay over the three backends gave 251 rows = 251 spans; list-price cost $0.0061083, 92.4% of it from Gemini's 40 requests | `bench/cost_meter_demo-20261126.json`, `bench/cost_meter_demo-20261126.png` |
+| API query encoder | bge-base as int8 ONNX on 1 CPU thread: 109,361,320 B, p50 18.06 ms, ret-dev recall@10 0.2912 vs 0.2967 (drop 0.0055, within the pre-registered 0.01) | `bench/embed_onnx_check.json`, rule `bench/m5_embed_rule.json` |
+| API image | python:3.12-slim (pinned by digest), no torch: 181,358,328 B in the registry, 447,714,271 B unpacked, healthy 1.27 s after `docker run`, runs as uid 10001 | `bench/api_image.json` |
+| **Live demo (D3)** | Cloud Run + Neon + Gemini free tier, actual spend $0: see the next section | `bench/cloud_run_check.json`, `bench/demo_db_check_neon.json` |
+
+**"Done when" (spec §4 M5):**
+- [x] **D1:** `bench/serving.csv` and a chart are committed, with the exact command used.
+- [x] **D2:** the router notebook shows constraints, solution and savings vs greedy on the same traffic mix.
+- [x] **D3:** the Cloud Run URL works; teardown steps are in the README.
+
 ## Live demo (FL-M5, Cloud Run)
 
 **URL:** https://filinglens-api-557912440708.us-east1.run.app (public, no key; scales to zero, so the first request after an idle period takes about 10 s).
@@ -116,7 +136,7 @@ curl -s $URL/costs                           # list-price cost of the metered /a
 | `/answer` (3 companies) | 3 / 3 answered with `[n]` citations; Gemini latency 0.77 s, 3.82 s and 21.05 s in one run (heavy tail, as in T9) | `bench/cloud_run_check.json` |
 | Cost | list price $0.00144425 per 3 answers, and `/costs` reports exactly the sum of all calls; **actual spend $0** | `bench/cloud_run_check.json` |
 
-**Limits:** a public demo, not a load test: one instance with one database connection (concurrency 4). `/answer` is capped by the Gemini free tier (beyond it the API returns 429); its daily counter lives in the container's `/tmp` and resets on a cold start, while Google's own quota still applies. Answers are not yet evaluated for faithfulness; citations are only checked to point at a real excerpt. Loading the demo database from the laptop took 3,188.9 s (`bench/demo_db_build_neon.json`).
+**Limits:** a public demo, not a load test: one instance with one database connection (concurrency 4). `/answer` is capped by the Gemini free tier (beyond it the API returns 429); its daily counter lives in the container's `/tmp` and resets on a cold start, while Google's own quota still applies. When the free tier is overloaded (Gemini HTTP 503) `/answer` returns 502 with the search hits, and Gemini's latency has a long tail: three identical requests on 28 Nov took 1.136 s, 1.057 s and 117.596 s, the last close to the service's 120 s request timeout (curl, not in a bench file). Answers are not yet evaluated for faithfulness; citations are only checked to point at a real excerpt. Loading the demo database from the laptop took 3,188.9 s (`bench/demo_db_build_neon.json`).
 
 ## Layout
 
@@ -133,6 +153,11 @@ src/filinglens/
               MLflow helpers, dev evaluation, paired bootstrap, Optuna search
   retrieval/  chunks, graded queries, embeddings, FAISS / pgvector / Qdrant stores and benchmark,
               ranking metrics, reranker, offline A/B (power analysis, cluster bootstrap), peers
+  serve/      merge, quantization (llm-compressor), GGUF client, vLLM wrapper, load generator, GPU
+              monitor, ONNX reranker and query encoder, backends (OpenAI-compatible, Gemini), router
+              inputs, LP router and greedy baseline, cost meter (Postgres + OpenTelemetry)
+  api/        FastAPI app (/health, /companies, /search, /answer, /costs), int8 query encoder,
+              demo database, outside check of the deployed URL
   bench/      dbt run_results summary
 dagster_project/  Dagster assets and the backfill report
 dbt/              staging -> intermediate -> marts (DuckDB and BigQuery targets), tests, docs
@@ -140,8 +165,10 @@ gold/             silver risk-paragraph splits, table pages with truth, master c
                   synthetic Q&A, retrieval queries (all committed; "gold" is the spec's directory name)
 sql/              8 hand-written queries, their index changes, plans, RESULTS.md
 infra/terraform/gcp/  BigQuery datasets (state in HCP Terraform)
-notebooks/        data profiling; the Databricks notebook; the Kaggle teacher driver
-scripts/          FL-M4 ablation runner, FL-M3 environment record
+notebooks/        data profiling; the Databricks notebook; the Kaggle teacher driver; the FL-M5 router
+scripts/          FL-M4 ablation runner, FL-M3 environment record, FL-M5 GGUF build, serving benchmark,
+                  image measurement
+Dockerfile        the API image (python:3.12-slim by digest, hash-pinned requirements-api.txt)
 bench/            committed benchmark outputs (each records the command that made it)
 docs/             SPEC, DATA, EXPERIMENTS, LABELING_GUIDE, LATER, labeling prompts, dbt docs site
 data/             git-ignored: downloads, Iceberg warehouse, DuckDB file
@@ -276,6 +303,69 @@ $GPU -m filinglens.extract.fields generate --variant zero --split test --allow-t
 $GPU -m filinglens.extract.fields generate --variant zero --split test --allow-test $EVAL --max-lora-rank 16 \
   --lora data/interim/adapters/teacher-n1500-r16-lr0.0002-e1/adapter
 uv run python -m filinglens.train.final_comparison --allow-test
+```
+
+## Running FL-M5
+
+Five environments: `uv run` (main; add `--group api` for the API), `~/venvs/fl-train` (merge, ONNX export), `~/venvs/fl-quant` (llm-compressor), `~/venvs/fl-gpu` (vLLM 0.34), `~/venvs/fl-onnx` (ONNX Runtime GPU; run with `PYTHONPATH=src`). Versions: `bench/serving_env.txt`. Gemini needs `GEMINI_API_KEY` in `.env` (AI Studio, free tier, no billing).
+
+```bash
+TRAIN=~/venvs/fl-train/bin/python; QUANT="env PYTHONPATH=src $HOME/venvs/fl-quant/bin/python"
+ONNX="env PYTHONPATH=src $HOME/venvs/fl-onnx/bin/python"; MODE="AC power, Best performance"
+$TRAIN -m filinglens.serve.merge                                   # registry adapter -> merged BF16
+for s in fp8 gptq awq rtn; do $QUANT -m filinglens.serve.quantize --scheme $s --note "$MODE"; done
+bash scripts/fl_m5_gguf.sh                                         # llama.cpp CPU build + Q4_K_M
+bash scripts/fl_m5_serving.sh load "$MODE"                         # dev load runs, all builds
+bash scripts/fl_m5_serving.sh test "$MODE"                         # the one test run (rule committed first)
+bash scripts/fl_m5_serving.sh table                                # bench/serving.csv + chart (D1)
+# ONNX reranker: dev parity per engine is in serve/onnx_reranker.py's docstring; the one ret-test run:
+$TRAIN -m filinglens.serve.onnx_reranker export --attn eager
+$ONNX -m filinglens.serve.onnx_reranker optimize --source eager
+$TRAIN -m filinglens.serve.onnx_reranker inputs --split test --allow-test
+$TRAIN -m filinglens.serve.onnx_reranker score --split test --allow-test --engine torch --device cuda --dtype fp16 --note "$MODE"
+$ONNX -m filinglens.serve.onnx_reranker score --split test --allow-test --engine ort --device cuda --graph eager-opt-fp16 --note "$MODE"
+uv run python -m filinglens.serve.onnx_reranker compare --split test --allow-test
+# router inputs (dev), router, notebook (D2)
+uv run python -m filinglens.serve.router_inputs extract --rpm 15 --rpd 500
+uv run python -m filinglens.extract.fields score --variant zero --split dev --tag gemini-3.1-flash-lite
+for b in "gemini --rpm 15 --rpd 500" "vllm --model gptq-w4a16" gguf; do
+  uv run python -m filinglens.serve.router_inputs qa --backend $b; done
+uv run python -m filinglens.serve.router_inputs assemble
+uv run python -m filinglens.serve.router
+uv run --with nbconvert --with ipykernel jupyter nbconvert --to notebook --execute --inplace notebooks/router.ipynb
+# cost meter demo (local servers up)
+uv run python -m filinglens.serve.cost_demo replay --tag demo-20261126 --rpm 15 --rpd 500
+uv run python -m filinglens.serve.cost_demo report --tag demo-20261126
+# API: query encoder, demo database, image
+$TRAIN -m filinglens.serve.onnx_embedder export && $ONNX -m filinglens.serve.onnx_embedder optimize
+uv run --group api python -m filinglens.serve.onnx_embedder check --split dev
+uv run python -m filinglens.api.demo_db build && uv run --group api python -m filinglens.api.demo_db check
+bash scripts/fl_m5_image.sh
+```
+
+Cloud Run + Neon (D3). `.env` holds `GCP_PROJECT`, `GCP_REGION=us-east1`, `GEMINI_API_KEY` and `NEON_DATABASE_URL` (the Neon direct connection string, **single-quoted**: it contains `&`). A new project on the $300 trial with a $5 budget alert; never upgrade the trial.
+
+```bash
+set -a; source .env; set +a
+DATABASE_URL="$NEON_DATABASE_URL" uv run python -m filinglens.api.demo_db build --tag neon
+DATABASE_URL="$NEON_DATABASE_URL" uv run --group api python -m filinglens.api.demo_db check --tag neon
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com iam.googleapis.com
+gcloud artifacts repositories create filinglens --repository-format=docker --location="$GCP_REGION"
+IMG="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/filinglens/filinglens-api:$(git rev-parse --short HEAD)"
+gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" --quiet
+docker tag filinglens-api:local "$IMG" && docker push "$IMG"
+printf '%s' "$GEMINI_API_KEY" | gcloud secrets create gemini-api-key --data-file=-
+printf '%s' "$NEON_DATABASE_URL" | gcloud secrets create neon-database-url --data-file=-
+gcloud iam service-accounts create filinglens-api
+SA="filinglens-api@$GCP_PROJECT.iam.gserviceaccount.com"
+for s in gemini-api-key neon-database-url; do
+  gcloud secrets add-iam-policy-binding $s --member="serviceAccount:$SA" --role=roles/secretmanager.secretAccessor; done
+gcloud run deploy filinglens-api --image="$IMG" --region="$GCP_REGION" --service-account="$SA" \
+  --port=8080 --cpu=1 --memory=1Gi --concurrency=4 --min-instances=0 --max-instances=1 --timeout=120 \
+  --allow-unauthenticated --set-secrets=GEMINI_API_KEY=gemini-api-key:1,DATABASE_URL=neon-database-url:1 \
+  --set-env-vars=GEMINI_RPM=15,GEMINI_RPD=500,EMBED_THREADS=1
+URL=$(gcloud run services describe filinglens-api --region="$GCP_REGION" --format='value(status.url)')
+uv run --group api python -m filinglens.api.cloud_check --url "$URL" --project "$GCP_PROJECT"
 ```
 
 ## Resources and teardown ($0)
