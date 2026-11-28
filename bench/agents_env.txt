@@ -1,0 +1,65 @@
+# FL-M6 agents environment
+recorded_utc: 2026-11-28T19:42:26Z
+command: bash scripts/fl_m6_env.sh
+git: 3c92edc; uncommitted outside bench/: .github/workflows/python-ci.yml PROVENANCE.md pyproject.toml uv.lock scripts/fl_m6_env.sh tests/test_agents_workflow_smoke.py 
+uv: uv 0.13.8 (x86_64-unknown-linux-gnu)
+python (uv env): 3.12.16
+
+## node (promptfoo needs ^20.20.0 or >=22.22.0)
+node: not installed
+promptfoo: not installed (T13)
+
+## containers (name, image, image ID)
+filinglens-postgres pgvector/pgvector:0.8.7-pg18-trixie sha256:ab49524d18df7200b74ac9a475e1db6297fc1eb57da4c214c63d10ecc4b754fa
+filinglens-qdrant qdrant/qdrant:v1.20.2 sha256:d277592721d2e3b73f9b797b53cf05e6a5bb2134f6d13fdbda4ca51782afbcac
+filinglens-mlflow ghcr.io/mlflow/mlflow:v3.18.0 sha256:257204c77980b0f3450a26eb6089e487603fcdd4509529eadaf88f90669f5c13
+
+## agents group: direct dependencies (pyproject.toml)
+agents = [
+    "llama-index-workflows==2.26.1",
+    "mcp==2.3.0",
+]
+
+## agents group: every resolved package, version and declared license
+annotated-types 0.8.0 | license: MIT | classifiers: MIT License
+anyio 4.16.0 | license: MIT | classifiers: -
+attrs 26.1.0 | license: MIT | classifiers: -
+cffi 2.1.1 | license: MIT-0 | classifiers: -
+click 8.5.1 | license: BSD-3-Clause | classifiers: -
+cryptography 50.0.2 | license: Apache-2.0 OR BSD-3-Clause | classifiers: -
+deprecated 3.0.1 | license: MIT | classifiers: -
+h11 0.16.0 | license: MIT | classifiers: MIT License
+httpcore2 2.16.2 | license: BSD-3-Clause | classifiers: BSD License
+httpx2 2.16.2 | license: BSD-3-Clause | classifiers: BSD License
+httpx2-jsfetch | not installed
+idna 3.20 | license: BSD-3-Clause | classifiers: -
+jsonschema 4.26.0 | license: MIT | classifiers: -
+jsonschema-specifications 2025.9.1 | license: MIT | classifiers: -
+llama-index-instrumentation 0.6.0 | license: MIT | classifiers: -
+llama-index-workflows 2.26.1 | license: MIT | classifiers: -
+mcp 2.3.0 | license: MIT | classifiers: MIT License
+mcp-types 2.3.0 | license: MIT | classifiers: MIT License
+opentelemetry-api 1.45.2 | license: Apache-2.0 | classifiers: -
+pycparser 3.12 | license: BSD-3-Clause | classifiers: -
+pydantic 2.14.3 | license: MIT | classifiers: -
+pydantic-core 2.50.4 | license: MIT | classifiers: -
+pyjwt 2.15.1 | license: MIT | classifiers: -
+python-multipart 0.0.34 | license: Apache-2.0 | classifiers: Apache Software License
+pywin32 | not installed
+referencing 0.37.0 | license: MIT | classifiers: -
+rpds-py 2026.9.1 | license: MIT | classifiers: -
+sse-starlette 3.7.1 | license: BSD-3-Clause | classifiers: -
+starlette 1.10.0 | license: BSD-3-Clause | classifiers: -
+truststore 0.10.5 | license: MIT | classifiers: -
+typing-extensions 4.16.0 | license: PSF-2.0 | classifiers: -
+typing-inspection 0.4.5 | license: MIT | classifiers: -
+uvicorn 0.54.0 | license: BSD-3-Clause | classifiers: -
+wrapt 2.5.2 | license: BSD-2-Clause | classifiers: -
+
+## shared packages the crew also uses (api group)
+psycopg 3.3.9 | license: LGPL-3.0-only | classifiers: -
+pgvector 0.5.1 | license: MIT | classifiers: -
+onnxruntime 1.32.0 | license: MIT License | classifiers: MIT License
+tokenizers 0.23.3 | license: - | classifiers: Apache Software License
+numpy 2.5.5 | license: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | classifiers: -
+opentelemetry-sdk 1.45.2 | license: Apache-2.0 | classifiers: -

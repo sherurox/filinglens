@@ -37,7 +37,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.3
         with:
           enable-cache: true
-      - run: uv sync --locked
+      - run: uv sync --locked --group agents
       - run: uv run ruff format --check .
       - run: uv run ruff check .
-      - run: uv run pytest -v
+      - run: uv run --group agents pytest -v
